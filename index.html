@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portfolio de Juan Decoud</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #6e44ff, #b892ff);
+      color: #fff;
+      min-height: 100vh;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: fadeIn 1.2s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+
+    p.subtitle {
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+      text-align: center;
+      color: #e0d4ff;
+    }
+
+    .projects {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .project {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      transition: transform 0.3s ease, background 0.3s ease;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .project:hover {
+      transform: translateY(-5px);
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .project a {
+      color: #fff;
+      font-weight: 600;
+      font-size: 1.1rem;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .project a:hover {
+      color: #e2c1ff;
+    }
+
+    footer {
+      margin-top: auto;
+      padding: 2rem 0 1rem;
+      font-size: 0.9rem;
+      color: #d1c6ff;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Juan Manuel Decoud</h1>
+  <p class="subtitle">Estudiante de Ingeniería Informática · Portfolio de proyectos</p>
+
+  <section class="projects">
+    <div class="project">
+      <a href="https://github.com/DecoudJuan/Laboratorio1" target="_blank">🚗 App Ubica2</a>
+      <p>Sistema de gestión de estacionamientos desarrollado con Flask. Incluye autenticación con encriptación de contraseñas, base de datos PostgreSQL, ABM de usuarios, vehículos y parkings, y envío automatizado de correos.</p>
+    </div>
+    <div class="project">
+      <a href="https://github.com/emmabeni27/Portatic" target="_blank">🔐 Sistema de puertas</a>
+      <p>Proyecto para control de accesos. Dispositivos ESP32 y ESP01 se comunican con un servidor Mosquitto MQTT. El backend, desarrollado con Flask, gestiona llaves digitales, puertas, usuarios y permisos. La base de datos utilizada es MySQL, y el sistema permite registro, autenticación JWT y monitoreo remoto.</p>
+    </div>
+    <div class="project">
+      <a href="https://github.com/austral-ingsis-classroom/chess-DecoudJuan" target="_blank">♟️ Ajedrez/ Damas</a>
+      <p>Proyecto académico desarrollado en Java para la materia Diseño de Sistemas (Universidad Austral). Implementa el juego de ajedrez y damas utilizando patrones de diseño y una arquitectura orientada a objetos. Se desarrolló un adaptador para integrar una interfaz gráfica provista por la cátedra, así como toda la lógica de juego, tablero y movimientos válidos.</p>
+    </div>
+  </section>
+
+  <footer>
+    © 2025 Juan Decoud · <a href="https://www.linkedin.com/in/juan-decoud-7aa608232/" target="_blank" style="color: #c8a7ff;">LinkedIn</a>
+  </footer>
+
+</body>
+</html>

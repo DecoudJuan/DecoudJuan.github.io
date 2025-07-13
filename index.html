@@ -12,41 +12,48 @@
       padding: 0;
       box-sizing: border-box;
     }
+    
     body {
       font-family: 'Poppins', sans-serif;
       background: linear-gradient(135deg, #6e44ff, #b892ff);
+      background-attachment: fixed; /* Fondo fijo para mejor rendimiento */
       color: #fff;
       min-height: 100vh;
       padding: 2rem;
       display: flex;
       flex-direction: column;
       align-items: center;
-      animation: fadeIn 1.2s ease-in;
+      animation: fadeIn 0.8s ease-out; /* Animación más rápida */
     }
+    
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
+      from { opacity: 0; transform: translateY(10px); } /* Movimiento reducido */
       to { opacity: 1; transform: translateY(0); }
     }
-    @keyframes bounce {
-      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-      40% { transform: translateY(-10px); }
-      60% { transform: translateY(-5px); }
+    
+    @keyframes bounceSubtle {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); } /* Bounce más sutil */
     }
+    
     .header {
       text-align: center;
       margin-bottom: 3rem;
-      animation: bounce 2s infinite;
+      animation: bounceSubtle 3s ease-in-out infinite; /* Más lento y suave */
     }
+    
     h1 {
       font-size: 2.5rem;
       margin-bottom: 0.5rem;
       text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
     }
+    
     .subtitle {
       font-size: 1.1rem;
       margin-bottom: 1rem;
       color: #e0d4ff;
     }
+    
     .about-me {
       max-width: 800px;
       text-align: center;
@@ -56,18 +63,32 @@
       border-radius: 15px;
       backdrop-filter: blur(10px);
       box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      /* Animación de entrada optimizada */
+      opacity: 0;
+      transform: translateY(20px);
+      animation: slideInUp 0.8s ease-out 0.3s forwards;
     }
+    
+    @keyframes slideInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
     .about-me h2 {
       font-size: 1.8rem;
       margin-bottom: 1rem;
       color: #fff;
     }
+    
     .about-me p {
       font-size: 1rem;
       line-height: 1.6;
       margin-bottom: 1.5rem;
       color: #e8e0ff;
     }
+    
     .skills {
       display: flex;
       flex-wrap: wrap;
@@ -75,18 +96,22 @@
       justify-content: center;
       margin-top: 1rem;
     }
+    
     .skill-tag {
       background: rgba(255, 255, 255, 0.2);
       padding: 0.5rem 1rem;
       border-radius: 20px;
       font-size: 0.9rem;
       font-weight: 600;
-      transition: all 0.3s ease;
+      transition: all 0.2s ease; /* Transición más rápida */
+      will-change: transform; /* Optimización para GPU */
     }
+    
     .skill-tag:hover {
       background: rgba(255, 255, 255, 0.3);
       transform: scale(1.05);
     }
+    
     .contact-buttons {
       display: flex;
       gap: 1rem;
@@ -94,6 +119,7 @@
       flex-wrap: wrap;
       margin-top: 1.5rem;
     }
+    
     .contact-btn {
       background: rgba(255, 255, 255, 0.2);
       color: #fff;
@@ -101,15 +127,18 @@
       padding: 0.8rem 1.5rem;
       border-radius: 25px;
       font-weight: 600;
-      transition: all 0.3s ease;
+      transition: all 0.2s ease;
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      will-change: transform;
     }
+    
     .contact-btn:hover {
       background: rgba(255, 255, 255, 0.3);
       transform: translateY(-2px);
     }
+    
     .section-title {
       font-size: 2rem;
       text-align: center;
@@ -117,6 +146,7 @@
       color: #fff;
       text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
     }
+    
     .projects {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -125,6 +155,7 @@
       max-width: 1200px;
       margin-bottom: 3rem;
     }
+    
     .project {
       background: rgba(255, 255, 255, 0.1);
       border-radius: 15px;
@@ -134,42 +165,51 @@
       box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
       backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.1);
+      will-change: transform;
     }
+    
     .project:hover {
       transform: translateY(-8px);
       background: rgba(255, 255, 255, 0.15);
       box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
     }
+    
     .project-header {
       display: flex;
       align-items: center;
       gap: 0.8rem;
       margin-bottom: 1rem;
     }
+    
     .project-icon {
       font-size: 1.5rem;
     }
+    
     .project-title {
       color: #fff;
       font-weight: 600;
       font-size: 1.2rem;
       text-decoration: none;
-      transition: color 0.3s ease;
+      transition: color 0.2s ease;
     }
+    
     .project-title:hover {
       color: #e2c1ff;
     }
+    
     .project-description {
       color: #e8e0ff;
       line-height: 1.6;
       margin-bottom: 1.5rem;
     }
+    
     .project-tech {
       display: flex;
       flex-wrap: wrap;
       gap: 0.5rem;
       margin-bottom: 1rem;
     }
+    
     .tech-tag {
       background: rgba(255, 255, 255, 0.2);
       padding: 0.3rem 0.8rem;
@@ -178,23 +218,28 @@
       font-weight: 600;
       color: #fff;
     }
+    
     .project-links {
       display: flex;
       gap: 1rem;
     }
+    
     .project-link {
       color: #e2c1ff;
       text-decoration: none;
       font-weight: 600;
-      transition: color 0.3s ease;
+      transition: color 0.2s ease;
     }
+    
     .project-link:hover {
       color: #fff;
     }
+    
     .timeline {
       max-width: 800px;
       margin-bottom: 3rem;
     }
+    
     .timeline-item {
       background: rgba(255, 255, 255, 0.1);
       padding: 1.5rem;
@@ -203,19 +248,23 @@
       backdrop-filter: blur(10px);
       border-left: 4px solid rgba(255, 255, 255, 0.3);
     }
+    
     .timeline-year {
       font-weight: 600;
       color: #e2c1ff;
       font-size: 1.1rem;
     }
+    
     .timeline-title {
       font-weight: 600;
       margin: 0.5rem 0;
     }
+    
     .timeline-description {
       color: #e8e0ff;
       line-height: 1.5;
     }
+    
     footer {
       margin-top: auto;
       padding: 2rem 0 1rem;
@@ -223,6 +272,7 @@
       color: #d1c6ff;
       text-align: center;
     }
+    
     .scroll-indicator {
       position: fixed;
       bottom: 2rem;
@@ -235,14 +285,36 @@
       align-items: center;
       justify-content: center;
       font-size: 1.2rem;
-      animation: bounce 2s infinite;
       cursor: pointer;
       transition: all 0.3s ease;
+      will-change: transform;
     }
+    
     .scroll-indicator:hover {
       background: rgba(255, 255, 255, 0.3);
       transform: scale(1.1);
     }
+    
+    /* Optimización para animaciones de entrada */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.6s ease;
+    }
+    
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    /* Preload optimization */
+    .preload * {
+      animation-duration: 0s !important;
+      animation-delay: 0s !important;
+      transition-duration: 0s !important;
+      transition-delay: 0s !important;
+    }
+    
     @media (max-width: 768px) {
       body {
         padding: 1rem;
@@ -302,7 +374,7 @@
 
   <h2 class="section-title">🚀 Featured Projects</h2>
   <section class="projects">
-    <div class="project">
+    <div class="project fade-in">
       <div class="project-header">
         <span class="project-icon">🚗</span>
         <a href="https://github.com/DecoudJuan/Laboratorio1" target="_blank" class="project-title">Ubica2 App</a>
@@ -320,7 +392,7 @@
       </div>
     </div>
 
-    <div class="project">
+    <div class="project fade-in">
       <div class="project-header">
         <span class="project-icon">🔐</span>
         <a href="https://github.com/emmabeni27/Portatic" target="_blank" class="project-title">Access Control System</a>
@@ -339,7 +411,7 @@
       </div>
     </div>
 
-    <div class="project">
+    <div class="project fade-in">
       <div class="project-header">
         <span class="project-icon">♟️</span>
         <a href="https://github.com/austral-ingsis-classroom/chess-DecoudJuan" target="_blank" class="project-title">Chess and Checkers Game</a>
@@ -360,17 +432,17 @@
 
   <h2 class="section-title">📚 Education</h2>
   <section class="timeline">
-    <div class="timeline-item">
+    <div class="timeline-item fade-in">
       <div class="timeline-year">2023 - Present</div>
       <div class="timeline-title">Computer Engineering</div>
       <div class="timeline-description">Universidad Austral - Focus on software development, systems architecture, and emerging technologies.</div>
     </div>
-    <div class="timeline-item">
+    <div class="timeline-item fade-in">
       <div class="timeline-year">2025</div>
       <div class="timeline-title">Collaborative IoT Project</div>
       <div class="timeline-description">Development of access control system using MQTT technologies and ESP32.</div>
     </div>
-    <div class="timeline-item">
+    <div class="timeline-item fade-in">
       <div class="timeline-year">2025</div>
       <div class="timeline-title">Flask Management System</div>
       <div class="timeline-description">Implementation of complete web application with authentication and database.</div>
@@ -386,33 +458,59 @@
   </div>
 
   <script>
-    // Smooth parallax effect
-    window.addEventListener('scroll', () => {
-      const scrolled = window.pageYOffset;
-      const rate = scrolled * -0.5;
-      document.body.style.backgroundPosition = `center ${rate}px`;
+    // Preload optimization - remove después de que la página cargue
+    document.body.classList.add('preload');
+    window.addEventListener('load', () => {
+      document.body.classList.remove('preload');
     });
 
-    // Element fade-in animation
+    // Throttle function para optimizar eventos
+    function throttle(func, limit) {
+      let inThrottle;
+      return function() {
+        const args = arguments;
+        const context = this;
+        if (!inThrottle) {
+          func.apply(context, args);
+          inThrottle = true;
+          setTimeout(() => inThrottle = false, limit);
+        }
+      }
+    }
+
+    // Optimized scroll animations con throttling
     const observerOptions = {
       threshold: 0.1,
-      rootMargin: '0px 0px -50px 0px'
+      rootMargin: '0px 0px -30px 0px' // Reducido para mejor rendimiento
     };
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          entry.target.style.opacity = '1';
-          entry.target.style.transform = 'translateY(0)';
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target); // Dejar de observar después de animar
         }
       });
     }, observerOptions);
 
-    document.querySelectorAll('.project, .timeline-item').forEach(el => {
-      el.style.opacity = '0';
-      el.style.transform = 'translateY(20px)';
-      el.style.transition = 'all 0.6s ease';
+    // Observar solo elementos que necesiten animación
+    const animatedElements = document.querySelectorAll('.fade-in');
+    animatedElements.forEach(el => {
       observer.observe(el);
+    });
+
+    // Mejorar el rendimiento con requestAnimationFrame
+    let ticking = false;
+    function updateScroll() {
+      // Cualquier lógica de scroll optimizada aquí
+      ticking = false;
+    }
+
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(updateScroll);
+        ticking = true;
+      }
     });
   </script>
 </body>

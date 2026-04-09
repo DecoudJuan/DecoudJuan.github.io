@@ -5,385 +5,400 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Juan Manuel Decoud — Computer Engineer</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
   <style>
     :root {
-      --violet: #6b4fa8;
-      --violet-light: #9271cc;
-      --violet-pale: #ede8f7;
-      --violet-soft: #f5f2fc;
-      --ink: #1a1625;
-      --muted: #6b6478;
-      --line: #e2dced;
-      --white: #ffffff;
+      --bg:          #fdf7ee;
+      --surface:     #f5f0e4;
+      --surface-2:   #eee6d6;
+      --border:      #e0dbd2;
+      --ink:         #1c1917;
+      --muted:       #78716c;
+      --faint:       #a8a29e;
+      --red:         #8b3232;
+      --red-mid:     #a64444;
+      --red-pale:    #f5eaea;
+      --sidebar-w:   300px;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
     html { scroll-behavior: smooth; }
 
     body {
       font-family: 'Inter', sans-serif;
-      background: var(--white);
+      background: var(--bg);
       color: var(--ink);
       line-height: 1.6;
     }
 
-    /* ─── NAV ─────────────────────────────── */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1.2rem 3rem;
-      background: rgba(255,255,255,0.95);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--line);
-    }
-
-    .nav-logo {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.2rem;
-      color: var(--violet);
-      text-decoration: none;
-      font-weight: 700;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 2rem;
-      list-style: none;
-    }
-
-    .nav-links a {
-      text-decoration: none;
-      color: var(--muted);
-      font-size: 0.85rem;
-      font-weight: 500;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      transition: color 0.2s;
-    }
-
-    .nav-links a:hover { color: var(--violet); }
-
-    /* ─── HERO ────────────────────────────── */
-    .hero {
-      min-height: 100vh;
+    /* ─── LAYOUT ──────────────────────────────── */
+    .layout {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      align-items: center;
-      padding: 0 3rem;
-      max-width: 1200px;
-      margin: 0 auto;
+      grid-template-columns: var(--sidebar-w) 1fr;
+      min-height: 100vh;
     }
 
-    .hero-text { padding-top: 5rem; }
+    /* ─── SIDEBAR ─────────────────────────────── */
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0;
+      width: var(--sidebar-w);
+      height: 100vh;
+      overflow-y: auto;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 3rem 2.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+    }
 
-    .hero-eyebrow {
+    .sidebar-brand {}
+
+    .sidebar-initials {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      background: var(--red);
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      border-radius: 8px;
+      margin-bottom: 1.2rem;
+    }
+
+    .sidebar-name {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.5rem;
+      line-height: 1.2;
+      color: var(--ink);
+      margin-bottom: 0.3rem;
+    }
+
+    .sidebar-role {
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 1rem;
+    }
+
+    .sidebar-bio {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .sidebar-divider {
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* nav */
+    .sidebar-nav {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    .sidebar-nav a {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--muted);
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .sidebar-nav a:hover,
+    .sidebar-nav a.active {
+      background: var(--surface-2);
+      color: var(--ink);
+    }
+
+    .sidebar-nav a .nav-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--border);
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+
+    .sidebar-nav a:hover .nav-dot,
+    .sidebar-nav a.active .nav-dot {
+      background: var(--red);
+    }
+
+    /* contact links */
+    .sidebar-links {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-top: auto;
+    }
+
+    .sidebar-link {
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      font-size: 0.8rem;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .sidebar-link:hover { color: var(--red); }
+
+    .sidebar-link-icon {
+      width: 16px;
+      height: 16px;
+      opacity: 0.5;
+      flex-shrink: 0;
+    }
+
+    /* ─── MAIN CONTENT ────────────────────────── */
+    .content {
+      margin-left: var(--sidebar-w);
+    }
+
+    /* ─── SECTION BASE ────────────────────────── */
+    .section {
+      padding: 5rem 4rem;
+      border-bottom: 1px solid var(--border);
+      max-width: 860px;
+    }
+
+    .section:last-child { border-bottom: none; }
+
+    .section-label {
+      font-size: 0.72rem;
       font-weight: 600;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
-      color: var(--violet);
-      margin-bottom: 1.5rem;
+      color: var(--red);
+      margin-bottom: 0.6rem;
     }
 
-    .hero-eyebrow::before {
-      content: '';
-      display: block;
-      width: 24px;
-      height: 1px;
-      background: var(--violet);
+    .section-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2.2rem;
+      color: var(--ink);
+      line-height: 1.15;
+      margin-bottom: 2.5rem;
     }
 
-    .hero h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(2.8rem, 5vw, 4.5rem);
+    /* ─── HERO/ABOUT SECTION ──────────────────── */
+    .hero-section {
+      padding: 5rem 4rem 4rem;
+      border-bottom: 1px solid var(--border);
+      max-width: 860px;
+    }
+
+    .hero-eyebrow {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 1.2rem;
+    }
+
+    .hero-heading {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2.6rem, 4vw, 3.8rem);
       line-height: 1.1;
       color: var(--ink);
       margin-bottom: 1.5rem;
     }
 
-    .hero h1 span { color: var(--violet-light); }
+    .hero-heading em {
+      font-style: italic;
+      color: var(--red-mid);
+    }
 
-    .hero-desc {
+    .hero-body {
       font-size: 1.05rem;
       color: var(--muted);
-      max-width: 460px;
+      max-width: 540px;
+      line-height: 1.8;
       margin-bottom: 2.5rem;
-      line-height: 1.75;
     }
 
     .hero-cta {
       display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-
-    /* ─── BUTTONS ─────────────────────────── */
-    .btn-primary {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      background: var(--violet);
-      color: #fff;
-      padding: 0.8rem 1.8rem;
-      border-radius: 6px;
-      text-decoration: none;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      border: 2px solid var(--violet);
-      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-      user-select: none;
-    }
-
-    .btn-primary:hover {
-      background: #5a3f91;
-      border-color: #5a3f91;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 14px rgba(107, 79, 168, 0.35);
-    }
-
-    .btn-primary:active { transform: translateY(0); }
-
-    .btn-ghost {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      color: var(--violet);
-      padding: 0.8rem 1.8rem;
-      border-radius: 6px;
-      border: 2px solid var(--violet);
-      text-decoration: none;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-      user-select: none;
-    }
-
-    .btn-ghost:hover {
-      background: var(--violet-pale);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 14px rgba(107, 79, 168, 0.15);
-    }
-
-    .btn-ghost:active { transform: translateY(0); }
-
-    /* ─── HERO VISUAL ─────────────────────── */
-    .hero-visual {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding-top: 5rem;
-    }
-
-    .hero-card {
-      position: relative;
-      width: 340px;
-      height: 410px;
-    }
-
-    .hero-card-bg {
-      position: absolute;
-      inset: 0;
-      background: var(--violet-soft);
-      border-radius: 24px;
-      transform: rotate(3deg);
-      border: 1px solid var(--line);
-    }
-
-    .hero-card-main {
-      position: absolute;
-      inset: 0;
-      background: var(--white);
-      border-radius: 24px;
-      border: 1px solid var(--line);
-      padding: 2rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      box-shadow: 0 2px 16px rgba(107, 79, 168, 0.07);
-    }
-
-    .card-avatar {
-      width: 64px;
-      height: 64px;
-      border-radius: 50%;
-      background: var(--violet);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.6rem;
-    }
-
-    .card-name {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.3rem;
-      color: var(--ink);
-    }
-
-    .card-role {
-      font-size: 0.8rem;
-      color: var(--muted);
-      margin-top: 0.2rem;
-    }
-
-    .card-stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-    }
-
-    .stat {
-      background: var(--violet-soft);
-      border-radius: 12px;
-      padding: 0.8rem;
-      border: 1px solid var(--line);
-    }
-
-    .stat-num {
-      font-size: 1.4rem;
-      font-weight: 600;
-      color: var(--violet);
-    }
-
-    .stat-label {
-      font-size: 0.7rem;
-      color: var(--muted);
-      margin-top: 0.2rem;
-    }
-
-    .card-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-    }
-
-    .card-tag {
-      background: var(--violet-pale);
-      color: var(--violet);
-      font-size: 0.7rem;
-      font-weight: 500;
-      padding: 0.25rem 0.6rem;
-      border-radius: 20px;
-      border: 1px solid var(--line);
-    }
-
-    /* ─── SECTION COMMONS ─────────────────── */
-    section {
-      padding: 6rem 3rem;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .section-header {
-      margin-bottom: 3.5rem;
-    }
-
-    .section-label {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--violet);
-      margin-bottom: 0.75rem;
-    }
-
-    .section-label::before {
-      content: '';
-      width: 18px;
-      height: 1px;
-      background: var(--violet);
-    }
-
-    .section-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 2.4rem;
-      color: var(--ink);
-    }
-
-    hr.divider {
-      border: none;
-      border-top: 1px solid var(--line);
-      margin: 0 3rem;
-    }
-
-    /* ─── SKILLS ──────────────────────────── */
-    .skills-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
       gap: 0.75rem;
+      flex-wrap: wrap;
     }
 
-    .skill-item {
-      background: var(--violet-soft);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 0.9rem 1rem;
-      font-size: 0.85rem;
+    /* ─── BUTTONS ─────────────────────────────── */
+    .btn-solid {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--red);
+      color: #fff;
+      padding: 0.75rem 1.6rem;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 600;
+      border: 2px solid var(--red);
+      cursor: pointer;
+      transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+      user-select: none;
+    }
+
+    .btn-solid:hover {
+      background: #6e2727;
+      border-color: #6e2727;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(139, 50, 50, 0.25);
+    }
+
+    .btn-solid:active { transform: translateY(0); }
+
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: transparent;
+      color: var(--red);
+      padding: 0.75rem 1.6rem;
+      border-radius: 6px;
+      border: 2px solid var(--red);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.15s;
+      user-select: none;
+    }
+
+    .btn-outline:hover {
+      background: var(--red-pale);
+      transform: translateY(-2px);
+    }
+
+    .btn-outline:active { transform: translateY(0); }
+
+    /* ─── SKILLS ──────────────────────────────── */
+    .skills-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .skill-pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 0.4rem 1rem;
+      font-size: 0.82rem;
       font-weight: 500;
       color: var(--ink);
-      text-align: center;
-      transition: border-color 0.2s, color 0.2s, background 0.2s;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
       cursor: default;
     }
 
-    .skill-item:hover {
-      border-color: var(--violet-light);
-      color: var(--violet);
-      background: var(--violet-pale);
+    .skill-pill:hover {
+      background: var(--red-pale);
+      border-color: var(--red-mid);
+      color: var(--red);
     }
 
-    /* ─── PROJECTS ────────────────────────── */
+    /* ─── PROJECTS ────────────────────────────── */
     .projects-list {
       display: flex;
       flex-direction: column;
+      gap: 2.5rem;
     }
 
-    .project-row {
-      display: grid;
-      grid-template-columns: 80px 1fr auto;
-      align-items: start;
-      gap: 2rem;
-      padding: 2.2rem 0;
-      border-bottom: 1px solid var(--line);
-      transition: background 0.2s;
+    .project-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
 
-    .project-row:first-child { border-top: 1px solid var(--line); }
+    .project-card:hover {
+      border-color: var(--red-mid);
+      box-shadow: 0 4px 24px rgba(139, 50, 50, 0.08);
+    }
+
+    .project-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 0.75rem;
+    }
 
     .project-num {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       font-weight: 600;
-      color: var(--violet-light);
       letter-spacing: 0.1em;
-      padding-top: 0.3rem;
+      color: var(--faint);
+      margin-bottom: 0.4rem;
     }
 
     .project-name {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.3rem;
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.25rem;
       color: var(--ink);
-      margin-bottom: 0.5rem;
     }
+
+    .project-link-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--red);
+      text-decoration: none;
+      padding: 0.45rem 0.9rem;
+      border: 1px solid var(--red);
+      border-radius: 6px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: background 0.15s, box-shadow 0.15s;
+      cursor: pointer;
+    }
+
+    .project-link-btn:hover {
+      background: var(--red-pale);
+      box-shadow: 0 2px 8px rgba(139, 50, 50, 0.12);
+    }
+
+    .project-link-btn::after { content: ' →'; }
 
     .project-desc {
       font-size: 0.9rem;
       color: var(--muted);
-      max-width: 560px;
-      margin-bottom: 1rem;
       line-height: 1.75;
+      margin-bottom: 1rem;
+    }
+
+    .project-role-note {
+      font-size: 0.85rem;
+      color: var(--ink);
+      line-height: 1.7;
+      margin-bottom: 1rem;
+      padding: 0.6rem 0.9rem;
+      background: var(--red-pale);
+      border-left: 3px solid var(--red);
+      border-radius: 0 6px 6px 0;
     }
 
     .tags-row {
@@ -393,8 +408,8 @@
     }
 
     .tag {
-      background: transparent;
-      border: 1px solid var(--line);
+      background: var(--bg);
+      border: 1px solid var(--border);
       color: var(--muted);
       font-size: 0.72rem;
       font-weight: 500;
@@ -402,73 +417,48 @@
       border-radius: 4px;
     }
 
-    .project-action { padding-top: 0.3rem; }
-
-    .project-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      color: var(--violet);
-      text-decoration: none;
-      font-size: 0.85rem;
-      font-weight: 600;
-      white-space: nowrap;
-      padding: 0.5rem 1rem;
-      border: 1px solid var(--violet-light);
-      border-radius: 6px;
-      transition: background 0.2s, gap 0.2s, box-shadow 0.2s;
-      cursor: pointer;
-    }
-
-    .project-link:hover {
-      background: var(--violet-pale);
-      gap: 0.55rem;
-      box-shadow: 0 2px 8px rgba(107, 79, 168, 0.12);
-    }
-
-    .project-link::after { content: '→'; }
-
-    /* ─── EXPERIENCE ─────────────────────── */
-    .exp-card {
-      background: var(--violet-soft);
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 2.5rem;
+    /* ─── EXPERIENCE ──────────────────────────── */
+    .exp-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
       position: relative;
       overflow: hidden;
     }
 
-    .exp-card::before {
+    .exp-block::before {
       content: '';
       position: absolute;
       top: 0; left: 0;
-      width: 4px;
+      width: 3px;
       height: 100%;
-      background: var(--violet);
+      background: var(--red);
+      border-radius: 3px 0 0 3px;
     }
 
-    .exp-header {
+    .exp-top {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
       flex-wrap: wrap;
       gap: 1rem;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.25rem;
     }
 
     .exp-company {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.6rem;
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.5rem;
       color: var(--ink);
     }
 
-    .exp-role {
-      font-size: 0.85rem;
+    .exp-role-title {
+      font-size: 0.78rem;
       font-weight: 600;
-      color: var(--violet);
-      letter-spacing: 0.06em;
       text-transform: uppercase;
-      margin-top: 0.3rem;
+      letter-spacing: 0.08em;
+      color: var(--red);
+      margin-top: 0.25rem;
     }
 
     .exp-badges {
@@ -479,561 +469,542 @@
     }
 
     .exp-badge {
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       font-weight: 500;
-      padding: 0.3rem 0.8rem;
-      border-radius: 20px;
+      padding: 0.25rem 0.75rem;
+      border-radius: 100px;
       white-space: nowrap;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--muted);
     }
 
-    .badge-intern   { background: var(--violet-pale); color: var(--violet); border: 1px solid var(--violet-light); }
-    .badge-parttime { background: var(--white);       color: var(--violet); border: 1px solid var(--violet-light); }
+    .exp-badge.current {
+      background: var(--red-pale);
+      border-color: var(--red-mid);
+      color: var(--red);
+    }
 
     .exp-summary {
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       color: var(--muted);
       line-height: 1.8;
       margin-bottom: 1.5rem;
     }
 
-    .exp-responsibilities {
+    .exp-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 0.75rem;
+      gap: 0.65rem;
       margin-bottom: 1.5rem;
     }
 
-    .exp-resp-item {
-      background: var(--white);
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      padding: 0.9rem 1rem;
-      font-size: 0.85rem;
+    .exp-item {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      font-size: 0.84rem;
       color: var(--ink);
-      display: flex;
-      gap: 0.6rem;
-      align-items: flex-start;
       line-height: 1.6;
     }
 
-    .exp-resp-icon { color: var(--violet-light); flex-shrink: 0; font-size: 0.9rem; margin-top: 0.05rem; }
+    .exp-item strong { color: var(--red); }
 
-    .exp-tech-row { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .exp-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
 
-    .exp-tech-tag {
-      background: var(--violet-pale);
-      color: var(--violet);
-      font-size: 0.75rem;
+    .exp-tag {
+      background: var(--red-pale);
+      color: var(--red);
+      font-size: 0.73rem;
       font-weight: 500;
-      padding: 0.25rem 0.7rem;
+      padding: 0.22rem 0.65rem;
       border-radius: 4px;
-      border: 1px solid var(--line);
+      border: 1px solid #dbb8b8;
     }
 
-    @media (max-width: 640px) {
-      .exp-responsibilities { grid-template-columns: 1fr; }
-      .exp-badges { align-items: flex-start; flex-direction: row; flex-wrap: wrap; }
-    }
-
-    /* ─── EDUCATION ───────────────────────── */
-    .edu-list {
+    /* ─── EDUCATION ───────────────────────────── */
+    .edu-timeline {
       display: flex;
       flex-direction: column;
+      position: relative;
     }
 
-    .edu-item {
+    .edu-timeline::before {
+      content: '';
+      position: absolute;
+      top: 8px;
+      left: 0;
+      width: 1px;
+      height: calc(100% - 16px);
+      background: var(--border);
+    }
+
+    .edu-entry {
       display: grid;
-      grid-template-columns: 160px 1fr;
-      gap: 2rem;
-      padding: 2rem 0;
-      border-bottom: 1px solid var(--line);
+      grid-template-columns: 130px 1fr;
+      gap: 1.5rem;
+      padding: 1.5rem 0 1.5rem 0;
+      border-bottom: 1px solid var(--border);
     }
 
-    .edu-item:first-child { border-top: 1px solid var(--line); }
+    .edu-entry:last-child { border-bottom: none; }
 
     .edu-year {
-      font-size: 0.82rem;
-      color: var(--violet);
+      font-size: 0.78rem;
       font-weight: 600;
-      padding-top: 0.2rem;
+      color: var(--red);
+      padding-top: 0.15rem;
+      letter-spacing: 0.04em;
     }
 
     .edu-title {
       font-weight: 600;
-      font-size: 1rem;
+      font-size: 0.95rem;
       color: var(--ink);
-      margin-bottom: 0.4rem;
+      margin-bottom: 0.25rem;
     }
 
     .edu-institution {
-      font-size: 0.82rem;
+      font-size: 0.76rem;
       font-weight: 500;
-      color: var(--violet);
-      margin-bottom: 0.4rem;
+      color: var(--red);
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.07em;
+      margin-bottom: 0.4rem;
     }
 
     .edu-desc {
-      font-size: 0.88rem;
+      font-size: 0.86rem;
       color: var(--muted);
       line-height: 1.7;
     }
 
-    /* ─── CONTACT ─────────────────────────── */
-    .contact-section {
-      background: var(--violet-soft);
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      padding: 4rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 2rem;
-      flex-wrap: wrap;
-      max-width: 1200px;
-      margin: 0 auto 6rem;
+    /* ─── CONTACT ─────────────────────────────── */
+    .contact-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 3rem;
     }
 
-    .contact-text h2 {
-      font-family: 'Playfair Display', serif;
+    .contact-box h2 {
+      font-family: 'DM Serif Display', serif;
       font-size: 2rem;
       color: var(--ink);
       margin-bottom: 0.5rem;
     }
 
-    .contact-text p {
-      color: var(--muted);
+    .contact-box p {
       font-size: 0.95rem;
+      color: var(--muted);
+      margin-bottom: 2rem;
     }
 
-    .contact-links {
+    .contact-btns {
       display: flex;
       gap: 0.75rem;
       flex-wrap: wrap;
     }
 
-    /* ─── FOOTER ──────────────────────────── */
-    footer {
-      text-align: center;
-      padding: 2rem;
-      font-size: 0.82rem;
-      color: var(--muted);
-      border-top: 1px solid var(--line);
+    /* ─── FOOTER ──────────────────────────────── */
+    .footer {
+      padding: 2rem 4rem;
+      font-size: 0.8rem;
+      color: var(--faint);
+      border-top: 1px solid var(--border);
+      max-width: 860px;
     }
 
-    /* ─── SCROLL TOP ──────────────────────── */
-    .to-top {
-      position: fixed;
-      bottom: 2rem;
-      right: 2rem;
-      width: 42px;
-      height: 42px;
-      background: var(--violet);
-      color: white;
-      border: none;
-      border-radius: 50%;
-      font-size: 1rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
-      text-decoration: none;
-      box-shadow: 0 2px 10px rgba(107, 79, 168, 0.3);
-    }
-
-    .to-top:hover {
-      background: #5a3f91;
-      transform: translateY(-3px);
-      box-shadow: 0 6px 18px rgba(107, 79, 168, 0.4);
-    }
-
-    /* ─── FADE IN ─────────────────────────── */
+    /* ─── REVEAL ──────────────────────────────── */
     .reveal {
       opacity: 0;
-      transform: translateY(18px);
-      transition: opacity 0.6s ease, transform 0.6s ease;
+      transform: translateY(14px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
     }
-    .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ─── RESPONSIVE ──────────────────────────── */
+
+    /* Tablet: collapse sidebar to top bar */
+    @media (max-width: 900px) {
+      :root { --sidebar-w: 0px; }
+
+      .layout { grid-template-columns: 1fr; }
+
+      .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+        padding: 1.75rem 1.5rem;
+        flex-direction: column;
+        gap: 1.25rem;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .sidebar-nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+      }
+
+      .sidebar-links {
+        margin-top: 0;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      .sidebar-divider { display: none; }
+
+      .content { margin-left: 0; }
+
+      .section,
+      .hero-section { padding: 3rem 1.5rem; }
+
+      .section-title { font-size: 1.8rem; }
+
+      .hero-heading { font-size: 2.2rem; }
+
+      .exp-grid { grid-template-columns: 1fr; }
+
+      .exp-top { flex-direction: column; }
+      .exp-badges { align-items: flex-start; flex-direction: row; flex-wrap: wrap; }
+
+      .edu-entry { grid-template-columns: 1fr; gap: 0.2rem; }
+
+      .project-card-header { flex-direction: column; gap: 0.75rem; }
+      .project-link-btn { align-self: flex-start; }
+
+      .contact-box { padding: 1.75rem; }
+      .footer { padding: 1.5rem; }
     }
 
-    /* ─── RESPONSIVE ──────────────────────── */
-    @media (max-width: 860px) {
-      nav { padding: 1rem 1.5rem; }
-      .nav-links { display: none; }
-      .hero {
-        grid-template-columns: 1fr;
-        padding: 0 1.5rem;
-        text-align: center;
-      }
-      .hero-eyebrow { justify-content: center; }
-      .hero-desc { margin: 0 auto 2.5rem; }
-      .hero-cta { justify-content: center; }
-      .hero-visual { display: none; }
-      section { padding: 4rem 1.5rem; }
-      hr.divider { margin: 0 1.5rem; }
-      .project-row { grid-template-columns: 50px 1fr; }
-      .project-action { display: none; }
-      .edu-item { grid-template-columns: 1fr; gap: 0.3rem; }
-      .contact-section { padding: 2.5rem; margin: 0 1.5rem 4rem; }
+    /* Mobile: tighter spacing */
+    @media (max-width: 560px) {
+      .sidebar { padding: 1.5rem 1.25rem; }
+
+      .section,
+      .hero-section { padding: 2.5rem 1.25rem; }
+
+      .hero-heading { font-size: 1.9rem; }
+      .section-title { font-size: 1.6rem; }
+
+      .hero-cta { flex-direction: column; }
+      .btn-solid, .btn-outline { width: 100%; justify-content: center; }
+
+      .contact-btns { flex-direction: column; }
+      .contact-btns .btn-solid,
+      .contact-btns .btn-outline { width: 100%; justify-content: center; }
+
+      .skills-grid { gap: 0.4rem; }
+      .skill-pill { font-size: 0.78rem; padding: 0.35rem 0.85rem; }
+
+      .project-card { padding: 1.5rem; }
+      .exp-block { padding: 1.5rem; }
+      .contact-box { padding: 1.5rem; }
+
+      .sidebar-nav a { font-size: 0.82rem; padding: 0.4rem 0.6rem; }
     }
   </style>
 </head>
 <body>
 
-  <!-- NAV -->
-  <nav>
-    <a href="#" class="nav-logo">JD</a>
-    <ul class="nav-links">
-      <li><a href="#about">About</a></li>
-      <li><a href="#skills">Skills</a></li>
-      <li><a href="#projects">Projects</a></li>
-      <li><a href="#experience">Experience</a></li>
-      <li><a href="#education">Education</a></li>
-      <li><a href="#contact">Contact</a></li>
-    </ul>
-  </nav>
+<div class="layout">
 
-  <!-- HERO -->
-  <div class="hero" id="about">
-    <div class="hero-text">
-      <div class="hero-eyebrow">Computer Engineering Student</div>
-      <h1>Juan Manuel<br><span>Decoud</span></h1>
-      <p class="hero-desc">
-        Software and hardware engineer in training, building real-world systems at the intersection of web development, IoT, and workflow automation. Currently working at a fast-growing AI startup while completing my degree at Universidad Austral.
+  <!-- ─── SIDEBAR ─────────────────────────────── -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-initials">JD</div>
+      <div class="sidebar-name">Juan Manuel<br>Decoud</div>
+      <div class="sidebar-role">Computer Engineer</div>
+      <p class="sidebar-bio">Building at the intersection of software, cloud infrastructure, and hardware. Currently at Darwin AI while finishing my degree at Universidad Austral.</p>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <ul class="sidebar-nav">
+      <li><a href="#about"><span class="nav-dot"></span>About</a></li>
+      <li><a href="#skills"><span class="nav-dot"></span>Skills</a></li>
+      <li><a href="#projects"><span class="nav-dot"></span>Projects</a></li>
+      <li><a href="#experience"><span class="nav-dot"></span>Experience</a></li>
+      <li><a href="#education"><span class="nav-dot"></span>Education</a></li>
+      <li><a href="#contact"><span class="nav-dot"></span>Contact</a></li>
+    </ul>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-links">
+      <a href="https://www.linkedin.com/in/juan-decoud-7aa608232/" target="_blank" rel="noopener" class="sidebar-link">
+        <svg class="sidebar-link-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+        LinkedIn
+      </a>
+      <a href="https://github.com/DecoudJuan" target="_blank" rel="noopener" class="sidebar-link">
+        <svg class="sidebar-link-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>
+        GitHub
+      </a>
+      <a href="mailto:decoudjuanmanuel1@gmail.com" class="sidebar-link">
+        <svg class="sidebar-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Email
+      </a>
+    </div>
+  </aside>
+
+  <!-- ─── MAIN CONTENT ──────────────────────────── -->
+  <main class="content">
+
+    <!-- ABOUT -->
+    <div class="hero-section reveal" id="about">
+      <div class="hero-eyebrow">Computer Engineering · Universidad Austral</div>
+      <h1 class="hero-heading">Software &amp; infrastructure<br>engineer.</h1>
+      <p class="hero-body">
+        I build full-stack systems, IoT devices, and cloud infrastructure — from a parking app to a custom programming language deployed across microservices on Azure. Currently working at Darwin AI as a Support &amp; Integrations Engineer while completing 60%+ of my degree.
       </p>
       <div class="hero-cta">
-        <a href="#projects" class="btn-primary">View Projects</a>
-        <a href="#contact" class="btn-ghost">Get in Touch</a>
+        <a href="#projects" class="btn-solid">View Projects</a>
+        <a href="#contact" class="btn-outline">Get in Touch</a>
       </div>
     </div>
 
-    <div class="hero-visual">
-      <div class="hero-card">
-        <div class="hero-card-bg"></div>
-        <div class="hero-card-main">
-          <div>
-            <div class="card-avatar">👨‍💻</div>
-          </div>
-          <div>
-            <div class="card-name">Juan Decoud</div>
-            <div class="card-role">Universidad Austral · Computer Engineering</div>
-          </div>
-          <div class="card-stats">
-            <div class="stat">
-              <div class="stat-num">38</div>
-              <div class="stat-label">Subjects passed</div>
-            </div>
-            <div class="stat">
-              <div class="stat-num">60%+</div>
-              <div class="stat-label">Degree progress</div>
-            </div>
-          </div>
-          <div class="card-tags">
-            <span class="card-tag">Python</span>
-            <span class="card-tag">Flask</span>
-            <span class="card-tag">ESP32</span>
-            <span class="card-tag">n8n</span>
-            <span class="card-tag">REST APIs</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <hr class="divider">
-
-  <!-- SKILLS -->
-  <section id="skills">
-    <div class="section-header reveal">
+    <!-- SKILLS -->
+    <div class="section reveal" id="skills">
       <div class="section-label">Stack</div>
-      <h2 class="section-title">Technologies I Work With</h2>
+      <h2 class="section-title">Technologies</h2>
+      <div class="skills-grid">
+        <span class="skill-pill">Python</span>
+        <span class="skill-pill">Flask</span>
+        <span class="skill-pill">Java</span>
+        <span class="skill-pill">Kotlin</span>
+        <span class="skill-pill">React</span>
+        <span class="skill-pill">NestJS</span>
+        <span class="skill-pill">TypeScript</span>
+        <span class="skill-pill">PostgreSQL</span>
+        <span class="skill-pill">MySQL</span>
+        <span class="skill-pill">ESP32 / IoT</span>
+        <span class="skill-pill">MQTT</span>
+        <span class="skill-pill">Docker</span>
+        <span class="skill-pill">Azure</span>
+        <span class="skill-pill">CI / CD</span>
+        <span class="skill-pill">Gradle</span>
+        <span class="skill-pill">n8n</span>
+        <span class="skill-pill">Zapier</span>
+        <span class="skill-pill">HubSpot</span>
+        <span class="skill-pill">Salesforce</span>
+        <span class="skill-pill">REST APIs</span>
+        <span class="skill-pill">JWT / OAuth</span>
+        <span class="skill-pill">Auth0</span>
+        <span class="skill-pill">Git</span>
+        <span class="skill-pill">Software Design</span>
+      </div>
     </div>
-    <div class="skills-grid">
-      <div class="skill-item reveal">Python</div>
-      <div class="skill-item reveal">Flask</div>
-      <div class="skill-item reveal">Java</div>
-      <div class="skill-item reveal">PostgreSQL</div>
-      <div class="skill-item reveal">MySQL</div>
-      <div class="skill-item reveal">ESP32 / IoT</div>
-      <div class="skill-item reveal">MQTT</div>
-      <div class="skill-item reveal">n8n</div>
-      <div class="skill-item reveal">Zapier</div>
-      <div class="skill-item reveal">REST APIs</div>
-      <div class="skill-item reveal">JWT / OAuth</div>
-      <div class="skill-item reveal">Git</div>
-      <div class="skill-item reveal">HubSpot</div>
-      <div class="skill-item reveal">Salesforce</div>
-      <div class="skill-item reveal">HTML / CSS</div>
-      <div class="skill-item reveal">Software Design</div>
-      <div class="skill-item reveal">Kotlin</div>
-      <div class="skill-item reveal">Docker</div>
-      <div class="skill-item reveal">Azure</div>
-      <div class="skill-item reveal">CI/CD</div>
-      <div class="skill-item reveal">React</div>
-      <div class="skill-item reveal">NestJS</div>
-      <div class="skill-item reveal">Auth0</div>
-      <div class="skill-item reveal">Gradle</div>
-    </div>
-  </section>
 
-  <hr class="divider">
-
-  <!-- PROJECTS -->
-  <section id="projects">
-    <div class="section-header reveal">
+    <!-- PROJECTS -->
+    <div class="section reveal" id="projects">
       <div class="section-label">Work</div>
       <h2 class="section-title">Featured Projects</h2>
-    </div>
-    <div class="projects-list">
+      <div class="projects-list">
 
-      <div class="project-row reveal">
-        <div class="project-num">01</div>
-        <div class="project-info">
-          <div class="project-name">Ubica2 — Parking Management System</div>
-          <p class="project-desc">Full-stack web application for managing parking spaces, built with Flask and PostgreSQL. Implements secure user authentication with password hashing, role-based access control, full CRUD operations for users, vehicles and spaces, and automated email notifications on key events.</p>
+        <div class="project-card reveal">
+          <div class="project-num">01</div>
+          <div class="project-card-header">
+            <div class="project-name">Snippet Searcher — Microservices Platform</div>
+            <a href="https://github.com/DecoudJuan" target="_blank" rel="noopener" class="project-link-btn">Code</a>
+          </div>
+          <p class="project-desc">The largest project I've built. A two-part Systems Engineering capstone: first, a custom programming language (PrintScript) implemented from scratch in Kotlin — streaming Lexer, AST Parser, Interpreter, configurable Formatter and Static Code Analyzer (YAML/JSON rules), built on SOLID principles and GoF patterns. Second, a full microservices web platform on top of it — 8 independent services (snippet, execution, static analysis, user, gateway, UI, infra, asset) with Auth0 authentication, deployed on Azure with separate dev and prod VMs. CI/CD with Docker: updating a service rebuilds its container in place; updating infra rebuilds all services. Branch-based continuous delivery with Gradle.</p>
+          <div class="project-role-note">
+            <strong>My role:</strong> architecture design, Azure VM setup and management, full CI/CD pipeline configuration, cloud infrastructure lead — plus active contributions to service development across the platform.
+          </div>
           <div class="tags-row">
-            <span class="tag">Flask</span>
-            <span class="tag">PostgreSQL</span>
-            <span class="tag">Python</span>
-            <span class="tag">HTML / CSS</span>
-            <span class="tag">SMTP</span>
+            <span class="tag">Kotlin</span><span class="tag">TypeScript</span><span class="tag">Docker</span><span class="tag">Azure</span><span class="tag">CI/CD</span><span class="tag">Gradle</span><span class="tag">Auth0</span><span class="tag">Microservices</span><span class="tag">REST APIs</span>
           </div>
         </div>
-        <div class="project-action">
-          <a href="https://github.com/DecoudJuan/Laboratorio1" target="_blank" rel="noopener" class="project-link">View Code</a>
-        </div>
-      </div>
 
-      <div class="project-row reveal">
-        <div class="project-num">02</div>
-        <div class="project-info">
-          <div class="project-name">Portatic — IoT Access Control</div>
+        <div class="project-card reveal">
+          <div class="project-num">02</div>
+          <div class="project-card-header">
+            <div class="project-name">Sonora — Cloud-Deployed Web App</div>
+            <a href="https://github.com/FacultadDeIngenieria/sonora-back" target="_blank" rel="noopener" class="project-link-btn">Code</a>
+          </div>
+          <p class="project-desc">Collaborative Lab 2 project developed with three fifth-year students as project owners. Full-stack web application with a React frontend and NestJS backend, deployed on Azure. I contributed across the entire stack — frontend, backend, and database — with primary responsibility for cloud infrastructure setup and deployment.</p>
+          <div class="tags-row">
+            <span class="tag">React</span><span class="tag">NestJS</span><span class="tag">Azure</span><span class="tag">Docker</span><span class="tag">TypeScript</span><span class="tag">PostgreSQL</span>
+          </div>
+        </div>
+
+        <div class="project-card reveal">
+          <div class="project-num">03</div>
+          <div class="project-card-header">
+            <div class="project-name">Portatic — IoT Access Control</div>
+            <a href="https://github.com/emmabeni27/Portatic" target="_blank" rel="noopener" class="project-link-btn">Code</a>
+          </div>
           <p class="project-desc">End-to-end IoT system for intelligent access control using ESP32 and ESP01 microcontrollers communicating through a Mosquitto MQTT broker. The Flask backend handles digital key management, door control, user permissions, and JWT-based authentication, with real-time device monitoring.</p>
           <div class="tags-row">
-            <span class="tag">ESP32</span>
-            <span class="tag">MQTT</span>
-            <span class="tag">Flask</span>
-            <span class="tag">MySQL</span>
-            <span class="tag">JWT</span>
-            <span class="tag">Embedded C</span>
+            <span class="tag">ESP32</span><span class="tag">MQTT</span><span class="tag">Flask</span><span class="tag">MySQL</span><span class="tag">JWT</span><span class="tag">Embedded C</span>
           </div>
         </div>
-        <div class="project-action">
-          <a href="https://github.com/emmabeni27/Portatic" target="_blank" rel="noopener" class="project-link">View Code</a>
-        </div>
-      </div>
 
-      <div class="project-row reveal">
-        <div class="project-num">03</div>
-        <div class="project-info">
-          <div class="project-name">Chess &amp; Checkers Engine</div>
+        <div class="project-card reveal">
+          <div class="project-num">04</div>
+          <div class="project-card-header">
+            <div class="project-name">Ubica2 — Parking Management System</div>
+            <a href="https://github.com/DecoudJuan/Laboratorio1" target="_blank" rel="noopener" class="project-link-btn">Code</a>
+          </div>
+          <p class="project-desc">Full-stack web application for managing parking spaces, built with Flask and PostgreSQL. Implements secure user authentication with password hashing, role-based access control, full CRUD for users, vehicles and spaces, and automated email notifications on key events.</p>
+          <div class="tags-row">
+            <span class="tag">Flask</span><span class="tag">PostgreSQL</span><span class="tag">Python</span><span class="tag">HTML / CSS</span><span class="tag">SMTP</span>
+          </div>
+        </div>
+
+        <div class="project-card reveal">
+          <div class="project-num">05</div>
+          <div class="project-card-header">
+            <div class="project-name">Chess &amp; Checkers Engine</div>
+            <a href="https://github.com/austral-ingsis-classroom/chess-DecoudJuan" target="_blank" rel="noopener" class="project-link-btn">Code</a>
+          </div>
           <p class="project-desc">Academic project for Systems Design at Universidad Austral implementing chess and checkers in Java. Built around GoF design patterns (Strategy, Adapter, Observer) with clean OOP architecture, full move validation, check/checkmate detection, and a Swing GUI via an adapter layer. Tested with JUnit.</p>
           <div class="tags-row">
-            <span class="tag">Java</span>
-            <span class="tag">OOP</span>
-            <span class="tag">Design Patterns</span>
-            <span class="tag">Swing</span>
-            <span class="tag">JUnit</span>
+            <span class="tag">Java</span><span class="tag">OOP</span><span class="tag">Design Patterns</span><span class="tag">Swing</span><span class="tag">JUnit</span>
           </div>
         </div>
-        <div class="project-action">
-          <a href="https://github.com/austral-ingsis-classroom/chess-DecoudJuan" target="_blank" rel="noopener" class="project-link">View Code</a>
-        </div>
-      </div>
 
-      <div class="project-row reveal">
-        <div class="project-num">04</div>
-        <div class="project-info">
-          <div class="project-name">Snippet Searcher — Microservices Platform</div>
-          <p class="project-desc">The largest and most complex project I've built. A two-part Systems Engineering capstone: first, a custom programming language (PrintScript) implemented from scratch in Kotlin — including a streaming Lexer, AST-based Parser, Interpreter, configurable Formatter and Static Code Analyzer (YAML/JSON rules), built following SOLID principles and GoF patterns. Second, a full microservices web platform on top of it — 8 independent services (snippet, execution, static analysis, user, gateway, UI, infra, asset) deployed on Azure with separate dev and prod VMs. CI/CD pipeline with Docker: updating a service pulls down its container, rebuilds it, and brings it back up; updating infra rebuilds all services. Branch-based continuous delivery with Gradle. Auth0 for authentication.</p>
-          <p class="project-desc" style="margin-top:-0.4rem; margin-bottom:1rem;"><strong>My role:</strong> architecture design, Azure VM setup and management, full CI/CD pipeline configuration, cloud infrastructure lead — plus active contributions to service development across the platform.</p>
-          <div class="tags-row">
-            <span class="tag">Kotlin</span>
-            <span class="tag">TypeScript</span>
-            <span class="tag">Docker</span>
-            <span class="tag">Azure</span>
-            <span class="tag">CI/CD</span>
-            <span class="tag">Gradle</span>
-            <span class="tag">Auth0</span>
-            <span class="tag">Microservices</span>
-            <span class="tag">REST APIs</span>
-          </div>
-        </div>
-        <div class="project-action">
-          <a href="https://github.com/DecoudJuan" target="_blank" rel="noopener" class="project-link">View Code</a>
-        </div>
       </div>
-
-      <div class="project-row reveal">
-        <div class="project-num">05</div>
-        <div class="project-info">
-          <div class="project-name">Sonora — Cloud-Deployed Web App</div>
-          <p class="project-desc">Collaborative Lab 2 project developed with three fifth-year students as project owners. Full-stack web application with a React frontend and NestJS backend, deployed on Azure. I contributed across the entire stack — frontend, backend, and database — with primary responsibility for cloud infrastructure setup and deployment configuration on Azure.</p>
-          <div class="tags-row">
-            <span class="tag">React</span>
-            <span class="tag">NestJS</span>
-            <span class="tag">Azure</span>
-            <span class="tag">Docker</span>
-            <span class="tag">TypeScript</span>
-            <span class="tag">PostgreSQL</span>
-          </div>
-        </div>
-        <div class="project-action">
-          <a href="https://github.com/FacultadDeIngenieria/sonora-back" target="_blank" rel="noopener" class="project-link">View Code</a>
-        </div>
-      </div>
-
     </div>
-  </section>
 
-  <hr class="divider">
-
-  <!-- EXPERIENCE -->
-  <section id="experience">
-    <div class="section-header reveal">
+    <!-- EXPERIENCE -->
+    <div class="section reveal" id="experience">
       <div class="section-label">Experience</div>
       <h2 class="section-title">Professional Experience</h2>
-    </div>
-    <div class="exp-card reveal">
-      <div class="exp-header">
-        <div>
-          <div class="exp-company">Darwin AI</div>
-          <div class="exp-role">Support &amp; Integrations Engineer</div>
+      <div class="exp-block">
+        <div class="exp-top">
+          <div>
+            <div class="exp-company">Darwin AI</div>
+            <div class="exp-role-title">Support &amp; Integrations Engineer</div>
+          </div>
+          <div class="exp-badges">
+            <span class="exp-badge">Intern · Jul 2025 – Dec 2025 · 4 h/day</span>
+            <span class="exp-badge current">Part-time · Dec 2025 – Present · 6 h/day</span>
+          </div>
         </div>
-        <div class="exp-badges">
-          <span class="exp-badge badge-intern">Intern · Jul 2025 – Dec 2025 · 4 h/day</span>
-          <span class="exp-badge badge-parttime">Part-time · Dec 2025 – Present · 6 h/day</span>
+        <p class="exp-summary">
+          Darwin AI is an AI-powered sales automation platform that connects to clients' CRMs to qualify leads and automate follow-ups. As Support &amp; Integrations Engineer, I act as the technical bridge between the product and its customers — designing automation workflows, managing CRM integrations, troubleshooting production issues, and leading technical onboarding from kick-off to go-live.
+        </p>
+        <div class="exp-grid">
+          <div class="exp-item"><strong>Workflow automation</strong><br>Design end-to-end flows in n8n and Zapier — webhooks, conditional branching, data transformations and multi-step pipelines.</div>
+          <div class="exp-item"><strong>CRM integrations</strong><br>Connect HubSpot, Salesforce and Pipedrive with Darwin AI — field mapping, OAuth/API key auth, bidirectional data consistency.</div>
+          <div class="exp-item"><strong>Technical support</strong><br>Diagnose and resolve integration failures, broken flows and API errors, prioritizing fast triage and permanent root-cause fixes.</div>
+          <div class="exp-item"><strong>Client onboarding</strong><br>Lead end-to-end onboarding sessions, translate client requirements into integration specs, maintain internal documentation.</div>
         </div>
-      </div>
-
-      <p class="exp-summary">
-        Darwin AI is an AI-powered sales automation platform that connects to clients' CRMs to qualify leads and automate follow-ups. As Support &amp; Integrations Engineer, I act as the technical bridge between the product and its customers: I design and configure the automation workflows that bring each client's CRM into Darwin's ecosystem, troubleshoot production issues end-to-end, and lead technical onboarding from kick-off to go-live. My work directly determines how fast new customers become productive on the platform and how reliably it runs post-deployment.
-      </p>
-
-      <div class="exp-responsibilities">
-        <div class="exp-resp-item">
-          <span class="exp-resp-icon">&#9881;&#65039;</span>
-          <span><strong>Workflow automation:</strong> design and configure end-to-end automation flows in n8n and Zapier, including webhook triggers, conditional branching, data transformations, and multi-step pipelines across client environments.</span>
+        <div class="exp-tags">
+          <span class="exp-tag">n8n</span><span class="exp-tag">Zapier</span><span class="exp-tag">HubSpot</span><span class="exp-tag">Salesforce</span><span class="exp-tag">Pipedrive</span><span class="exp-tag">Webhooks</span><span class="exp-tag">REST APIs</span><span class="exp-tag">OAuth 2.0</span>
         </div>
-        <div class="exp-resp-item">
-          <span class="exp-resp-icon">&#128279;</span>
-          <span><strong>CRM integrations:</strong> connect and synchronize HubSpot, Salesforce, and Pipedrive with Darwin AI — handling field mapping, OAuth and API key authentication, and bidirectional data consistency.</span>
-        </div>
-        <div class="exp-resp-item">
-          <span class="exp-resp-icon">&#128295;</span>
-          <span><strong>Technical support:</strong> diagnose and resolve integration failures, broken automation flows, and API errors escalated by clients, prioritizing fast triage and permanent root-cause fixes.</span>
-        </div>
-        <div class="exp-resp-item">
-          <span class="exp-resp-icon">&#128203;</span>
-          <span><strong>Client onboarding:</strong> lead end-to-end technical onboarding sessions, translate client requirements into integration specs, and maintain internal documentation for recurring integration patterns.</span>
-        </div>
-      </div>
-
-      <div class="exp-tech-row">
-        <span class="exp-tech-tag">n8n</span>
-        <span class="exp-tech-tag">Zapier</span>
-        <span class="exp-tech-tag">HubSpot</span>
-        <span class="exp-tech-tag">Salesforce</span>
-        <span class="exp-tech-tag">Pipedrive</span>
-        <span class="exp-tech-tag">Webhooks</span>
-        <span class="exp-tech-tag">REST APIs</span>
-        <span class="exp-tech-tag">OAuth 2.0</span>
       </div>
     </div>
-  </section>
 
-  <hr class="divider">
-
-  <!-- EDUCATION -->
-  <section id="education">
-    <div class="section-header reveal">
+    <!-- EDUCATION -->
+    <div class="section reveal" id="education">
       <div class="section-label">Background</div>
       <h2 class="section-title">Education</h2>
+      <div class="edu-timeline">
+
+        <div class="edu-entry reveal">
+          <div class="edu-year">2023 – Present</div>
+          <div>
+            <div class="edu-title">Bachelor's in Computer Engineering</div>
+            <div class="edu-institution">Universidad Austral · Buenos Aires</div>
+            <div class="edu-desc">60%+ completed, 38 subjects passed. Coursework in software development, systems architecture, embedded systems, algorithms, networking, and emerging technologies. Strong applied project focus.</div>
+          </div>
+        </div>
+
+        <div class="edu-entry reveal">
+          <div class="edu-year">2025</div>
+          <div>
+            <div class="edu-title">Ingeniería de Sistemas — Systems Engineering</div>
+            <div class="edu-institution">Universidad Austral</div>
+            <div class="edu-desc">Two-part capstone: built PrintScript (custom language in Kotlin with Lexer, AST, Interpreter, Formatter, Static Analyzer) then architected Snippet Searcher — an 8-service microservices platform on Azure with full Docker CI/CD. Led cloud infrastructure and pipeline setup.</div>
+          </div>
+        </div>
+
+        <div class="edu-entry reveal">
+          <div class="edu-year">2025</div>
+          <div>
+            <div class="edu-title">Laboratorio 2 — Full-Stack &amp; Cloud</div>
+            <div class="edu-institution">Universidad Austral</div>
+            <div class="edu-desc">Built Sonora with fifth-year project owners — React frontend, NestJS backend, Azure deployment. Responsible for frontend, backend and cloud infrastructure.</div>
+          </div>
+        </div>
+
+        <div class="edu-entry reveal">
+          <div class="edu-year">2025</div>
+          <div>
+            <div class="edu-title">Diseño de Sistemas — Systems Design</div>
+            <div class="edu-institution">Universidad Austral</div>
+            <div class="edu-desc">Applied GoF patterns (Strategy, Adapter, Observer) in Java to build a chess and checkers engine with full move validation and a Swing GUI. Tested with JUnit.</div>
+          </div>
+        </div>
+
+        <div class="edu-entry reveal">
+          <div class="edu-year">2024 – 2025</div>
+          <div>
+            <div class="edu-title">Laboratorio 1 — Web Development &amp; IoT</div>
+            <div class="edu-institution">Universidad Austral</div>
+            <div class="edu-desc">Built Ubica2 (Flask + PostgreSQL parking system) and Portatic (ESP32 + MQTT + Flask IoT access control system with JWT authentication).</div>
+          </div>
+        </div>
+
+      </div>
     </div>
-    <div class="edu-list">
 
-      <div class="edu-item reveal">
-        <div class="edu-year">2023 – Present</div>
-        <div>
-          <div class="edu-title">Bachelor's in Computer Engineering</div>
-          <div class="edu-institution">Universidad Austral · Buenos Aires, Argentina</div>
-          <div class="edu-desc">More than 60% of the degree completed with 38 subjects passed. Coursework covers software development, systems architecture, embedded systems, algorithms, networking, and emerging technologies. Strong emphasis on applied project work and design patterns.</div>
+    <!-- CONTACT -->
+    <div class="section reveal" id="contact">
+      <div class="section-label">Contact</div>
+      <h2 class="section-title">Let's Work Together</h2>
+      <div class="contact-box">
+        <h2>Open to opportunities</h2>
+        <p>Interested in new roles, collaborations, and interesting projects.</p>
+        <div class="contact-btns">
+          <a href="https://www.linkedin.com/in/juan-decoud-7aa608232/" target="_blank" rel="noopener" class="btn-solid">LinkedIn</a>
+          <a href="https://github.com/DecoudJuan" target="_blank" rel="noopener" class="btn-outline">GitHub</a>
+          <a href="mailto:decoudjuanmanuel1@gmail.com" class="btn-outline">Email Me</a>
         </div>
       </div>
-
-      <div class="edu-item reveal">
-        <div class="edu-year">2025</div>
-        <div>
-          <div class="edu-title">Ingeniería de Sistemas — Systems Engineering</div>
-          <div class="edu-institution">Universidad Austral</div>
-          <div class="edu-desc">Two-part capstone course. Part 1: designed and implemented a custom programming language (PrintScript) in Kotlin — Lexer, AST Parser, Interpreter, Formatter and Static Code Analyzer — applying SOLID principles and GoF patterns. Part 2: architected and deployed a full microservices platform (Snippet Searcher) on Azure with Docker-based CI/CD, leading cloud infrastructure for dev and prod environments.</div>
-        </div>
-      </div>
-
-      <div class="edu-item reveal">
-        <div class="edu-year">2025</div>
-        <div>
-          <div class="edu-title">Laboratorio 2 — Full-Stack &amp; Cloud</div>
-          <div class="edu-institution">Universidad Austral</div>
-          <div class="edu-desc">Collaborative project with fifth-year students: built Sonora, a full-stack web application (React + NestJS) deployed on Azure. Responsible for frontend, backend, and cloud infrastructure setup and deployment.</div>
-        </div>
-      </div>
-
-      <div class="edu-item reveal">
-        <div class="edu-year">2025</div>
-        <div>
-          <div class="edu-title">Diseño de Sistemas — Systems Design</div>
-          <div class="edu-institution">Universidad Austral</div>
-          <div class="edu-desc">Applied GoF design patterns (Strategy, Adapter, Observer, Factory) in a Java project implementing chess and checkers. Focus on clean OOP architecture, testability with JUnit, and SOLID principles.</div>
-        </div>
-      </div>
-
-      <div class="edu-item reveal">
-        <div class="edu-year">2024 – 2025</div>
-        <div>
-          <div class="edu-title">Laboratorio 1 — Web Development</div>
-          <div class="edu-institution">Universidad Austral</div>
-          <div class="edu-desc">Built Ubica2, a full-stack parking management system (Flask + PostgreSQL), and Portatic, a production IoT access control system integrating ESP32 firmware, MQTT messaging, and a Flask REST backend with JWT authentication.</div>
-        </div>
-      </div>
-
     </div>
-  </section>
 
-  <!-- CONTACT -->
-  <div class="contact-section reveal" id="contact">
-    <div class="contact-text">
-      <h2>Let's Work Together</h2>
-      <p>Open to new opportunities, collaborations, and interesting projects.</p>
-    </div>
-    <div class="contact-links">
-      <a href="https://www.linkedin.com/in/juan-decoud-7aa608232/" target="_blank" rel="noopener" class="btn-primary">LinkedIn</a>
-      <a href="https://github.com/DecoudJuan" target="_blank" rel="noopener" class="btn-ghost">GitHub</a>
-      <a href="mailto:decoudjuanmanuel1@gmail.com" class="btn-ghost">Email Me</a>
-    </div>
-  </div>
+    <div class="footer">&copy; 2026 Juan Manuel Decoud</div>
 
-  <footer>
-    &copy; 2026 Juan Manuel Decoud
-  </footer>
+  </main>
+</div>
 
-  <a href="#" class="to-top" aria-label="Back to top">↑</a>
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08 });
 
-  <script>
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-  </script>
+  // Active nav: track which section is currently in view
+  const sectionIds = ['about', 'skills', 'projects', 'experience', 'education', 'contact'];
+  const navLinks = document.querySelectorAll('.sidebar-nav a');
+
+  function updateActiveNav() {
+    const scrollY = window.scrollY + 120;
+    let current = sectionIds[0];
+    for (const id of sectionIds) {
+      const el = document.getElementById(id);
+      if (el && el.offsetTop <= scrollY) current = id;
+    }
+    navLinks.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+    });
+  }
+
+  window.addEventListener('scroll', updateActiveNav, { passive: true });
+  updateActiveNav();
+</script>
 </body>
 </html>

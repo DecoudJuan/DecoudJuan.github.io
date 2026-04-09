@@ -33,8 +33,6 @@
 
     /* ─── LAYOUT ──────────────────────────────── */
     .layout {
-      display: grid;
-      grid-template-columns: var(--sidebar-w) 1fr;
       min-height: 100vh;
     }
 
@@ -630,7 +628,7 @@
     @media (max-width: 900px) {
       :root { --sidebar-w: 0px; }
 
-      .layout { grid-template-columns: 1fr; }
+      .layout { display: block; }
 
       .sidebar {
         position: relative;
@@ -811,7 +809,7 @@
             <div class="project-name">Snippet Searcher — Microservices Platform</div>
             <a href="https://github.com/DecoudJuan" target="_blank" rel="noopener" class="project-link-btn">Code</a>
           </div>
-          <p class="project-desc">The largest project I've built. A two-part Systems Engineering capstone: first, a custom programming language (PrintScript) implemented from scratch in Kotlin — streaming Lexer, AST Parser, Interpreter, configurable Formatter and Static Code Analyzer (YAML/JSON rules), built on SOLID principles and GoF patterns. Second, a full microservices web platform on top of it — 8 independent services (snippet, execution, static analysis, user, gateway, UI, infra, asset) with Auth0 authentication, deployed on Azure with separate dev and prod VMs. CI/CD with Docker: updating a service rebuilds its container in place; updating infra rebuilds all services. Branch-based continuous delivery with Gradle.</p>
+          <p class="project-desc">The largest project I've built — a two-part Systems Engineering capstone developed with 2 colleagues. Part 1: a custom programming language (PrintScript) implemented from scratch in Kotlin — streaming Lexer, AST Parser, Interpreter, configurable Formatter and Static Code Analyzer (YAML/JSON rules), following SOLID principles and GoF patterns. Part 2: a full microservices web platform — 8 independent services (snippet, execution, static analysis, user, gateway, UI, infra, asset) with Auth0 authentication, deployed on Azure with separate dev and prod VMs. CI/CD with Docker: updating a service rebuilds its container in place; updating infra rebuilds all services. Branch-based continuous delivery with Gradle.</p>
           <div class="project-role-note">
             <strong>My role:</strong> architecture design, Azure VM setup and management, full CI/CD pipeline configuration, cloud infrastructure lead — plus active contributions to service development across the platform.
           </div>
@@ -835,6 +833,18 @@
         <div class="project-card reveal">
           <div class="project-num">03</div>
           <div class="project-card-header">
+            <div class="project-name">Chess &amp; Checkers Engine</div>
+            <a href="https://github.com/austral-ingsis-classroom/chess-DecoudJuan" target="_blank" rel="noopener" class="project-link-btn">Code</a>
+          </div>
+          <p class="project-desc">Academic project for Systems Design at Universidad Austral implementing chess and checkers in Java. Built around GoF design patterns (Strategy, Adapter, Observer) with clean OOP architecture, full move validation, check/checkmate detection, and a Swing GUI via an adapter layer. Tested with JUnit.</p>
+          <div class="tags-row">
+            <span class="tag">Java</span><span class="tag">OOP</span><span class="tag">Design Patterns</span><span class="tag">Swing</span><span class="tag">JUnit</span>
+          </div>
+        </div>
+
+        <div class="project-card reveal">
+          <div class="project-num">04</div>
+          <div class="project-card-header">
             <div class="project-name">Portatic — IoT Access Control</div>
             <a href="https://github.com/emmabeni27/Portatic" target="_blank" rel="noopener" class="project-link-btn">Code</a>
           </div>
@@ -845,7 +855,7 @@
         </div>
 
         <div class="project-card reveal">
-          <div class="project-num">04</div>
+          <div class="project-num">05</div>
           <div class="project-card-header">
             <div class="project-name">Ubica2 — Parking Management System</div>
             <a href="https://github.com/DecoudJuan/Laboratorio1" target="_blank" rel="noopener" class="project-link-btn">Code</a>
@@ -853,18 +863,6 @@
           <p class="project-desc">Full-stack web application for managing parking spaces, built with Flask and PostgreSQL. Implements secure user authentication with password hashing, role-based access control, full CRUD for users, vehicles and spaces, and automated email notifications on key events.</p>
           <div class="tags-row">
             <span class="tag">Flask</span><span class="tag">PostgreSQL</span><span class="tag">Python</span><span class="tag">HTML / CSS</span><span class="tag">SMTP</span>
-          </div>
-        </div>
-
-        <div class="project-card reveal">
-          <div class="project-num">05</div>
-          <div class="project-card-header">
-            <div class="project-name">Chess &amp; Checkers Engine</div>
-            <a href="https://github.com/austral-ingsis-classroom/chess-DecoudJuan" target="_blank" rel="noopener" class="project-link-btn">Code</a>
-          </div>
-          <p class="project-desc">Academic project for Systems Design at Universidad Austral implementing chess and checkers in Java. Built around GoF design patterns (Strategy, Adapter, Observer) with clean OOP architecture, full move validation, check/checkmate detection, and a Swing GUI via an adapter layer. Tested with JUnit.</p>
-          <div class="tags-row">
-            <span class="tag">Java</span><span class="tag">OOP</span><span class="tag">Design Patterns</span><span class="tag">Swing</span><span class="tag">JUnit</span>
           </div>
         </div>
 

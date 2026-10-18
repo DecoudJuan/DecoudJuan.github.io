@@ -11,7 +11,7 @@ const es = {
   link: { try: 'Probarlo', code: 'Código', download: 'Descargar' },
   aboutPenguin: 'Pingüino de Juan, con anteojos y auriculares.',
   recordsOpen: 'Abrir',
-  player: { demo: 'Demo de', soon: 'Acá va el video. Carga recién cuando le das play.', list: 'Demos', speed: 'Velocidad', resume: 'seguís en', chapters: 'Capítulos', all: 'Todas las demos' },
+  player: { demo: 'Demo de', live: 'Probalo en vivo', soonTitle: 'Próximamente', soon: 'La demo está en camino.', list: 'Demos', speed: 'Velocidad', resume: 'seguís en', chapters: 'Capítulos', all: 'Todas las demos' },
   hire: { cta: 'Ver mis servicios', copy: 'Copiar mail', copied: 'Mail copiado', open: 'Abrir' },
   games: {
     tabs: 'Juegos', points: 'puntos', best: 'récord', cells: 'casillas', won: 'ganadas',
@@ -56,7 +56,7 @@ const en: typeof es = {
   link: { try: 'Try it', code: 'Code', download: 'Download' },
   aboutPenguin: "Juan's penguin, with glasses and headphones.",
   recordsOpen: 'Open',
-  player: { demo: 'Demo of', soon: 'The video goes here. It only loads when you press play.', list: 'Demos', speed: 'Speed', resume: 'resuming at', chapters: 'Chapters', all: 'All demos' },
+  player: { demo: 'Demo of', live: 'Try it live', soonTitle: 'Coming soon', soon: 'The demo is on its way.', list: 'Demos', speed: 'Speed', resume: 'resuming at', chapters: 'Chapters', all: 'All demos' },
   hire: { cta: 'See my services', copy: 'Copy email', copied: 'Email copied', open: 'Open' },
   games: {
     tabs: 'Games', points: 'points', best: 'best', cells: 'cells', won: 'won',

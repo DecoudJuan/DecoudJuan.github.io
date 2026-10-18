@@ -130,6 +130,9 @@ function Os() {
   const [project, setProject] = useState(c.PROJECTS[0].id);
   const [note, setNote] = useState(NOTES[0].id);
   const [boot, setBoot] = useState<'on' | 'out' | 'off'>('off');
+  // The server render can't know the screen size: windows and icons stay hidden (still in the
+  // HTML for search engines) until the first measurement, so nothing jumps on load.
+  const [ready, setReady] = useState(false);
   const [spot, setSpot] = useState(false);
   const [wall, setWall] = useState<Wall>('auto');
   const [wallMenu, setWallMenu] = useState(false);
@@ -205,7 +208,7 @@ function Os() {
   // Track the desk size; windows the user hasn't touched follow the responsive layout.
   useLayoutEffect(() => {
     const el = desk.current!;
-    const ro = new ResizeObserver(() => {
+    const fit = () => {
       const w = el.clientWidth, h = el.clientHeight;
       setSize({ w, h });
       const L = layout(w, h);
@@ -219,15 +222,17 @@ function Os() {
         });
         return next;
       });
-    });
+    };
+    // Measure right away (before the first client paint), then follow resizes.
+    fit();
+    // Phones start on the home screen: no windows open.
+    if (matchMedia('(max-width: 760px)').matches) {
+      setWins((ws) => Object.fromEntries(ORDER.map((id) => [id, { ...ws[id], status: 'closed' }])) as Record<AppId, WinState>);
+    }
+    setReady(true);
+    const ro = new ResizeObserver(fit);
     ro.observe(el);
     return () => ro.disconnect();
-  }, []);
-
-  // Phones start on the home screen: no windows open.
-  useEffect(() => {
-    if (!matchMedia('(max-width: 760px)').matches) return;
-    setWins((ws) => Object.fromEntries(ORDER.map((id) => [id, { ...ws[id], status: 'closed' }])) as Record<AppId, WinState>);
   }, []);
 
   // Boot screen once per session; stored wallpaper; Ctrl/Cmd + K for search.
@@ -322,7 +327,7 @@ function Os() {
 
   return (
     <div
-      className="desk" ref={desk} data-wall={wall}
+      className={'desk' + (ready ? ' ready' : '')} ref={desk} data-wall={wall}
       onPointerDown={(e) => {
         const tgt = e.target as HTMLElement;
         // Only the bare desk starts a selection: not windows, icons, menu, dock or widgets.

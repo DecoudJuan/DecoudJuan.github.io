@@ -144,20 +144,21 @@ main { height: 100%; }
 .m7 i { background: conic-gradient(#f3ead8 25%, transparent 0 50%, #f3ead8 0 75%, transparent 0) 0 0 / 22px 22px; opacity: .2; }
 .disc-k { font-size: .78rem; color: var(--mut); }
 
-/* ---------- player: the video always fits whole; details and the demo list go beside it ----------
-   Nothing scrolls but the list of demos (and the description, if it is very long). */
-.player { display: flex; flex-direction: column; gap: 14px; padding: 16px; height: 100%; overflow: hidden; }
-.screen-wrap { flex: none; display: grid; place-items: center; min-height: 0; animation: pl-in .5s cubic-bezier(.22,1,.36,1); }
+/* ---------- player: video on top with its description beside it, the other demos in a strip below ----------
+   The video always fits whole; only the description (if long) and the strip of demos scroll. */
+.player { --strip: 112px; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) var(--strip);
+  gap: 14px; padding: 16px; height: 100%; overflow: hidden; }
+.screen-wrap { display: grid; place-items: center; min-height: 0; animation: pl-in .5s cubic-bezier(.22,1,.36,1); }
 @keyframes pl-in { from { opacity: 0; transform: translateY(10px) scale(.985); filter: blur(4px); } }
-.screen { position: relative; width: 100%; max-width: calc(42cqh * 16 / 9); aspect-ratio: 16 / 9; border-radius: 10px; overflow: hidden; background: #0d0a08; color: #f3ead8; }
+.screen { position: relative; width: 100%; max-width: calc(40cqh * 16 / 9); aspect-ratio: 16 / 9; border-radius: 10px; overflow: hidden; background: #0d0a08; color: #f3ead8; }
 .screen video { width: 100%; height: 100%; display: block; background: #000; object-fit: contain; }
 .ph-video { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; padding: 16px;
   background: radial-gradient(circle at 50% 40%, var(--c), #0d0a08 75%); }
 .ph-video small { opacity: .75; max-width: 40ch; font-size: .82rem; }
 .soon-tag { font: 700 .75rem var(--mono); letter-spacing: .1em; text-transform: uppercase; border: 1.5px solid #e0aa4f; color: #e0aa4f; border-radius: 999px; padding: .3rem .9rem; }
 .demo-anim { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-.pl-side { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 14px; }
-.pl-info { flex: none; max-height: 45%; overflow: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 4px; animation: pl-in .45s cubic-bezier(.22,1,.36,1); }
+.pl-side { display: contents; }
+.pl-info { min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 4px; animation: pl-in .45s cubic-bezier(.22,1,.36,1); }
 .pl-h { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
 .pl-h h2 { margin: 0; font-size: 1.45rem; letter-spacing: -.03em; font-weight: 800; line-height: 1.1; }
 .pl-h > span { color: var(--acc); font: 500 .75rem var(--mono); }
@@ -172,21 +173,23 @@ main { height: 100%; }
 .chap button:hover { background: var(--bar); }
 .pl-links { display: flex; gap: 14px; flex-wrap: wrap; }
 .pl-links a { font-weight: 700; color: var(--acc); text-decoration: none; }
-.pl-list { flex: 1; min-height: 0; display: flex; flex-direction: column; border-top: 1px solid var(--ln); padding-top: 10px; }
-.pl-list ul { flex: 1; min-height: 0; overflow: auto; list-style: none; margin: 0; padding: 0 4px 0 0; display: grid; align-content: start; gap: 4px; }
-.pl-list button { width: 100%; display: flex; gap: 10px; align-items: center; text-align: left; background: none; border: 1px solid transparent; border-radius: 10px; padding: 6px; cursor: pointer; }
+.pl-list { grid-column: 1 / -1; min-width: 0; display: flex; flex-direction: column; border-top: 1px solid var(--ln); padding-top: 8px; }
+.pl-list .chap-h { margin-bottom: 6px; }
+.pl-list ul { flex: 1; min-height: 0; overflow-x: auto; overflow-y: hidden; list-style: none; margin: 0; padding: 0 0 4px; display: flex; gap: 6px; scroll-snap-type: x proximity; }
+.pl-list li { flex: none; scroll-snap-align: start; }
+.pl-list button { width: 230px; height: 100%; display: flex; gap: 10px; align-items: center; text-align: left; background: none; border: 1px solid transparent; border-radius: 10px; padding: 6px; cursor: pointer; }
 .pl-list button:hover { background: var(--bar); }
 .pl-list button[aria-current="true"] { background: var(--bar); border-color: var(--ln); }
-.pl-list .thumb { flex: none; width: 64px; aspect-ratio: 16 / 9; border-radius: 6px; background: radial-gradient(circle at 50% 45%, var(--c), #0d0a08 85%); background-size: cover; background-position: center; position: relative; }
+.pl-list .thumb { flex: none; width: 88px; aspect-ratio: 16 / 9; border-radius: 6px; background: radial-gradient(circle at 50% 45%, var(--c), #0d0a08 85%); background-size: cover; background-position: center; position: relative; }
 .pl-list .thumb::after { content: ""; position: absolute; left: 50%; top: 50%; margin: -5px 0 0 -3px; border-left: 8px solid #f3ead8; border-top: 5px solid transparent; border-bottom: 5px solid transparent; opacity: .8; }
 .pl-it { display: flex; flex-direction: column; min-width: 0; }
 .pl-it b { font-weight: 700; font-size: .92rem; }
 .pl-it small { color: var(--mut); font-size: .76rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 @container (min-width: 760px) {
-  .player { flex-direction: row; align-items: stretch; }
-  .screen-wrap { flex: 1; min-width: 0; height: 100%; }
-  .screen { max-width: min(100%, calc((100cqh - 32px) * 16 / 9)); }
-  .pl-side { flex: none; width: clamp(260px, 28cqi, 380px); height: 100%; }
+  .player { grid-template-columns: minmax(0, 1fr) clamp(260px, 30cqi, 400px); grid-template-rows: minmax(0, 1fr) var(--strip); }
+  .screen-wrap { height: 100%; }
+  .screen { max-width: min(100%, calc((100cqh - 32px - 14px - var(--strip)) * 16 / 9)); }
+  .pl-info { align-self: start; max-height: 100%; }
 }
 
 /* ---------- terminal ---------- */
@@ -420,3 +423,8 @@ main { height: 100%; }
 .marquee { position: absolute; z-index: 5; pointer-events: none; border: 1px solid var(--acc); border-radius: 3px; background: color-mix(in srgb, var(--acc) 16%, transparent); }
 .icon.sel .ic { outline: 2px solid color-mix(in srgb, var(--acc) 70%, transparent); outline-offset: 4px; border-radius: 14px; background: color-mix(in srgb, var(--acc) 18%, transparent); }
 .icon.sel .lb { background: var(--acc); color: var(--on-acc); }
+
+/* ---------- first paint: hidden until the desk is measured (see `ready` in Desktop.tsx) ---------- */
+.desk:not(.ready) .win, .desk:not(.ready) .icons, .desk:not(.ready) .widgets, .desk:not(.ready) .home { visibility: hidden; }
+.desk.ready .icons, .desk.ready .widgets, .desk.ready .home { animation: appear .35s ease-out; }
+@keyframes appear { from { opacity: 0; } }

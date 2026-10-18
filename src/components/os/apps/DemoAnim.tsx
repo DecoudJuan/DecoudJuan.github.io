@@ -7,7 +7,7 @@ import type { Lang } from '../../../data/content';
 
 export type AnimKind = 'wasp' | 'vexa' | 'chess';
 
-const C = { bg: '#0d0a08', ink: '#f3ead8', mut: '#9b8d78', acc: '#e0aa4f', red: '#d9634a', grn: '#6aa25a', dim: '#3a2f27', paper: '#fbf8f2', paperInk: '#1e1914' };
+const C = { bg: '#0d0a08', ink: '#f3ead8', mut: '#b9ab93', soft: '#ddd2bd', acc: '#e0aa4f', red: '#d9634a', grn: '#6aa25a', dim: '#3a2f27', paper: '#fbf8f2', paperInk: '#1e1914' };
 const L = {
   es: {
     scan: 'semgrep · gitleaks · trivy', model: 'el modelo confirma sólo lo que importa', first: '142 s · primera pasada', cached: '6 s · sólo lo que cambió',
@@ -300,11 +300,11 @@ function chess(c: CanvasRenderingContext2D, W: number, H: number, t: number, lan
   const cp = CHAPTERS[ch];
   txt(c, `${ch + 1} / ${CHAPTERS.length}`, px, by + 16, 12, C.mut, 600, 'left', 'JetBrains Mono');
   const ty = wrap(c, cp.title[lang], px, by + 46, pw, 26, 21, C.ink);
-  wrap(c, cp.text[lang], px, ty + 30, pw, 20, 13.5, C.mut);
+  wrap(c, cp.text[lang], px, ty + 30, pw, 21, 14.5, C.soft);
   c.globalAlpha = 1;
 
   // SOLID row and chapter progress, always visible
-  const sy = by + side - 30, bw = Math.min(30, pw / 6);
+  const sy = by + side - 76, bw = Math.min(30, pw / 6);
   SOLID.forEach(([letter], i) => {
     const on = cp.solid.includes(letter), x = px + i * (bw + 6);
     c.fillStyle = on ? C.acc : '#17120e'; c.fillRect(x, sy, bw, 30);
@@ -312,13 +312,13 @@ function chess(c: CanvasRenderingContext2D, W: number, H: number, t: number, lan
     txt(c, letter, x + bw / 2, sy + 21, 15, on ? C.bg : C.mut, 800, 'center');
   });
   const names = SOLID.filter(([l]) => cp.solid.includes(l)).map(([, n]) => n[lang]).join(' · ');
-  c.globalAlpha = fade; txt(c, names, px + 5 * (bw + 6) + 6, sy + 20, 12, C.ink, 600); c.globalAlpha = 1;
+  c.globalAlpha = fade; wrap(c, names, px, sy + 50, pw, 16, 12.5, C.ink); c.globalAlpha = 1;
   const pgW = Math.min(pw, 320);
   CHAPTERS.forEach((_, i) => {
     const x = px + i * (pgW / CHAPTERS.length), seg = pgW / CHAPTERS.length - 6;
-    c.fillStyle = C.dim; c.fillRect(x, sy + 42, seg, 3);
+    c.fillStyle = C.dim; c.fillRect(x, sy + 72, seg, 3);
     const p = i < ch ? 1 : i === ch ? k / CH_LEN : 0;
-    c.fillStyle = C.acc; c.fillRect(x, sy + 42, seg * p, 3);
+    c.fillStyle = C.acc; c.fillRect(x, sy + 72, seg * p, 3);
   });
 }
 
@@ -339,9 +339,13 @@ export default function DemoAnim({ kind, lang }: { kind: AnimKind; lang: Lang })
       if (!W) return;
       c.fillStyle = C.bg; c.fillRect(0, 0, W, H);
       const t = reduced ? 5.5 : (performance.now() - t0) / 1000;
-      if (kind === 'chess') chess(c, W, H, t, lang);
-      else if (kind === 'vexa') vexa(c, W, H, t, lang, st);
-      else wasp(c, W, H, t, L[lang], st);
+      // Scenes are laid out for a ~820×460 screen; on bigger ones everything (text included) scales up.
+      const u = Math.max(1, Math.min(2.2, W / 820, H / 460)), w = W / u, h = H / u;
+      c.save(); c.scale(u, u);
+      if (kind === 'chess') chess(c, w, h, t, lang);
+      else if (kind === 'vexa') vexa(c, w, h, t, lang, st);
+      else wasp(c, w, h, t, L[lang], st);
+      c.restore();
     };
     const loop = () => { frame(); raf = requestAnimationFrame(loop); };
     const run = () => { cancelAnimationFrame(raf); if (vis && !reduced) loop(); else frame(); };

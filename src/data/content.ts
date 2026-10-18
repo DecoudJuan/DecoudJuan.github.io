@@ -14,7 +14,7 @@ export type Project = {
   /** Sleeve colour (album art, same in both themes). */
   color: string;
   /** Sleeve pattern, see `.cover.m1` … `.m6` in global.css. */
-  motif: 'm1' | 'm2' | 'm3' | 'm4' | 'm5' | 'm6';
+  motif: 'm1' | 'm2' | 'm3' | 'm4' | 'm5' | 'm6' | 'm7';
   text: string;
   links: [LinkKind, string][];
   /** Full demo. Hosted outside the repo (R2 or similar); loaded only on play. */
@@ -36,7 +36,7 @@ export const MUSIC_EMBED = '';
 /** CV PDF under /public. Empty until the file is in the repo; the download button is hidden meanwhile. */
 export const CV_PDF = '/cv/Juan_Decoud_Resume_EN.pdf';
 
-const PROJECTS: (Omit<Project, 'kind' | 'side' | 'text'> & { kind: T; side: T; text: T })[] = [
+const PROJECTS: (Omit<Project, 'name' | 'kind' | 'side' | 'text'> & { name: string | T; kind: T; side: T; text: T })[] = [
   {
     id: 'scout', name: 'Scout', color: '#2f5d46', motif: 'm1',
     kind: { es: '1.er puesto · hackatón 2026', en: '1st place · 2026 hackathon' },
@@ -97,10 +97,19 @@ const PROJECTS: (Omit<Project, 'kind' | 'side' | 'text'> & { kind: T; side: T; t
     },
     links: [],
   },
+  {
+    id: 'chess', name: { es: 'Ajedrez y damas', en: 'Chess & Checkers' }, color: '#5a3e2b', motif: 'm7',
+    kind: { es: 'Java · patrones GoF', en: 'Java · GoF patterns' },
+    side: { es: 'Lado B · 2025', en: 'Side B · 2025' },
+    text: {
+      es: 'Un motor de ajedrez y damas en Java construido sobre patrones GoF (Strategy, Adapter y Observer): validación completa de movimientos, detección de jaque y jaque mate, interfaz en Swing y tests con JUnit. El mismo motor juega los dos juegos cambiando sólo las reglas.',
+      en: 'A chess and checkers engine in Java built on GoF patterns (Strategy, Adapter and Observer): full move validation, check and checkmate detection, a Swing GUI and JUnit tests. The same engine plays both games by swapping only the rules.',
+    },
+    links: [['code', 'https://github.com/austral-ingsis-classroom/chess-DecoudJuan']],
+  },
 ];
 
 const TRASH: { name: string; year: string; what: T; url: string }[] = [
-  { name: 'Ajedrez y damas', year: '2025', what: { es: 'Motor en Java con Strategy, Adapter y Observer, GUI en Swing y JUnit.', en: 'Java engine on Strategy, Adapter and Observer, Swing GUI and JUnit.' }, url: 'https://github.com/austral-ingsis-classroom/chess-DecoudJuan' },
   { name: 'Ubica2', year: '2024', what: { es: 'Estacionamientos en Flask y PostgreSQL, con roles, chat y notificaciones.', en: 'Parking management in Flask and PostgreSQL, with roles, chat and notifications.' }, url: 'https://github.com/DecoudJuan/Laboratorio1' },
   { name: 'Portatic', year: '2024', what: { es: 'Control de acceso con ESP32 y MQTT, y llaves digitales en Flask (en equipo).', en: 'Access control with ESP32 and MQTT, digital keys in Flask (team project).' }, url: 'https://github.com/emmabeni27/Portatic' },
   { name: 'ESP key', year: '2024', what: { es: 'ESP8266 y ESP32 por ESP-NOW que validan una clave para prender LEDs.', en: 'ESP8266 and ESP32 talking over ESP-NOW to validate a key and light LEDs.' }, url: 'https://github.com/DecoudJuan/ESP_project-key' },
@@ -119,7 +128,7 @@ const STACK: [T, string[]][] = [
 ];
 
 const EDU: [string, T, T][] = [
-  ['2023 –', { es: 'Ingeniería Informática, Universidad Austral', en: 'Computer Engineering, Universidad Austral' }, { es: '72,6 % de la carrera y 45 materias aprobadas.', en: '72.6% of the degree done, 45 courses passed.' }],
+  ['2023 –', { es: 'Ingeniería Informática, Universidad Austral', en: 'Computer Engineering, Universidad Austral' }, { es: '69,36 % de la carrera y 43 materias aprobadas.', en: '69.36% of the degree done, 43 courses passed.' }],
   ['2026', { es: 'Laboratorio III · proyecto final', en: 'Laboratorio III · capstone' }, { es: 'Plataforma de benchmarks de modelos y agentes de IA para un cliente real.', en: 'Benchmarking platform for AI models and agents, for a real client.' }],
   ['2026', { es: 'Aseguramiento de la Calidad', en: 'Software Quality Assurance' }, { es: 'TDD, BDD y automatización de tests.', en: 'TDD, BDD and test automation.' }],
   ['2025', { es: 'Ingeniería de Sistemas', en: 'Systems Engineering' }, { es: 'PrintScript y Snippet Searcher: 8 servicios en Azure con CI/CD.', en: 'PrintScript and Snippet Searcher: 8 services on Azure with CI/CD.' }],
@@ -161,7 +170,7 @@ function build(l: Lang) {
       services: [t({ es: 'Webs y landings', en: 'Websites and landings' }), t({ es: 'Sistemas a medida', en: 'Custom systems' }), t({ es: 'Automatizaciones con IA', en: 'AI automations' })],
       site: LINKS.site,
     },
-    PROJECTS: PROJECTS.map((p) => ({ ...p, kind: t(p.kind), side: t(p.side), text: t(p.text) })) as Project[],
+    PROJECTS: PROJECTS.map((p) => ({ ...p, name: typeof p.name === 'string' ? p.name : t(p.name), kind: t(p.kind), side: t(p.side), text: t(p.text) })) as Project[],
     STACK: STACK.map(([k, v]) => [t(k), v]) as [string, string[]][],
     TRASH: TRASH.map((x) => ({ ...x, what: t(x.what) })),
     CV: {

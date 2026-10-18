@@ -138,6 +138,7 @@ main { height: 100%; }
 .m4 i { background: repeating-linear-gradient(0deg, transparent 0 13px, #f3ead8 13px 14px); mask: linear-gradient(90deg, transparent 30%, #000); }
 .m5 i { background: linear-gradient(90deg, #f3ead8 0 8%, transparent 8% 14%, #f3ead8 14% 30%, transparent 30% 36%, #f3ead8 36% 46%, transparent 46%) 0 30% / 100% 18% no-repeat, linear-gradient(90deg, #f3ead8 0 60%, transparent 60%) 0 55% / 100% 10% no-repeat; }
 .m6 i { background: radial-gradient(circle at 30% 30%, #f3ead8 3px, transparent 4px), radial-gradient(circle at 70% 40%, #f3ead8 3px, transparent 4px), radial-gradient(circle at 50% 70%, #f3ead8 3px, transparent 4px), linear-gradient(35deg, transparent 49%, #f3ead8 49.5% 50.5%, transparent 51%); }
+.m7 i { background: conic-gradient(#f3ead8 25%, transparent 0 50%, #f3ead8 0 75%, transparent 0) 0 0 / 22px 22px; opacity: .2; }
 .disc-k { font-size: .78rem; color: var(--mut); }
 
 /* ---------- player: video with its description underneath, list of every demo on the side ---------- */

@@ -20,7 +20,7 @@ const P: Record<string, string> = {
   n: '#29366f', b: '#3b5dc9', l: '#41a6f6', c: '#73eff7', w: '#f4f4f4', s: '#94b0c2', S: '#566c86', d: '#333c57', q: '#c9d4dd',
 };
 
-const PENGU = [
+const PENGU_FRONT = [
   '....ssssssss....',
   '...s.kkkkkk.s...',
   '..s.kkkkkkkk.s..',
@@ -37,7 +37,25 @@ const PENGU = [
   '...kkwwwwwwkk...',
   '....kkkkkkkk....',
 ];
-const FEET = ['...oo......oo...', '....oo....oo....'];
+// Side view, facing right: headphone band and cup, glasses on the white face, beak forward.
+const PENGU_SIDE = [
+  '......ssss......',
+  '.....s.kkkk.....',
+  '....s.kkkkkk....',
+  '...ss.kkkkkkk...',
+  '...sskkkkkkkkk..',
+  '...sskkkkwwkwk..',
+  '...sskkkkkkkkoo.',
+  '....skkkwwwwkoo.',
+  '.....kkwwwwwwk..',
+  '....kkkwwwwwwk..',
+  '...kkkkwwwwwwk..',
+  '..kk.kkwwwwwwk..',
+  '....kkkwwwwwk...',
+  '.....kkkwwwkk...',
+  '......kkkkkk....',
+];
+const RUN = ['.....oo...oo....', '......ooo.......', '....oo.....oo...'];
 const FISH = ['...ooo.y', '.oooooyy', 'okooooyy', '.oooooyy', '...ooo.y'];
 const MINE = ['...k...', '.kkkkk.', '.kwkkk.', 'kkkkkkk', '.kkkkk.', '.kkkkk.', '...k...'];
 const FLAG = ['..rrrr.', '..rrrrr', '..rrr..', '..k....', '..k....', '.kkk...', 'kkkkk..'];
@@ -139,8 +157,10 @@ function Pingu({ active, onScore, onEnd, g }: { active: boolean; onScore: (n: nu
     // the penguin (blinks when it crashes)
     if (!(st.dead && Math.floor(st.t / 6) % 2)) {
       const py = GROUND - 16 - st.y;
-      sprite(c, PENGU, 20, py);
-      sprite(c, [st.y > 0 ? FEET[0] : FEET[Math.floor(st.t / 6) % 2]], 20, py + 15);
+      const f = st.y > 0 ? 0 : Math.floor(st.t / 5) % RUN.length;
+      const bob = st.y === 0 && f === 1 ? -1 : 0;
+      sprite(c, PENGU_SIDE, 20, py + bob);
+      sprite(c, [RUN[f]], 20, py + 15);
     }
     // snow
     c.fillStyle = P.w;
@@ -338,7 +358,7 @@ function Mines({ onScore, g }: { onScore: (n: number) => void; g: G }) {
     panel(W - OX - 22, 22, String(Math.min(999, st.secs)).padStart(3, '0'));
     const fx = W / 2 - 8, fy = 4;
     c.fillStyle = P.w; c.fillRect(fx - 1, fy - 1, 18, 18); c.fillStyle = P.S; c.fillRect(fx + 1, fy + 1, 17, 17); c.fillStyle = P.q; c.fillRect(fx, fy, 16, 16);
-    sprite(c, PENGU.slice(0, 11), fx, fy + 3);
+    sprite(c, PENGU_FRONT.slice(0, 11), fx, fy + 3);
     if (st.state === 'lost') { c.fillStyle = P.r; [[fx + 4, fy + 8], [fx + 6, fy + 10], [fx + 6, fy + 8], [fx + 4, fy + 10], [fx + 10, fy + 8], [fx + 12, fy + 10], [fx + 12, fy + 8], [fx + 10, fy + 10]].forEach(([x, y]) => c.fillRect(x, y, 1, 1)); }
     if (st.state === 'won') { c.fillStyle = P.k; c.fillRect(fx + 3, fy + 8, 10, 2); }
     // board

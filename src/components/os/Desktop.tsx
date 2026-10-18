@@ -6,7 +6,6 @@ import Dock, { type DockItem } from './Dock';
 import NetBackground from './NetBackground';
 import Penguin from './Penguin';
 import Spotlight, { type SpotItem } from './Spotlight';
-import GitHubWidget from './GitHubWidget';
 import About from './apps/About';
 import Records from './apps/Records';
 import Player from './apps/Player';
@@ -18,10 +17,10 @@ import Notes from './apps/Notes';
 import Cv from './apps/Cv';
 import Trash from './apps/Trash';
 import { toggleTheme } from './theme';
+import { ICONS, LINK_ICONS } from './icons';
 import { LangCtx, storeLang, storedLang, useLang } from './lang';
-import { getContent, type Lang } from '../../data/content';
+import type { Lang } from '../../data/content';
 import { NOTES } from '../../data/notes';
-import type { Activity } from '../../data/github';
 import type { OpenTarget } from '../../data/fs';
 import type { Anim, AppId, Rect, WinState } from './types';
 
@@ -63,20 +62,6 @@ function layout(W: number, H: number): Record<AppId, Rect> {
   };
 }
 
-const I = (d: ReactNode) => <svg viewBox="0 0 24 24" aria-hidden="true">{d}</svg>;
-const ICONS: Record<AppId, ReactNode> = {
-  about: <Penguin still className="dk-pm" />,
-  records: I(<><circle cx="12" cy="12" r="9.5" fill="#17120e" /><circle cx="12" cy="12" r="7" fill="none" stroke="#3a2f27" strokeWidth=".8" /><circle cx="12" cy="12" r="5" fill="none" stroke="#3a2f27" strokeWidth=".8" /><circle cx="12" cy="12" r="3.2" fill="var(--acc)" /><circle cx="12" cy="12" r=".9" fill="#17120e" /></>),
-  player: I(<><rect x="2.5" y="4.5" width="19" height="15" rx="3" fill="var(--ink)" /><path d="M10 9v6l5-3z" fill="var(--acc)" /></>),
-  terminal: I(<><rect x="2.5" y="4" width="19" height="16" rx="3" fill="var(--term)" stroke="var(--term-ln)" /><path d="M6.5 9.5l3 2.5-3 2.5M11.5 15h5" fill="none" stroke="var(--term-acc)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></>),
-  games: I(<><rect x="2.5" y="7" width="19" height="10" rx="5" fill="var(--ink)" /><path d="M7 10v4M5 12h4" stroke="var(--win)" strokeWidth="1.8" strokeLinecap="round" /><circle cx="16" cy="11" r="1.2" fill="var(--acc)" /><circle cx="18" cy="13.2" r="1.2" fill="var(--acc)" /></>),
-  hire: I(<><rect x="3" y="7" width="18" height="12" rx="2.5" fill="var(--ink)" /><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7" fill="none" stroke="var(--ink)" strokeWidth="2" /><rect x="10.5" y="11" width="3" height="2.4" rx=".6" fill="var(--acc)" /></>),
-  music: I(<><rect x="3" y="3" width="18" height="18" rx="5" fill="var(--acc)" /><path d="M10 16.5V7.5l7-1.5v9" fill="none" stroke="var(--on-acc)" strokeWidth="1.8" strokeLinejoin="round" /><circle cx="8.6" cy="16.6" r="1.8" fill="var(--on-acc)" /><circle cx="15.6" cy="15.1" r="1.8" fill="var(--on-acc)" /></>),
-  notes: I(<><rect x="4" y="3" width="16" height="18" rx="2.5" fill="var(--note)" /><path d="M7.5 8h9M7.5 11.5h9M7.5 15h6" stroke="var(--note-ink)" strokeWidth="1.5" strokeLinecap="round" /></>),
-  cv: I(<><path d="M6 2.5h8l4 4V21a.5.5 0 0 1-.5.5h-11A.5.5 0 0 1 6 21z" fill="var(--win)" stroke="var(--ink)" strokeWidth="1.4" /><path d="M14 2.5V6.5h4" fill="none" stroke="var(--ink)" strokeWidth="1.4" /><path d="M8.5 11h7M8.5 14h7M8.5 17h4" stroke="var(--acc)" strokeWidth="1.4" strokeLinecap="round" /></>),
-  trash: I(<><path d="M5.5 7h13l-1.2 13.2a1 1 0 0 1-1 .8H7.7a1 1 0 0 1-1-.8z" fill="var(--bar)" stroke="var(--ink)" strokeWidth="1.4" /><path d="M4 7h16M9.5 7V4.5h5V7" fill="none" stroke="var(--ink)" strokeWidth="1.4" strokeLinecap="round" /><path d="M10 10.5v7M14 10.5v7" stroke="var(--mut)" strokeWidth="1.2" strokeLinecap="round" /></>),
-};
-
 function Clock({ lang }: { lang: Lang }) {
   const [t, setT] = useState('--:--');
   useEffect(() => {
@@ -89,18 +74,18 @@ function Clock({ lang }: { lang: Lang }) {
   return <span>BUE {t}</span>;
 }
 
-export default function Desktop({ activity = [] }: { activity?: Activity[] }) {
+export default function Desktop() {
   const [lang, setLangState] = useState<Lang>('es');
   useEffect(() => { const l = storedLang(); if (l) { setLangState(l); document.documentElement.lang = l; } }, []);
   const setLang = useCallback((l: Lang) => { setLangState(l); storeLang(l); }, []);
   return (
     <LangCtx.Provider value={{ lang, setLang }}>
-      <Os activity={activity} />
+      <Os />
     </LangCtx.Provider>
   );
 }
 
-function Os({ activity }: { activity: Activity[] }) {
+function Os() {
   const { lang, setLang, t, c } = useLang();
   const desk = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 1280, h: 800 });
@@ -117,6 +102,10 @@ function Os({ activity }: { activity: Activity[] }) {
   const [wall, setWall] = useState<Wall>('auto');
   const [wallMenu, setWallMenu] = useState(false);
   const z = useRef(20);
+  // Desktop selection: click selects an icon, drag on empty wood draws a selection box.
+  const [sel, setSel] = useState<AppId[]>([]);
+  const [box, setBox] = useState<{ x0: number; y0: number; x1: number; y1: number } | null>(null);
+  const iconRefs = useRef<Partial<Record<AppId, HTMLButtonElement | null>>>({});
 
   // Track the desk size; windows the user hasn't touched follow the responsive layout.
   useLayoutEffect(() => {
@@ -232,12 +221,36 @@ function Os({ activity }: { activity: Activity[] }) {
   };
   const item = (id: AppId): DockItem => ({ id, label: t.app[id][0], icon: ICONS[id], running: wins[id].status !== 'closed' });
   const links = [
-    { label: 'GitHub', href: c.PERSON.github, icon: I(<path fill="var(--ink)" d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.5-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.6 2.4 1.1 3 .8.1-.7.4-1.1.6-1.4-2.2-.2-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.7 1a9.4 9.4 0 0 1 5 0c1.9-1.3 2.7-1 2.7-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.3 4.8-4.6 5 .4.3.7.9.7 1.9V21c0 .3.2.6.7.5A10 10 0 0 0 12 2z" />) },
-    { label: 'LinkedIn', href: c.PERSON.linkedin, icon: I(<><rect x="3" y="3" width="18" height="18" rx="4" fill="var(--ink)" /><path d="M7.5 10v6.5M7.5 7.3v.1M11 16.5V10m0 3c0-2 1-3 2.6-3S16 11 16 13v3.5" stroke="var(--win)" strokeWidth="2" strokeLinecap="round" fill="none" /></>) },
+    { label: 'GitHub', href: c.PERSON.github, icon: LINK_ICONS.github },
+    { label: 'LinkedIn', href: c.PERSON.linkedin, icon: LINK_ICONS.linkedin },
   ];
 
   return (
-    <div className="desk" ref={desk} data-wall={wall}>
+    <div
+      className="desk" ref={desk} data-wall={wall}
+      onPointerDown={(e) => {
+        const tgt = e.target as HTMLElement;
+        // Only the bare desk starts a selection: not windows, icons, menu, dock or widgets.
+        if (e.button !== 0 || e.pointerType !== 'mouse' || !(tgt === desk.current || tgt.classList.contains('grain') || tgt.classList.contains('net'))) return;
+        setWallMenu(false);
+        const r = desk.current!.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+        setSel([]);
+        setBox({ x0: x, y0: y, x1: x, y1: y });
+        desk.current!.setPointerCapture(e.pointerId);
+      }}
+      onPointerMove={(e) => {
+        if (!box) return;
+        const r = desk.current!.getBoundingClientRect(), x1 = e.clientX - r.left, y1 = e.clientY - r.top;
+        setBox({ ...box, x1, y1 });
+        const L = Math.min(box.x0, x1) + r.left, R = Math.max(box.x0, x1) + r.left, T = Math.min(box.y0, y1) + r.top, B = Math.max(box.y0, y1) + r.top;
+        setSel(LAUNCH.filter((id) => {
+          const b = iconRefs.current[id]?.getBoundingClientRect();
+          return !!b && b.right > L && b.left < R && b.bottom > T && b.top < B;
+        }));
+      }}
+      onPointerUp={() => setBox(null)}
+      onPointerCancel={() => setBox(null)}
+    >
       <div className="grain" aria-hidden="true" />
       <NetBackground />
 
@@ -268,7 +281,13 @@ function Os({ activity }: { activity: Activity[] }) {
 
       <div className="icons" aria-label="Escritorio">
         {LAUNCH.map((id) => (
-          <button key={id} type="button" className="icon" onClick={() => open(id)}>
+          <button
+            key={id} type="button" ref={(el) => { iconRefs.current[id] = el; }}
+            className={'icon' + (sel.includes(id) ? ' sel' : '')} aria-pressed={sel.includes(id)}
+            // Mouse: click selects, double-click opens (like a desktop). Touch and keyboard: open right away.
+            onClick={(e) => { if ((e.nativeEvent as PointerEvent).pointerType === 'mouse') setSel([id]); else open(id); }}
+            onDoubleClick={() => { setSel([]); open(id); }}
+          >
             <span className="ic">{ICONS[id]}</span><span className="lb">{t.app[id][0]}</span>
           </button>
         ))}
@@ -279,7 +298,6 @@ function Os({ activity }: { activity: Activity[] }) {
           <b>{t.now}</b>
           <ul>{c.NOW.map(([k, v]) => <li key={k}><strong>{k}</strong> {v}</li>)}</ul>
         </aside>
-        <GitHubWidget items={activity} />
       </div>
 
       <nav className="home" aria-label={t.home}>
@@ -309,6 +327,10 @@ function Os({ activity }: { activity: Activity[] }) {
           {content[id]}
         </Window>
       ))}
+
+      {box && (
+        <div className="marquee" aria-hidden="true" style={{ left: Math.min(box.x0, box.x1), top: Math.min(box.y0, box.y1), width: Math.abs(box.x1 - box.x0), height: Math.abs(box.y1 - box.y0) }} />
+      )}
 
       <Dock items={(['about', 'records', 'player', 'notes', 'music', 'terminal', 'games', 'cv', 'hire'] as AppId[]).map(item)} links={links} tail={[item('trash')]} onApp={dockClick} />
 

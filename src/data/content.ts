@@ -34,7 +34,7 @@ const LINKS = {
 /** Spotify embed for the Música app, e.g. https://open.spotify.com/embed/playlist/<id>. Empty until Juan picks one. */
 export const MUSIC_EMBED = '';
 /** CV PDF under /public. Empty until the file is in the repo; the download button is hidden meanwhile. */
-export const CV_PDF = '';
+export const CV_PDF = '/cv/Juan_Decoud_Resume_EN.pdf';
 
 const PROJECTS: (Omit<Project, 'kind' | 'side' | 'text'> & { kind: T; side: T; text: T })[] = [
   {

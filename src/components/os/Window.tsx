@@ -41,6 +41,9 @@ function genieFrames(el: HTMLElement, id: string): Keyframe[] | null {
 
 export default function Window(p: Props) {
   const ref = useRef<HTMLElement>(null);
+  /** The last hide animation. It keeps its end frame (fill: forwards) so the window doesn't
+   *  flash back for a frame before React hides it; it is cancelled when the window comes back. */
+  const held = useRef<Animation | null>(null);
   const { win } = p;
 
   // Run the requested animation, then report back so Desktop can commit the state.
@@ -49,14 +52,17 @@ export default function Window(p: Props) {
     const a = win.anim;
     if (!el || !a) return;
     const done = () => p.onAnimEnd(a);
+    if (a === 'restoring' || a === 'opening') { held.current?.cancel(); held.current = null; }
     if (reduced() || narrow() || !el.animate) { done(); return; }
     let anim: Animation | null = null;
     const genie = genieFrames(el, win.id);
-    if (a === 'minimizing' && genie) anim = el.animate(genie, { duration: 520, easing: 'cubic-bezier(.55,0,.35,1)' });
+    const hide = { fill: 'forwards' as const };
+    if (a === 'minimizing' && genie) anim = el.animate(genie, { duration: 520, easing: 'cubic-bezier(.55,0,.35,1)', ...hide });
     else if (a === 'restoring' && genie) anim = el.animate([...genie].reverse().map((k) => ({ ...k, offset: 1 - (k.offset as number) })), { duration: 520, easing: 'cubic-bezier(.55,0,.35,1)' });
-    else if (a === 'closing') anim = el.animate([{ transform: 'none', opacity: 1 }, { transform: 'scale(.94)', opacity: 0 }], { duration: 170, easing: 'ease-in' });
+    else if (a === 'closing') anim = el.animate([{ transform: 'none', opacity: 1 }, { transform: 'scale(.94)', opacity: 0 }], { duration: 170, easing: 'ease-in', ...hide });
     else if (a === 'opening') anim = el.animate([{ transform: 'scale(.92)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 260, easing: 'cubic-bezier(.22,1,.36,1)' });
     if (!anim) { done(); return; }
+    if (a === 'minimizing' || a === 'closing') held.current = anim;
     anim.onfinish = done;
     return () => { anim && (anim.onfinish = null); };
     // eslint-disable-next-line react-hooks/exhaustive-deps

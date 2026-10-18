@@ -1,5 +1,6 @@
-// The dock. Its background never changes size: hovered icons grow with `scale` and their
-// neighbours slide sideways (translateX) by exactly the extra width, so nothing overlaps.
+// The dock. Hovered icons grow with `scale` and their neighbours slide sideways (translateX)
+// by exactly the extra width, so nothing overlaps; the background stretches to keep
+// covering the outermost icons, as in macOS.
 import { useRef, type ReactNode } from 'react';
 import type { AppId } from './types';
 
@@ -25,11 +26,22 @@ export default function Dock({ items, links, onApp }: Props) {
     for (let i = k + 1; i < c.length; i++) nc[i] = nc[i - 1] + (BASE * s[i - 1]) / 2 + GAP + (BASE * s[i]) / 2 + (c[i] - c[i - 1] - BASE - GAP);
     for (let i = k - 1; i >= 0; i--) nc[i] = nc[i + 1] - (BASE * s[i + 1]) / 2 - GAP - (BASE * s[i]) / 2 - (c[i + 1] - c[i] - BASE - GAP);
     els.forEach((el, i) => { el.style.transform = `translateX(${(nc[i] - c[i]).toFixed(1)}px) scale(${s[i].toFixed(3)})`; });
+    const bg = dock.querySelector<HTMLElement>('.dock-bg')!;
+    const first = els[0], lastEl = els[els.length - 1], n = els.length - 1;
+    bg.style.left = `${Math.min(0, nc[0] - (BASE * s[0]) / 2 - first.offsetLeft).toFixed(1)}px`;
+    bg.style.right = `${Math.min(0, lastEl.offsetLeft + BASE - (nc[n] + (BASE * s[n]) / 2)).toFixed(1)}px`;
   };
-  const leave = () => ref.current?.querySelectorAll<HTMLElement>('.dk').forEach((el) => { el.style.transform = ''; });
+  const leave = () => {
+    const dock = ref.current;
+    if (!dock) return;
+    dock.querySelectorAll<HTMLElement>('.dk').forEach((el) => { el.style.transform = ''; });
+    const bg = dock.querySelector<HTMLElement>('.dock-bg')!;
+    bg.style.left = bg.style.right = '';
+  };
 
   return (
     <nav className="dock" aria-label="Dock" ref={ref} onPointerMove={move} onPointerLeave={leave}>
+      <span className="dock-bg" aria-hidden="true" />
       {items.map((it) => (
         <button key={it.id} type="button" className={'dk' + (it.running ? ' run' : '')} data-dock={it.id} onClick={() => onApp(it.id)} aria-label={it.label}>
           {it.icon}<span className="tip" aria-hidden="true">{it.label}</span>

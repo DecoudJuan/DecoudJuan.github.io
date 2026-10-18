@@ -29,20 +29,17 @@ const ORDER: AppId[] = ['about', 'records', 'player', 'terminal', 'hire'];
 
 /** Initial layout as a function of the desk size, so big screens get big windows instead of empty wood. */
 function layout(W: number, H: number): Record<AppId, Rect> {
-  const top = MENU + 12, bottom = H - DOCK, side = W > 1500 ? 260 : 120;
-  const usable = W - side;
-  const leftW = clamp(usable * 0.42, 360, 720), rightX = clamp(usable * 0.47, 400, usable - 340);
-  const aboutH = clamp((bottom - top) * 0.46, 280, 470);
-  const recW = clamp(usable - rightX - 24, 340, 760), recH = clamp((bottom - top) * 0.58, 300, 600);
-  const termY = top + aboutH + 16, hireY = top + recH + 30;
-  const pW = clamp(W * 0.72, 380, 1280);
-  return {
-    about: { x: Math.round(usable * 0.03), y: top, w: leftW, h: aboutH },
-    records: { x: rightX, y: top + 18, w: recW, h: recH },
-    terminal: { x: Math.round(usable * 0.05), y: termY, w: clamp(leftW * 0.92, 320, 660), h: clamp(bottom - termY - 10, 180, 420) },
-    hire: { x: rightX + 30, y: hireY, w: clamp(recW * 0.75, 320, 560), h: clamp(bottom - hireY - 8, 230, 320) },
-    player: { x: Math.round((W - pW) / 2), y: top, w: pW, h: clamp(bottom - top - 10, 300, pW * 0.62) },
-  };
+  const top = MENU + 14, bottom = H - DOCK, side = W > 1500 ? 280 : 120, usable = W - side, avail = bottom - top;
+  const about = { x: Math.round(usable * 0.03), y: top, w: clamp(usable * 0.4, 380, 900), h: clamp(avail * 0.46, 300, 540) };
+  const recX = Math.round(about.x + about.w + usable * 0.03);
+  const records = { x: recX, y: top + 18, w: clamp(usable - recX - usable * 0.02, 340, 1100), h: clamp(avail * 0.55, 320, 660) };
+  const termY = about.y + about.h + 18;
+  const terminal = { x: Math.round(usable * 0.05), y: termY, w: clamp(about.w * 0.9, 320, 820), h: clamp(bottom - termY - 12, 180, 480) };
+  const hireH = clamp(avail * 0.42, 280, 520);
+  const hire = { x: recX + 40, y: Math.min(records.y + records.h + 18, bottom - hireH - 10), w: clamp(records.w * 0.82, 340, 900), h: hireH };
+  const pW = clamp(W * 0.8, 380, 1560);
+  const player = { x: Math.round((W - pW) / 2), y: top, w: pW, h: clamp(avail - 10, 320, pW * 0.6) };
+  return { about, records, terminal, hire, player };
 }
 
 const ICONS: Record<AppId, ReactNode> = {

@@ -17,9 +17,16 @@ export default function Hire() {
 
   return (
     <div className="hire">
-      <h2>{HIRE.title}</h2>
-      <p>{HIRE.text}</p>
-      <ul>{HIRE.items.map((i) => <li key={i}>{i}</li>)}</ul>
+      <div className="hire-head">
+        <h2>{HIRE.title}</h2>
+        <p>{HIRE.text}</p>
+      </div>
+      <ul className="hire-svc">
+        {HIRE.services.map(([k, v]) => <li key={k}><b>{k}</b><span>{v}</span></li>)}
+      </ul>
+      <ol className="hire-steps">
+        {HIRE.steps.map(([k, v]) => <li key={k}><b>{k}</b><span>{v}</span></li>)}
+      </ol>
       <div className="row">
         <a ref={btn} className="btn-l" href={`mailto:${PERSON.email}`} onPointerMove={mag} onPointerLeave={() => { btn.current!.style.transform = ''; }}>Escribime</a>
         <button type="button" className="btn-o" onClick={copy}>{copied ? 'Copiado' : PERSON.email}</button>

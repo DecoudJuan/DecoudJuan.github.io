@@ -22,6 +22,10 @@ export type Project = {
   poster?: string;
   /** [seconds, label]; only shown when there is a video. */
   chapters?: [number, string][];
+  /** An animated demo instead of a video (see apps/DemoAnim.tsx). */
+  anim?: 'wasp' | 'vexa' | 'chess';
+  /** No demo yet: the player says "Próximamente". */
+  soon?: boolean;
 };
 
 const LINKS = {
@@ -49,6 +53,7 @@ const PROJECTS: (Omit<Project, 'name' | 'kind' | 'side' | 'text'> & { name: stri
       en: 'Sorts the 72 group-stage matches of the 2026 World Cup for each person with a Bayesian model in the browser. Every thumbs up or down updates the model. The LLM translates and writes, it never decides: if the API is down, the app keeps classifying.',
     },
     links: [['try', 'https://scout-austral.github.io/'], ['code', 'https://github.com/scout-austral/scout-austral.github.io']],
+    video: '/demos/scout.mp4', poster: '/demos/scout.webp',
   },
   {
     id: 'vexa', name: 'Vexa', color: '#7a2e22', motif: 'm2',
@@ -59,6 +64,7 @@ const PROJECTS: (Omit<Project, 'name' | 'kind' | 'side' | 'text'> & { name: stri
       en: 'Replaced a Microsoft Access system. Argentine e-invoicing through ARCA (SOAP, CMS signing and the RG 4291 QR) with retries that never issue the same invoice twice. The business rules are Gherkin scenarios.',
     },
     links: [['download', 'https://github.com/DecoudJuan/Vexa/releases/latest'], ['code', 'https://github.com/DecoudJuan/Vexa']],
+    anim: 'vexa',
   },
   {
     id: 'wasp', name: 'Wasp', color: '#9c6f1e', motif: 'm3',
@@ -69,6 +75,7 @@ const PROJECTS: (Omit<Project, 'name' | 'kind' | 'side' | 'text'> & { name: stri
       en: 'Semgrep, Gitleaks and Trivy find candidates and the model only confirms and explains the ones that matter. An incremental cache took a large monorepo from 142 s to 6 s, and in CI it blocks the pipeline above a severity threshold.',
     },
     links: [['code', 'https://github.com/DecoudJuan/Wasp']],
+    anim: 'wasp',
   },
   {
     id: 'guitar', name: 'Guitar Learning', color: '#1f3550', motif: 'm4',
@@ -89,6 +96,7 @@ const PROJECTS: (Omit<Project, 'name' | 'kind' | 'side' | 'text'> & { name: stri
       en: 'A platform that benchmarks AI models and agents across harnesses, so results are comparable instead of anecdotal: parity, run isolation, cost, latency and results you can defend.',
     },
     links: [],
+    soon: true,
   },
   {
     id: 'snippet', name: 'Snippet Searcher', color: '#3a2c24', motif: 'm6',
@@ -99,6 +107,29 @@ const PROJECTS: (Omit<Project, 'name' | 'kind' | 'side' | 'text'> & { name: stri
       en: 'PrintScript, a language written from scratch in Kotlin, and its 8-service platform with Auth0 on Azure, with Docker CI/CD that rebuilds only the container that changed. My part: architecture, VMs and the whole pipeline.',
     },
     links: [],
+    video: '/demos/snippet-searcher.mp4', poster: '/demos/snippet-searcher.webp',
+  },
+  {
+    id: 'agent', name: 'Agent Orchestra', color: '#2e4057', motif: 'm2',
+    kind: { es: 'Agente de código · Python', en: 'Coding agent · Python' },
+    side: { es: 'Lado C · 2026', en: 'Side C · 2026' },
+    text: {
+      es: 'Un agente de código hecho desde cero: el loop agéntico sin frameworks, sólo el andamiaje entre el modelo y sus herramientas. Lee el repo, planea, edita archivos y corre comandos.',
+      en: 'A coding agent built from scratch: the raw agentic loop with no frameworks, just the scaffolding between the model and its tools. It reads the repo, plans, edits files and runs commands.',
+    },
+    links: [['code', 'https://github.com/DecoudJuan/Agent-Orchestra']],
+    video: '/demos/agent-orchestra.mp4', poster: '/demos/agent-orchestra.webp',
+  },
+  {
+    id: 'sonora', name: 'Sonora', color: '#6b3f5e', motif: 'm1',
+    kind: { es: 'Full-stack en Azure · en equipo', en: 'Full-stack on Azure · team project' },
+    side: { es: 'Lado C · 2025', en: 'Side C · 2025' },
+    text: {
+      es: 'Aplicación full-stack con React y NestJS deployada en Azure, hecha con product owners de quinto año. Trabajé en front, back y base de datos, y me encargué de la infraestructura cloud y el deploy.',
+      en: 'A full-stack app with React and NestJS deployed on Azure, built with fifth-year students as product owners. I worked across front end, back end and database, and owned the cloud infrastructure and deployment.',
+    },
+    links: [],
+    video: '/demos/sonora.mp4', poster: '/demos/sonora.webp',
   },
   {
     id: 'chess', name: { es: 'Ajedrez y damas', en: 'Chess & Checkers' }, color: '#5a3e2b', motif: 'm7',
@@ -109,6 +140,7 @@ const PROJECTS: (Omit<Project, 'name' | 'kind' | 'side' | 'text'> & { name: stri
       en: 'A chess and checkers engine in Java built on GoF patterns (Strategy, Adapter and Observer): full move validation, check and checkmate detection, a Swing GUI and JUnit tests. The same engine plays both games by swapping only the rules.',
     },
     links: [['code', 'https://github.com/austral-ingsis-classroom/chess-DecoudJuan']],
+    anim: 'chess',
   },
 ];
 

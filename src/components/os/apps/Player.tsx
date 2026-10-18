@@ -4,6 +4,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Project } from '../../../data/content';
 import { useLang } from '../lang';
+import DemoAnim from './DemoAnim';
 
 const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 const store = {
@@ -12,7 +13,7 @@ const store = {
 };
 
 export default function Player({ project, onPick }: { project: Project; onPick: (id: string) => void }) {
-  const { t, c } = useLang();
+  const { lang, t, c } = useLang();
   const P = t.player;
   const vRef = useRef<HTMLVideoElement>(null);
   const [rate, setRate] = useState(1);
@@ -41,11 +42,16 @@ export default function Player({ project, onPick }: { project: Project; onPick: 
             <video key={project.id} ref={vRef} controls playsInline preload="none" poster={project.poster} onLoadedMetadata={onMeta} onTimeUpdate={onTime}>
               <source src={project.video} type="video/mp4" />
             </video>
+          ) : project.anim ? (
+            <DemoAnim key={project.anim} kind={project.anim} lang={lang} />
           ) : (
             <div className="ph-video">
-              <span className="play" aria-hidden="true" />
-              <b>{P.demo} {project.name}</b>
-              <small>{P.soon}</small>
+              {project.soon && <span className="soon-tag">{P.soonTitle}</span>}
+              <b>{project.name}</b>
+              {project.soon ? <small>{P.soon}</small> : (() => {
+                const live = project.links.find(([k]) => k === 'try');
+                return live ? <a className="btn-l" href={live[1]} target="_blank" rel="noopener">{P.live} <span aria-hidden="true">&#8599;</span></a> : null;
+              })()}
             </div>
           )}
         </div>
@@ -78,7 +84,7 @@ export default function Player({ project, onPick }: { project: Project; onPick: 
           {c.PROJECTS.map((p) => (
             <li key={p.id}>
               <button type="button" aria-current={p.id === project.id} onClick={() => onPick(p.id)} style={{ ['--c' as string]: p.color }}>
-                <span className="thumb" aria-hidden="true" />
+                <span className="thumb" aria-hidden="true" style={p.poster ? { backgroundImage: `url(${p.poster})` } : undefined} />
                 <span className="pl-it"><b>{p.name}</b><small>{p.kind}</small></span>
               </button>
             </li>

@@ -31,8 +31,11 @@ const LINKS = {
   site: 'https://juandecoud.pages.dev/',
 };
 
-/** Spotify embed for the Música app, e.g. https://open.spotify.com/embed/playlist/<id>. Empty until Juan picks one. */
-export const MUSIC_EMBED = '';
+/** Spotify playlists for the Música app: [label, playlist id]. */
+export const PLAYLISTS: [string, string][] = [
+  ['Radio Jazz', '6RwxGfti99cThuzDJNn3d3'],
+  ['Radio City Pop', '2ZUyemczJdoozQYayNnihc'],
+];
 /** CV PDF under /public. Empty until the file is in the repo; the download button is hidden meanwhile. */
 export const CV_PDF = '/cv/Juan_Decoud_Resume_EN.pdf';
 

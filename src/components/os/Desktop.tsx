@@ -56,7 +56,7 @@ function layout(W: number, H: number): Record<AppId, Rect> {
     about, records, terminal, hire, player,
     games: centred(clamp(W * 0.42, 380, 760), clamp(avail * 0.62, 340, 580), 0, -10),
     notes: centred(clamp(W * 0.5, 400, 900), clamp(avail * 0.7, 320, 640), -30, -20),
-    music: centred(clamp(W * 0.32, 340, 520), clamp(avail * 0.62, 300, 560), 120, 0),
+    music: centred(clamp(W * 0.34, 360, 560), clamp(avail * 0.8, 520, 640), 120, 0),
     cv: centred(clamp(W * 0.42, 380, 760), clamp(avail * 0.9, 340, 980), 40, 0),
     trash: centred(clamp(W * 0.36, 340, 620), clamp(avail * 0.6, 280, 520), 80, 20),
   };

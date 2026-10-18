@@ -36,6 +36,38 @@ const ORDER: AppId[] = ['about', 'records', 'player', 'terminal', 'notes', 'musi
 /** Apps shown in the menu bar, the desktop icons and the phone home screen. */
 const LAUNCH: AppId[] = ['about', 'records', 'notes', 'music', 'terminal', 'games', 'cv', 'hire'];
 const WALLS = ['auto', 'roble', 'nogal', 'noche'] as const;
+
+/** Desktop icon grid: cells counted from the top-right corner of the desk. */
+type Cell = { c: number; r: number };
+const CELL_W = 100, CELL_H = 96, GRID_X = 4, GRID_Y = MENU + 8;
+const key = (x: Cell) => `${x.c}:${x.r}`;
+const gridFor = (W: number, H: number) => ({ cols: Math.max(1, Math.floor((W - GRID_X) / CELL_W)), rows: Math.max(1, Math.floor((H - GRID_Y - DOCK) / CELL_H)) });
+function nearestFree(want: Cell, taken: Set<string>, g: { cols: number; rows: number }): Cell {
+  for (let d = 0; d < g.cols + g.rows; d++) {
+    for (let dc = -d; dc <= d; dc++) for (let dr = -d; dr <= d; dr++) {
+      if (Math.max(Math.abs(dc), Math.abs(dr)) !== d) continue;
+      const c = { c: want.c + dc, r: want.r + dr };
+      if (c.c >= 0 && c.r >= 0 && c.c < g.cols && c.r < g.rows && !taken.has(key(c))) return c;
+    }
+  }
+  return want;
+}
+/** Saved cells where they still fit; everything else fills the right-hand columns top to bottom. */
+function placeIcons(saved: Partial<Record<AppId, Cell>>, g: { cols: number; rows: number }): Record<AppId, Cell> {
+  const out = {} as Record<AppId, Cell>, taken = new Set<string>();
+  LAUNCH.forEach((id) => {
+    const s = saved[id];
+    if (s && s.c < g.cols && s.r < g.rows && !taken.has(key(s))) { out[id] = s; taken.add(key(s)); }
+  });
+  let n = 0;
+  LAUNCH.forEach((id) => {
+    if (out[id]) return;
+    let c: Cell;
+    do { c = { c: Math.floor(n / g.rows), r: n % g.rows }; n++; } while (taken.has(key(c)));
+    out[id] = c; taken.add(key(c));
+  });
+  return out;
+}
 type Wall = (typeof WALLS)[number];
 
 /** Initial layout as a function of the desk size, so big screens get big windows instead of empty wood. */
@@ -106,43 +138,46 @@ function Os() {
   const [sel, setSel] = useState<AppId[]>([]);
   const [box, setBox] = useState<{ x0: number; y0: number; x1: number; y1: number } | null>(null);
   const iconRefs = useRef<Partial<Record<AppId, HTMLButtonElement | null>>>({});
-  // Icons can be dragged around the desk (several at once if selected); offsets are remembered.
-  const [iconPos, setIconPos] = useState<Partial<Record<AppId, { x: number; y: number }>>>({});
+  // Icons live on a grid, like Windows: the desk is split into cells counted from the top-right
+  // corner. Dragging moves the icon freely; on drop it snaps to the nearest free cell.
+  const [cells, setCells] = useState<Partial<Record<AppId, Cell>>>({});
+  const [drag, setDrag] = useState<{ ids: AppId[]; dx: number; dy: number; target: Cell | null } | null>(null);
   const dragged = useRef(false);
-  useEffect(() => { try { setIconPos(JSON.parse(localStorage.getItem('icons') || '{}')); } catch { /* ignore */ } }, []);
+  useEffect(() => { try { setCells(JSON.parse(localStorage.getItem('icon-cells') || '{}')); } catch { /* ignore */ } }, []);
+  const grid = gridFor(size.w, size.h);
+  const placed = placeIcons(cells, grid);
   const dragIcon = (id: AppId) => (e: React.PointerEvent<HTMLButtonElement>) => {
     if (e.pointerType !== 'mouse' || e.button !== 0) return;
     const ids = sel.includes(id) ? sel : [id];
-    const sx = e.clientX, sy = e.clientY, base = { ...iconPos };
-    const el = e.currentTarget;
-    const d = desk.current!.getBoundingClientRect();
-    // Untransformed position of each dragged icon, measured once so the clamp doesn't drift.
-    const home = Object.fromEntries(ids.map((k) => {
-      const b = iconRefs.current[k]!.getBoundingClientRect(), o = base[k] ?? { x: 0, y: 0 };
-      return [k, { left: b.left - o.x - d.left, top: b.top - o.y - d.top, w: b.width, h: b.height }];
-    })) as Record<AppId, { left: number; top: number; w: number; h: number }>;
-    let moved = false;
+    const sx = e.clientX, sy = e.clientY, el = e.currentTarget, from = placed[id];
+    let moved = false, target: Cell | null = null;
     el.setPointerCapture(e.pointerId);
     const move = (ev: PointerEvent) => {
       const dx = ev.clientX - sx, dy = ev.clientY - sy;
       if (!moved && Math.hypot(dx, dy) < 4) return;
       moved = true;
-      setIconPos(() => {
-        const next = { ...base };
-        ids.forEach((k) => {
-          const o = base[k] ?? { x: 0, y: 0 }, h = home[k];
-          // keep every icon inside the desk, below the menu and above the dock
-          next[k] = { x: clamp(o.x + dx, -h.left, d.width - h.left - h.w), y: clamp(o.y + dy, MENU + 4 - h.top, d.height - DOCK - h.top - h.h) };
-        });
-        return next;
-      });
+      // Cells are counted from the right edge, so moving right lowers the column.
+      target = { c: clamp(Math.round(from.c - dx / CELL_W), 0, grid.cols - 1), r: clamp(Math.round(from.r + dy / CELL_H), 0, grid.rows - 1) };
+      setDrag({ ids, dx, dy, target });
     };
     const up = () => {
       el.removeEventListener('pointermove', move); el.removeEventListener('pointerup', up); el.removeEventListener('pointercancel', up);
-      if (moved) {
-        dragged.current = true;
-        setIconPos((cur) => { try { localStorage.setItem('icons', JSON.stringify(cur)); } catch { /* ignore */ } return cur; });
-      }
+      setDrag(null);
+      if (!moved || !target) return;
+      dragged.current = true;
+      const dc = target.c - from.c, dr = target.r - from.r;
+      setCells(() => {
+        const next: Partial<Record<AppId, Cell>> = { ...placed };
+        const taken = new Set(LAUNCH.filter((k) => !ids.includes(k)).map((k) => key(placed[k])));
+        ids.forEach((k) => {
+          const want = { c: clamp(placed[k].c + dc, 0, grid.cols - 1), r: clamp(placed[k].r + dr, 0, grid.rows - 1) };
+          const spot = nearestFree(want, taken, grid);
+          taken.add(key(spot));
+          next[k] = spot;
+        });
+        try { localStorage.setItem('icon-cells', JSON.stringify(next)); } catch { /* ignore */ }
+        return next;
+      });
     };
     el.addEventListener('pointermove', move); el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up);
   };
@@ -320,22 +355,28 @@ function Os() {
       </div>
 
       <div className="icons" aria-label="Escritorio">
-        {LAUNCH.map((id) => (
-          <button
-            key={id} type="button" ref={(el) => { iconRefs.current[id] = el; }}
-            className={'icon' + (sel.includes(id) ? ' sel' : '')} aria-pressed={sel.includes(id)}
-            style={iconPos[id] ? { transform: `translate(${iconPos[id]!.x}px, ${iconPos[id]!.y}px)` } : undefined}
-            onPointerDown={dragIcon(id)}
-            // Mouse: click selects, double-click opens (like a desktop). Touch and keyboard: open right away.
-            onClick={(e) => {
-              if (dragged.current) { dragged.current = false; return; }
-              if ((e.nativeEvent as PointerEvent).pointerType === 'mouse') { if (!sel.includes(id) || sel.length > 1) setSel([id]); } else open(id);
-            }}
-            onDoubleClick={() => { setSel([]); open(id); }}
-          >
-            <span className="ic">{ICONS[id]}</span><span className="lb">{t.app[id][0]}</span>
-          </button>
-        ))}
+        {drag?.target && (
+          <span className="cell-hint" aria-hidden="true" style={{ right: GRID_X + drag.target.c * CELL_W, top: GRID_Y + drag.target.r * CELL_H, width: CELL_W, height: CELL_H }} />
+        )}
+        {LAUNCH.map((id) => {
+          const at = placed[id], moving = drag?.ids.includes(id);
+          return (
+            <button
+              key={id} type="button" ref={(el) => { iconRefs.current[id] = el; }}
+              className={'icon' + (sel.includes(id) ? ' sel' : '') + (moving ? ' moving' : '')} aria-pressed={sel.includes(id)}
+              style={{ right: GRID_X + at.c * CELL_W, top: GRID_Y + at.r * CELL_H, transform: moving ? `translate(${drag!.dx}px, ${drag!.dy}px)` : undefined }}
+              onPointerDown={dragIcon(id)}
+              // Mouse: click selects, double-click opens (like a desktop). Touch and keyboard: open right away.
+              onClick={(e) => {
+                if (dragged.current) { dragged.current = false; return; }
+                if ((e.nativeEvent as PointerEvent).pointerType === 'mouse') { if (!sel.includes(id) || sel.length > 1) setSel([id]); } else open(id);
+              }}
+              onDoubleClick={() => { setSel([]); open(id); }}
+            >
+              <span className="ic">{ICONS[id]}</span><span className="lb">{t.app[id][0]}</span>
+            </button>
+          );
+        })}
       </div>
 
       <div className="widgets">

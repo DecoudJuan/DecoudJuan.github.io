@@ -62,8 +62,11 @@ main { height: 100%; }
 .menu button:hover { opacity: 1; }
 .menu .r { margin-left: auto; display: flex; gap: 14px; align-items: center; font: 500 .8rem var(--mono); font-variant-numeric: tabular-nums; }
 
-.icons { position: absolute; right: 14px; top: 50px; z-index: 3; display: grid; gap: 4px; }
-.icon { position: relative; z-index: 1; touch-action: none; width: 92px; display: flex; flex-direction: column; align-items: center; gap: 4px; background: none; border: 0; border-radius: 10px; padding: 8px 4px; cursor: pointer; }
+.icons { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.icons .icon { position: absolute; pointer-events: auto; transition: right .25s cubic-bezier(.22,1,.36,1), top .25s cubic-bezier(.22,1,.36,1); }
+.icons .icon.moving { transition: none; z-index: 2; opacity: .9; }
+.cell-hint { position: absolute; border-radius: 12px; border: 1.5px dashed color-mix(in srgb, var(--acc) 70%, transparent); background: color-mix(in srgb, var(--acc) 10%, transparent); pointer-events: none; }
+.icon { touch-action: none; width: 100px; height: 96px; justify-content: flex-start; display: flex; flex-direction: column; align-items: center; gap: 4px; background: none; border: 0; border-radius: 10px; padding: 8px 4px; cursor: pointer; }
 .icon .ic { width: 50px; height: 50px; display: block; }
 .icon .lb { font-size: .74rem; font-weight: 500; text-align: center; line-height: 1.2; padding: 1px 6px; border-radius: 5px; background: var(--dock); }
 .icon:hover .lb, .icon:focus-visible .lb { background: var(--acc); color: var(--on-acc); }

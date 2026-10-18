@@ -1,8 +1,10 @@
 // Short pitch plus a live-looking preview of the freelance site; everything leads there.
 import { useRef, useState } from 'react';
-import { HIRE, PERSON } from '../../../data/content';
+import { useLang } from '../lang';
 
 export default function Hire() {
+  const { t, c } = useLang();
+  const HIRE = c.HIRE, PERSON = c.PERSON;
   const [copied, setCopied] = useState(false);
   const btn = useRef<HTMLAnchorElement>(null);
 
@@ -25,14 +27,14 @@ export default function Hire() {
         <ul className="hire-tags">{HIRE.services.map((s) => <li key={s}>{s}</li>)}</ul>
         <div className="row">
           <a ref={btn} className="btn-l" href={HIRE.site} target="_blank" rel="noopener" onPointerMove={mag} onPointerLeave={() => { btn.current!.style.transform = ''; }}>
-            Ver mis servicios <span aria-hidden="true">&#8599;</span>
+            {t.hire.cta} <span aria-hidden="true">&#8599;</span>
           </a>
-          <button type="button" className="btn-o" onClick={copy}>{copied ? 'Mail copiado' : 'Copiar mail'}</button>
+          <button type="button" className="btn-o" onClick={copy}>{copied ? t.hire.copied : t.hire.copy}</button>
         </div>
       </div>
-      <a className="browser" href={HIRE.site} target="_blank" rel="noopener" aria-label={`Abrir ${host}`}>
+      <a className="browser" href={HIRE.site} target="_blank" rel="noopener" aria-label={`${t.hire.open} ${host}`}>
         <span className="browser-bar" aria-hidden="true"><i /><i /><i /><span>{host}</span></span>
-        <img src="/previews/servicios.webp" alt={`Página de servicios freelance en ${host}`} width="1200" height="750" loading="lazy" />
+        <img src="/previews/servicios.webp" alt={host} width="1200" height="750" loading="lazy" />
       </a>
     </div>
   );

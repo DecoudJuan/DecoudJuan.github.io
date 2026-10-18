@@ -21,6 +21,9 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: withastro/action@v6
+        env:
+          # Only to read public activity for the desktop widget without hitting the anonymous rate limit.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   deploy:
     needs: build
     runs-on: ubuntu-latest

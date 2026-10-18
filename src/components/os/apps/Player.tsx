@@ -2,7 +2,8 @@
 // demo on the side. Nothing downloads until play (preload="none"); chapters, speed, and the
 // position is remembered per project in this browser.
 import { useEffect, useRef, useState } from 'react';
-import { PROJECTS, type Project } from '../../../data/content';
+import type { Project } from '../../../data/content';
+import { useLang } from '../lang';
 
 const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 const store = {
@@ -11,6 +12,8 @@ const store = {
 };
 
 export default function Player({ project, onPick }: { project: Project; onPick: (id: string) => void }) {
+  const { t, c } = useLang();
+  const P = t.player;
   const vRef = useRef<HTMLVideoElement>(null);
   const [rate, setRate] = useState(1);
   const [resume, setResume] = useState('');
@@ -20,8 +23,8 @@ export default function Player({ project, onPick }: { project: Project; onPick: 
   useEffect(() => { if (vRef.current) vRef.current.playbackRate = rate; }, [rate]);
 
   const onMeta = () => {
-    const v = vRef.current!, t = store.get(key);
-    if (t > 5 && t < v.duration - 5) { v.currentTime = t; setResume(`seguís en ${fmt(t)}`); }
+    const v = vRef.current!, pos = store.get(key);
+    if (pos > 5 && pos < v.duration - 5) { v.currentTime = pos; setResume(`${P.resume} ${fmt(pos)}`); }
   };
   const last = useRef(0);
   const onTime = () => {
@@ -41,8 +44,8 @@ export default function Player({ project, onPick }: { project: Project; onPick: 
           ) : (
             <div className="ph-video">
               <span className="play" aria-hidden="true" />
-              <b>Demo de {project.name}</b>
-              <small>Acá va el video. Carga recién cuando le das play.</small>
+              <b>{P.demo} {project.name}</b>
+              <small>{P.soon}</small>
             </div>
           )}
         </div>
@@ -50,7 +53,7 @@ export default function Player({ project, onPick }: { project: Project; onPick: 
           <div className="pl-h">
             <h2>{project.name}</h2><span>{project.kind}</span>
             {project.video && (
-              <span className="pl-ctl" role="group" aria-label="Velocidad">
+              <span className="pl-ctl" role="group" aria-label={P.speed}>
                 {[1, 1.5, 2].map((r) => (
                   <button key={r} type="button" aria-pressed={rate === r} onClick={() => setRate(r)}>{String(r).replace('.', ',')}x</button>
                 ))}
@@ -60,19 +63,19 @@ export default function Player({ project, onPick }: { project: Project; onPick: 
           </div>
           <p className="pl-t">{project.text}</p>
           {project.links.length > 0 && (
-            <div className="pl-links">{project.links.map(([l, u]) => <a key={u} href={u} target="_blank" rel="noopener">{l} <span aria-hidden="true">&#8599;</span></a>)}</div>
+            <div className="pl-links">{project.links.map(([k, u]) => <a key={u} href={u} target="_blank" rel="noopener">{t.link[k]} <span aria-hidden="true">&#8599;</span></a>)}</div>
           )}
           {project.video && project.chapters?.length ? (
-            <ul className="chap" aria-label="Capítulos">
-              {project.chapters.map(([t, l]) => <li key={t}><button type="button" onClick={() => seek(t)}><span>{fmt(t)}</span>{l}</button></li>)}
+            <ul className="chap" aria-label={P.chapters}>
+              {project.chapters.map(([at, l]) => <li key={at}><button type="button" onClick={() => seek(at)}><span>{fmt(at)}</span>{l}</button></li>)}
             </ul>
           ) : null}
         </div>
       </div>
-      <nav className="pl-list" aria-label="Todas las demos">
-        <p className="chap-h">Demos</p>
+      <nav className="pl-list" aria-label={P.all}>
+        <p className="chap-h">{P.list}</p>
         <ul>
-          {PROJECTS.map((p) => (
+          {c.PROJECTS.map((p) => (
             <li key={p.id}>
               <button type="button" aria-current={p.id === project.id} onClick={() => onPick(p.id)} style={{ ['--c' as string]: p.color }}>
                 <span className="thumb" aria-hidden="true" />

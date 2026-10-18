@@ -5,11 +5,11 @@ import { useRef, type ReactNode } from 'react';
 import type { AppId } from './types';
 
 export type DockItem = { id: AppId; label: string; icon: ReactNode; running: boolean };
-type Props = { items: DockItem[]; links: { label: string; href: string; icon: ReactNode }[]; onApp: (id: AppId) => void };
+type Props = { items: DockItem[]; links: { label: string; href: string; icon: ReactNode }[]; tail?: DockItem[]; onApp: (id: AppId) => void };
 
 const BASE = 48, MAX = 1.55, GAP = 6, REACH = 140;
 
-export default function Dock({ items, links, onApp }: Props) {
+export default function Dock({ items, links, tail = [], onApp }: Props) {
   const ref = useRef<HTMLElement>(null);
 
   const move = (e: React.PointerEvent) => {
@@ -39,20 +39,24 @@ export default function Dock({ items, links, onApp }: Props) {
     bg.style.left = bg.style.right = '';
   };
 
+  const button = (it: DockItem) => (
+    <button key={it.id} type="button" className={'dk' + (it.running ? ' run' : '')} data-dock={it.id} onClick={() => onApp(it.id)} aria-label={it.label}>
+      {it.icon}<span className="tip" aria-hidden="true">{it.label}</span>
+    </button>
+  );
+
   return (
     <nav className="dock" aria-label="Dock" ref={ref} onPointerMove={move} onPointerLeave={leave}>
       <span className="dock-bg" aria-hidden="true" />
-      {items.map((it) => (
-        <button key={it.id} type="button" className={'dk' + (it.running ? ' run' : '')} data-dock={it.id} onClick={() => onApp(it.id)} aria-label={it.label}>
-          {it.icon}<span className="tip" aria-hidden="true">{it.label}</span>
-        </button>
-      ))}
+      {items.map(button)}
       <span className="dsep" aria-hidden="true" />
       {links.map((l) => (
         <a key={l.href} className="dk" href={l.href} target="_blank" rel="noopener" aria-label={l.label}>
           {l.icon}<span className="tip" aria-hidden="true">{l.label}</span>
         </a>
       ))}
+      {tail.length > 0 && <span className="dsep" aria-hidden="true" />}
+      {tail.map(button)}
     </nav>
   );
 }

@@ -1,12 +1,16 @@
 ---
 import Base from '../layouts/Base.astro';
 import Desktop from '../components/os/Desktop';
+import { recentActivity } from '../data/github';
+
+// Read once per build; the desktop widget hides itself when this is empty.
+const activity = await recentActivity();
 ---
 <Base
   title="Juan Decoud · webs, sistemas y automatizaciones con IA"
   description="Juan Manuel Decoud: webs, sistemas y automatizaciones con IA para pymes. Support & Integrations Engineer en Darwin AI y estudiante de Ingeniería Informática en la Universidad Austral."
 >
   <main>
-    <Desktop client:load />
+    <Desktop client:load activity={activity} />
   </main>
 </Base>

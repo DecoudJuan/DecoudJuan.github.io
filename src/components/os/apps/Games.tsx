@@ -1,12 +1,15 @@
 // Three small games in one window: Pingu (jump the ice), Snake (with fish) and Buscaminas.
 // Keyboard only reaches a game while its window is focused.
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useLang } from '../lang';
+import type { UIStrings } from '../../../data/i18n';
+type G = UIStrings['games'];
 
 type GameId = 'pingu' | 'snake' | 'mines';
-const GAMES: [GameId, string, string][] = [
-  ['pingu', 'Pingu', 'Espacio o tocar para saltar'],
-  ['snake', 'Snake', 'Flechas o deslizar · comé pescados'],
-  ['mines', 'Buscaminas', 'Clic para abrir · clic derecho o mantener para marcar'],
+const GAMES: [GameId, { es: string; en: string }][] = [
+  ['pingu', { es: 'Pingu', en: 'Pingu' }],
+  ['snake', { es: 'Snake', en: 'Snake' }],
+  ['mines', { es: 'Buscaminas', en: 'Minesweeper' }],
 ];
 const css = (el: Element, n: string) => getComputedStyle(el).getPropertyValue(n).trim();
 const best = {
@@ -33,7 +36,7 @@ function useCanvas(draw: (c: CanvasRenderingContext2D, w: number, h: number) => 
   return { ref, size };
 }
 
-function Pingu({ active, onScore, onEnd }: { active: boolean; onScore: (n: number) => void; onEnd: () => void }) {
+function Pingu({ active, onScore, onEnd, g }: { active: boolean; onScore: (n: number) => void; onEnd: () => void; g: G }) {
   const s = useRef({ y: 0, vy: 0, obs: [] as { x: number; w: number; h: number }[], sp: 4.2, score: 0, dead: false, started: false });
   const draw = useCallback((c: CanvasRenderingContext2D, W: number, H: number) => {
     const st = s.current, el = c.canvas, ink = css(el, '--ink'), acc = css(el, '--acc'), gy = H - 24;
@@ -47,9 +50,9 @@ function Pingu({ active, onScore, onEnd }: { active: boolean; onScore: (n: numbe
     c.fillStyle = acc; st.obs.forEach((o) => c.fillRect(o.x, gy - o.h, o.w, o.h));
     if (st.dead || !st.started) {
       c.fillStyle = ink; c.font = '600 14px Onest, sans-serif'; c.textAlign = 'center';
-      c.fillText(st.dead ? 'Chocaste. Tocá o apretá espacio para seguir.' : 'Tocá o apretá espacio para empezar.', W / 2, H / 2 - 10); c.textAlign = 'left';
+      c.fillText(st.dead ? g.pinguDead : g.pinguStart, W / 2, H / 2 - 10); c.textAlign = 'left';
     }
-  }, []);
+  }, [g]);
   const { ref, size } = useCanvas(draw);
 
   const jump = useCallback(() => {
@@ -87,7 +90,7 @@ function Pingu({ active, onScore, onEnd }: { active: boolean; onScore: (n: numbe
   return <canvas ref={ref} className="game-cv" onPointerDown={(e) => { e.preventDefault(); jump(); }} aria-label="Pingu: el pingüino salta bloques de hielo" />;
 }
 
-function Snake({ active, onScore, onEnd }: { active: boolean; onScore: (n: number) => void; onEnd: () => void }) {
+function Snake({ active, onScore, onEnd, g }: { active: boolean; onScore: (n: number) => void; onEnd: () => void; g: G }) {
   const COLS = 22, ROWS = 14;
   const s = useRef({ body: [[6, 7], [5, 7], [4, 7]] as number[][], dir: [1, 0], next: [1, 0], food: [14, 7], dead: false, started: false });
   const draw = useCallback((c: CanvasRenderingContext2D, W: number, H: number) => {
@@ -100,9 +103,9 @@ function Snake({ active, onScore, onEnd }: { active: boolean; onScore: (n: numbe
     c.globalAlpha = 1;
     if (st.dead || !st.started) {
       c.fillStyle = css(el, '--ink'); c.font = '600 14px Onest, sans-serif'; c.textAlign = 'center';
-      c.fillText(st.dead ? 'Fin. Apretá una flecha para jugar de nuevo.' : 'Apretá una flecha para empezar.', W / 2, H / 2); c.textAlign = 'left';
+      c.fillText(st.dead ? g.snakeDead : g.snakeStart, W / 2, H / 2); c.textAlign = 'left';
     }
-  }, []);
+  }, [g]);
   const { ref, size } = useCanvas(draw);
 
   const turn = useCallback((d: number[]) => {
@@ -153,7 +156,7 @@ function Snake({ active, onScore, onEnd }: { active: boolean; onScore: (n: numbe
 }
 
 type Cell = { mine: boolean; open: boolean; flag: boolean; n: number };
-function Mines({ onScore }: { onScore: (n: number) => void }) {
+function Mines({ onScore, g }: { onScore: (n: number) => void; g: G }) {
   const N = 9, MINES = 10;
   const fresh = () => Array.from({ length: N * N }, () => ({ mine: false, open: false, flag: false, n: 0 }));
   const [cells, setCells] = useState<Cell[]>(fresh);
@@ -201,7 +204,7 @@ function Mines({ onScore }: { onScore: (n: number) => void }) {
   const flags = cells.filter((c) => c.flag).length;
   return (
     <div className="mines">
-      <p className="mines-st">{state === 'won' ? 'Ganaste. Tocá para jugar otra.' : state === 'lost' ? 'Boom. Tocá para jugar otra.' : `${MINES - flags} minas por marcar`}</p>
+      <p className="mines-st">{state === 'won' ? g.minesWon : state === 'lost' ? g.minesLost : `${MINES - flags} ${g.minesLeft}`}</p>
       <div className="mines-grid" style={{ ['--n' as string]: N }} onContextMenu={(e) => e.preventDefault()}>
         {cells.map((c, i) => (
           <button
@@ -221,27 +224,28 @@ function Mines({ onScore }: { onScore: (n: number) => void }) {
 }
 
 export default function Games({ focused }: { focused: boolean }) {
+  const { lang, t } = useLang();
+  const g = t.games;
   const [game, setGame] = useState<GameId>('pingu');
   const [score, setScore] = useState(0);
   const onScore = useCallback((n: number) => setScore(n), []);
   const [, bump] = useState(0);
   const onEnd = useCallback(() => bump((n) => n + 1), []);
   useEffect(() => { setScore(0); }, [game]);
-  const info = GAMES.find((g) => g[0] === game)!;
   return (
     <div className="games">
-      <div className="games-tabs" role="tablist" aria-label="Juegos">
+      <div className="games-tabs" role="tablist" aria-label={g.tabs}>
         {GAMES.map(([id, name]) => (
-          <button key={id} type="button" role="tab" aria-selected={game === id} onClick={() => setGame(id)}>{name}</button>
+          <button key={id} type="button" role="tab" aria-selected={game === id} onClick={() => setGame(id)}>{name[lang]}</button>
         ))}
-        <span className="games-score">{game === 'mines' ? `casillas ${score} · ganadas ${best.get(game)}` : `puntos ${score} · récord ${best.get(game)}`}</span>
+        <span className="games-score">{game === 'mines' ? `${g.cells} ${score} · ${g.won} ${best.get(game)}` : `${g.points} ${score} · ${g.best} ${best.get(game)}`}</span>
       </div>
       <div className="games-area">
-        {game === 'pingu' && <Pingu active={focused} onScore={onScore} onEnd={onEnd} />}
-        {game === 'snake' && <Snake active={focused} onScore={onScore} onEnd={onEnd} />}
-        {game === 'mines' && <Mines onScore={onScore} />}
+        {game === 'pingu' && <Pingu active={focused} onScore={onScore} onEnd={onEnd} g={g} />}
+        {game === 'snake' && <Snake active={focused} onScore={onScore} onEnd={onEnd} g={g} />}
+        {game === 'mines' && <Mines onScore={onScore} g={g} />}
       </div>
-      <p className="games-help">{info[2]}</p>
+      <p className="games-help">{g.help[game]}</p>
     </div>
   );
 }

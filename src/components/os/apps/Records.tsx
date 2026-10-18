@@ -1,13 +1,14 @@
 // Projects as records on a shelf. Hovering pulls the vinyl a little out of its sleeve
 // (no spinning); clicking opens the project in the player.
-import { PROJECTS } from '../../../data/content';
+import { useLang } from '../lang';
 
 export default function Records({ onOpen }: { onOpen: (id: string) => void }) {
+  const { t, c } = useLang();
   return (
     <div className="records">
       <div className="shelf">
-        {PROJECTS.map((p) => (
-          <button key={p.id} type="button" className="disc" style={{ ['--c' as string]: p.color }} onClick={() => onOpen(p.id)} aria-label={`Abrir ${p.name}`}>
+        {c.PROJECTS.map((p) => (
+          <button key={p.id} type="button" className="disc" style={{ ['--c' as string]: p.color }} onClick={() => onOpen(p.id)} aria-label={`${t.recordsOpen} ${p.name}`}>
             <span className="vin" aria-hidden="true" />
             <span className={'cover ' + p.motif}>
               <i aria-hidden="true" />

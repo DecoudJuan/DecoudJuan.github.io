@@ -19,6 +19,7 @@ const es = {
     pinguStart: 'Tocá o apretá espacio para empezar.', pinguDead: 'Chocaste. Tocá o apretá espacio para seguir.',
     snakeStart: 'Apretá una flecha para empezar.', snakeDead: 'Fin. Apretá una flecha para jugar de nuevo.',
     minesLeft: 'minas por marcar', minesWon: 'Ganaste. Tocá para jugar otra.', minesLost: 'Boom. Tocá para jugar otra.',
+    sound: 'Sonido', start: 'TOCÁ PARA EMPEZAR', over: 'GAME OVER', again: 'TOCÁ PARA SEGUIR',
   },
   term: {
     hello: 'DecoudJuan OS. Escribí help para ver los comandos, o ls para empezar.',
@@ -63,6 +64,7 @@ const en: typeof es = {
     pinguStart: 'Tap or press space to start.', pinguDead: 'Crashed. Tap or press space to go again.',
     snakeStart: 'Press an arrow to start.', snakeDead: 'Game over. Press an arrow to play again.',
     minesLeft: 'mines left to flag', minesWon: 'You won. Tap to play again.', minesLost: 'Boom. Tap to play again.',
+    sound: 'Sound', start: 'TAP TO START', over: 'GAME OVER', again: 'TAP TO RETRY',
   },
   term: {
     hello: 'DecoudJuan OS. Type help to see the commands, or ls to start.',

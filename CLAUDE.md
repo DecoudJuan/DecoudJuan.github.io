@@ -4,36 +4,40 @@ Guidance for working on this repo with Claude Code.
 
 ## What this is
 
-Juan Manuel Decoud's personal portfolio, published at https://decoudjuan.github.io/ with GitHub Pages. One static page, bilingual (English and Spanish), light and dark.
+Juan Manuel Decoud's personal portfolio, published at https://decoudjuan.github.io/ with GitHub Pages. It is **DecoudJuan OS**: a desktop operating system (windows, dock, apps) on a wooden desk, with Juan's penguin as its character. Bilingual (Spanish and English), light and dark.
 
 ## Stack
 
-Plain HTML, CSS and vanilla JavaScript in a single `index.html`. Google Fonts (Inter, DM Serif Display). No framework, no bundler, no dependencies.
+Astro 7 with one React 19 island (`src/components/os/Desktop.tsx`), plain CSS in `src/styles/global.css`, Phosphor icons. No backend.
 
 ## Commands
 
-There is no install, build, test or lint step.
-
-- Run it: open `index.html` in a browser, or `python -m http.server 8000` in the repo root.
-- Publish it: push to `main`; GitHub Pages serves the files as they are.
+- `npm install`, then `npm run dev` (http://localhost:4321).
+- `npm run build` builds the static site in `dist/`; `npx tsc --noEmit -p .` type-checks.
+- Publish: push to `main`; `.github/workflows/deploy.yml` builds and deploys to Pages. Pages is set to **GitHub Actions** as its source.
 
 ## Structure
 
-```
-index.html   style block, markup (sidebar + 7 sections), script (i18n, theme, effects, nav)
-favicon.ico
-docs/architecture.md   how index.html is organized
-```
+See [docs/architecture.md](docs/architecture.md). In short:
+
+- Content: `src/data/content.ts` (site content), `src/data/i18n.ts` (interface strings), `src/data/notes.ts`.
+- The terminal filesystem is built from those files in `src/data/fs.ts`.
+- Desktop and windows: `src/components/os/`. Apps: `src/components/os/apps/`.
 
 ## Conventions
 
-- Every translatable element has `data-t="<key>"`; the English text is in the markup and the Spanish one in the `ES` object of the script. Change both together and keep the keys in sync.
-- The dark theme is defined in two places (`:root[data-theme="dark"]` and the `prefers-color-scheme` media query). Edit both.
-- Colors, radii and spacing come from the CSS variables on `:root`, not from loose values.
-- Section `id`s (`about`, `skills`, `projects`, `experience`, `freelance`, `education`, `contact`) are used by the navigation script (`ids` array); a new section has to be added there too.
-- Project links should point to repositories or sites that exist and are public.
-- The hero "Download CV" button links to `Juan_Decoud_Resume_EN.pdf`, which is not in the repo yet.
-- Keep it a single dependency-free file unless there is a clear reason to split it.
+- **Text:**
+  - Every user-facing string lives in `content.ts` or `i18n.ts`, in **both** Spanish and English. Never hard-code text in a component.
+  - Spanish copy is rioplatense (voseo).
+- **Colours:**
+  - Colours come from CSS variables on `:root`.
+  - The dark theme is defined twice (the `prefers-color-scheme` media query and `:root[data-theme="dark"]`). Edit both.
+- **Projects:**
+  - Links point to public repositories or sites.
+  - Do not present someone else's project as Juan's. `manos` is not his.
+- **Demo videos** go on an external host (R2 or unlisted YouTube), never in the repo. The player loads them only on play.
+- **Motion:** respects `prefers-reduced-motion`. Pointer-only effects check `pointerType === 'mouse'`.
+- **Binary files** are marked in `.gitattributes`.
 
 ## Commits y PRs
 

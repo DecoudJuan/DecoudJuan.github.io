@@ -1,42 +1,60 @@
 # Architecture
 
-The whole site is one file, `index.html`, with three blocks: a `<style>` in the head, the markup in the body and a single `<script>` at the end. There is no build step.
+The site is a static Astro build. `src/pages/index.astro` renders one React component, `Desktop`, as a `client:load` island: Astro prerenders its HTML at build time and React hydrates it in the browser.
 
-## Style block
+## Folders
 
-- Design tokens are CSS custom properties on `:root` (colors, radii, sidebar width, gap).
-- The dark theme is defined twice: under `:root[data-theme="dark"]` for the manual choice, and inside `@media (prefers-color-scheme: dark)` guarded with `:root:not([data-theme="light"])` for the system default. A change to a dark color has to be made in both places.
-- Cards use a glass look (translucent background, inset edge, blur) over a gradient mesh background.
+```
+src/
+  pages/index.astro          the only page
+  layouts/Base.astro         <head>, fonts, and the script that applies the stored theme before paint
+  styles/global.css          design tokens (light and dark) and every component style
+  data/
+    content.ts               all site content in Spanish and English: person, quote, projects, CV, trash, playlists
+    i18n.ts                  interface strings (labels, buttons, messages) in both languages
+    notes.ts                 the Notes app entries
+    fs.ts                    the terminal's virtual filesystem, built from content.ts and notes.ts
+  components/os/
+    Desktop.tsx              window state, layout, menu bar, desktop icons, widgets, dock, search, wallpaper
+    Window.tsx               one window: title bar, the three buttons, drag, 8 resize handles, animations
+    Dock.tsx                 the dock and its magnification
+    Spotlight.tsx            Ctrl/Cmd + K search
+    NetBackground.tsx        the animated network of nodes on the canvas behind everything
+    Penguin.tsx              the penguin (ported from Claude-pet): follows the cursor, blinks, reacts
+    icons.tsx                app icons (Phosphor glyphs on coloured tiles)
+    lang.tsx                 language context and useLang()
+    theme.ts                 theme toggle with the View Transitions circle
+    types.ts                 AppId, WinState, Rect
+    apps/                    one file per app: About, Records, Player, Notes, Music, Terminal, Games, Cv, Hire, Trash
+public/
+  cv/                        the CV PDF
+  previews/                  screenshot of the freelance site shown in "Work with me"
+```
 
-## Markup
+## How the desktop works
 
-A fixed sidebar (name, role, bio, language and theme buttons, navigation, social links) and a main column with seven sections, each with the `id` used by the navigation:
+- `Desktop` keeps one `WinState` per app: rectangle, status (`open`, `min`, `closed`), maximized flag, z-index and a pending animation.
+- `Window` runs the animation (genie, open, close) and reports back when it ends.
+- Windows the user hasn't moved follow a responsive layout (`layout()` in `Desktop.tsx`) that scales with the desk size.
+- On phones (up to 760 px wide) the CSS turns every window into a full-screen sheet, and the home screen grid replaces the desktop icons.
 
-| `id` | Section |
-| --- | --- |
-| `about` | Hero: headline, summary, stats, calls to action (projects, CV, contact) |
-| `skills` | Stack, grouped by area |
-| `projects` | Selected projects, with links to repositories and live sites |
-| `experience` | Work experience |
-| `freelance` | Landing pages and web apps offer |
-| `education` | Degree, capstone and other studies |
-| `contact` | Contact links |
+## Content and languages
 
-## Script
+- Every user-facing string comes from `content.ts` or `i18n.ts`, in Spanish and English. Components read them with `useLang()`, so a change goes in those files and never in a component.
+- The language and the theme are stored in `localStorage`; the server render is in Spanish.
 
-One IIFE with four jobs:
+## Adding things
 
-1. **i18n.** Every translatable element carries `data-t="<key>"`. The markup holds the English text and the `ES` object holds the Spanish one; the language button swaps the text of each element, and the choice is saved in `localStorage`.
-2. **Theme.** The toggle sets `data-theme` on the root element and saves it; without a saved choice the CSS follows the system.
-3. **Effects.** Scroll-reveal for sections (`.reveal`) and a cursor-following highlight on cards.
-4. **Active navigation.** On scroll, the link of the section currently at the top gets the `active` class.
+- **A project:** add an entry to `PROJECTS` in `content.ts`. It shows up in Records, the Player, the terminal and the search.
+  - For its demo, set `video` (an external URL), `poster` and optionally `chapters`.
+- **A note:** add an entry to `NOTES` in `notes.ts`.
+- **An app:**
+  1. Add its id to `AppId` (`types.ts`).
+  2. Add its labels to `i18n.ts` and its icon to `icons.tsx`.
+  3. Add its size to `META` and `layout()` in `Desktop.tsx`, and its component to `content` there.
 
-`localStorage` reads and writes are wrapped in `try/catch`, so the page works with storage blocked.
+## Theme
 
-## Files
-
-| File | Purpose |
-| --- | --- |
-| `index.html` | The site |
-| `favicon.ico` | Tab icon |
-| `Juan_Decoud_Resume_EN.pdf` | CV, linked from the hero button (it has to be added to the repo root for the link to work) |
+- Colours are CSS variables on `:root`.
+- The dark theme is defined twice: in the `prefers-color-scheme` media query for the system default, and under `:root[data-theme="dark"]` for the toggle. Edit both.
+- Wallpapers override a few variables through `.desk[data-wall=…]`.

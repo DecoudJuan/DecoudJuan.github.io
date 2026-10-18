@@ -1,43 +1,65 @@
 # DecoudJuan.github.io
 
-Personal portfolio of Juan Manuel Decoud: Computer Engineering student at Universidad Austral and Support & Integrations Engineer at Darwin AI. It is for recruiters, teams and clients who want to see what he builds: automations, integrations and web projects, with contact details and a freelance offer.
+Personal portfolio of Juan Manuel Decoud: Computer Engineering student at Universidad Austral, Support & Integrations Engineer at Darwin AI and freelancer building websites, custom systems and AI automations for small businesses. It is for clients, recruiters and teams who want to see what he builds.
 
 Live site: https://decoudjuan.github.io/
 
+The site is **DecoudJuan OS**: a desktop operating system made of wood, with a network of connected nodes in the background and Juan's penguin (from [Claude-pet](https://github.com/DecoudJuan/Claude-pet)) as its character.
+
 ## What the site has
 
-- A sidebar with name, role, short bio, navigation and links to GitHub and LinkedIn.
-- Seven sections: About, Stack (`#skills`), Projects, Experience, Freelance, Education and Contact.
-- English and Spanish: a button in the page switches every text at runtime, and the choice is remembered.
-- Light and dark theme: follows the system setting by default, with a toggle that is remembered too.
-- A "Download CV" button that links to `Juan_Decoud_Resume_EN.pdf` at the root of the site.
-- Glass-style cards over a soft gradient background, with scroll-reveal animations and a highlight that follows the cursor.
+- **Windows like a real OS:** move, resize from any edge or corner, minimize to the dock with a genie effect, maximize (button or double-click on the title bar) and close.
+- **Dock and desktop:**
+  - The dock magnifies the icon under the pointer without overlapping its neighbours.
+  - Desktop icons can be selected with a click or a drag box, opened with a double-click and dragged around.
+  - Icon positions are remembered.
+- **Apps:**
+  - **About me:** the penguin and the headline quote.
+  - **Records:** projects as vinyl records.
+  - **Player:** for long demo videos, with a list of every demo, chapters, playback speed and resume position.
+  - **Notes:** short write-ups on things learned.
+  - **Music:** Spotify playlists.
+  - **Terminal:** a virtual filesystem (`ls`, `cd`, `cat`, `open`, `tree`, `neofetch`, `pingusay` and more).
+  - **Games:** Pingu, Snake and Minesweeper in pixel art.
+  - **CV:** with the PDF to download.
+  - **Work with me:** links to the freelance services site, https://juandecoud.pages.dev/.
+  - **Trash:** old university projects.
+- **Search:** Spotlight-style, with Ctrl/Cmd + K.
+- **Settings:**
+  - Spanish and English, switched from the menu bar.
+  - Light and dark theme; the theme switch is animated.
+  - Four wallpapers.
+- **Phones:** a home screen with an app grid; each app opens full screen.
 
 ## Stack
 
-- Plain HTML, CSS and vanilla JavaScript in a single `index.html`. No framework, no bundler, no dependencies to install.
-- Fonts from Google Fonts: Inter and DM Serif Display.
-- Hosting: GitHub Pages, served directly from the `main` branch (user site, so the repository name is `DecoudJuan.github.io`).
+- [Astro](https://astro.build/) 7 with one React 19 island (the desktop). Astro prerenders the HTML, so all the text is in the page for search engines.
+- Plain CSS with design tokens in `src/styles/global.css`.
+- [Phosphor](https://phosphoricons.com/) icons; fonts from Google Fonts (Onest, JetBrains Mono, Silkscreen).
+- No backend.
 
 ## Local setup
-
-There is nothing to install. Clone the repository and open `index.html` in a browser, or serve the folder with any static server:
 
 ```bash
 git clone https://github.com/DecoudJuan/DecoudJuan.github.io.git
 cd DecoudJuan.github.io
-python -m http.server 8000   # http://localhost:8000
+npm install
+npm run dev       # http://localhost:4321
+npm run build     # static site in dist/
+npm run preview   # serve dist/
 ```
 
-To edit content, change the markup of the section in `index.html`. Texts shown in Spanish live in the `ES` object of the script at the bottom of the file and are matched to the markup through the `data-t` attributes, so a text changed in one language has to be changed in the other too. See [docs/architecture.md](docs/architecture.md).
+Requires Node 22 or newer.
 
 ## Deploy
 
-GitHub Pages publishes the repository root at https://decoudjuan.github.io/ on every push to `main`. There is no build step, no workflow and no secrets. Files in the root are served as they are: `index.html`, `favicon.ico` and the CV PDF.
+Every push to `main` runs `.github/workflows/deploy.yml`, which builds the site with `withastro/action` and publishes it with `actions/deploy-pages`. In the repository settings, Pages uses **GitHub Actions** as its source.
+
+Demo videos are not stored in the repository: they go to an external host (Cloudflare R2 or unlisted YouTube) and are referenced from `src/data/content.ts`.
 
 ## Docs
 
-- [docs/architecture.md](docs/architecture.md): how `index.html` is organized and how to change it.
+- [docs/architecture.md](docs/architecture.md): how the code is organized and how to add content.
 - [CLAUDE.md](CLAUDE.md): guidance for working on the site with Claude Code.
 
 ## License

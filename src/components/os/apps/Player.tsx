@@ -16,6 +16,26 @@ export default function Player({ project, onPick }: { project: Project; onPick: 
   const { lang, t, c } = useLang();
   const P = t.player;
   const vRef = useRef<HTMLVideoElement>(null);
+  // The strip of demos: no scrollbar; the mouse wheel scrolls it sideways and arrows show
+  // up only on the side where there is more to see.
+  const strip = useRef<HTMLUListElement>(null);
+  const [more, setMore] = useState({ l: false, r: false });
+  useEffect(() => {
+    const ul = strip.current!;
+    const check = () => setMore({ l: ul.scrollLeft > 4, r: ul.scrollLeft + ul.clientWidth < ul.scrollWidth - 4 });
+    const wheel = (e: WheelEvent) => {
+      if (ul.scrollWidth <= ul.clientWidth || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+      e.preventDefault();
+      ul.scrollLeft += e.deltaY;
+    };
+    check();
+    ul.addEventListener('scroll', check, { passive: true });
+    ul.addEventListener('wheel', wheel, { passive: false });
+    const ro = new ResizeObserver(check);
+    ro.observe(ul);
+    return () => { ul.removeEventListener('scroll', check); ul.removeEventListener('wheel', wheel); ro.disconnect(); };
+  }, []);
+  const page = (dir: number) => strip.current?.scrollBy({ left: dir * strip.current.clientWidth * 0.8, behavior: 'smooth' });
   const [rate, setRate] = useState(1);
   const [resume, setResume] = useState('');
   const key = 'pos-' + project.id;
@@ -81,7 +101,9 @@ export default function Player({ project, onPick }: { project: Project; onPick: 
         </div>
         <nav className="pl-list" aria-label={P.all}>
         <p className="chap-h">{P.list}</p>
-        <ul>
+        <div className="strip">
+        {more.l && <button type="button" className="strip-btn l" aria-label="‹" onClick={() => page(-1)}>&#8249;</button>}
+        <ul ref={strip}>
           {c.PROJECTS.map((p) => (
             <li key={p.id}>
               <button type="button" aria-current={p.id === project.id} onClick={() => onPick(p.id)} style={{ ['--c' as string]: p.color }}>
@@ -91,6 +113,8 @@ export default function Player({ project, onPick }: { project: Project; onPick: 
             </li>
           ))}
         </ul>
+        {more.r && <button type="button" className="strip-btn r" aria-label="›" onClick={() => page(1)}>&#8250;</button>}
+        </div>
         </nav>
       </aside>
     </div>

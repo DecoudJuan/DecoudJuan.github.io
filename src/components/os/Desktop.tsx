@@ -143,7 +143,26 @@ function Os() {
   const [cells, setCells] = useState<Partial<Record<AppId, Cell>>>({});
   const [drag, setDrag] = useState<{ ids: AppId[]; dx: number; dy: number; target: Cell | null } | null>(null);
   const dragged = useRef(false);
+  /** Where each dropped icon was on screen when the mouse let go, so it slides from there to its cell. */
+  const landing = useRef<Partial<Record<AppId, DOMRect>> | null>(null);
   useEffect(() => { try { setCells(JSON.parse(localStorage.getItem('icon-cells') || '{}')); } catch { /* ignore */ } }, []);
+  useLayoutEffect(() => {
+    const from = landing.current;
+    if (!from) return;
+    landing.current = null;
+    (Object.keys(from) as AppId[]).forEach((k) => {
+      const el = iconRefs.current[k], r = from[k];
+      if (!el || !r) return;
+      el.style.transition = 'none';
+      el.style.transform = '';
+      const now = el.getBoundingClientRect();
+      el.style.transform = `translate(${r.left - now.left}px, ${r.top - now.top}px)`;
+      void el.getBoundingClientRect();
+      el.style.transition = 'transform .3s cubic-bezier(.22,1,.36,1)';
+      el.style.transform = '';
+      setTimeout(() => { el.style.transition = ''; }, 320);
+    });
+  }, [cells]);
   const grid = gridFor(size.w, size.h);
   const placed = placeIcons(cells, grid);
   const dragIcon = (id: AppId) => (e: React.PointerEvent<HTMLButtonElement>) => {
@@ -162,8 +181,9 @@ function Os() {
     };
     const up = () => {
       el.removeEventListener('pointermove', move); el.removeEventListener('pointerup', up); el.removeEventListener('pointercancel', up);
+      if (!moved || !target) { setDrag(null); return; }
+      landing.current = Object.fromEntries(ids.map((k) => [k, iconRefs.current[k]!.getBoundingClientRect()]));
       setDrag(null);
-      if (!moved || !target) return;
       dragged.current = true;
       const dc = target.c - from.c, dr = target.r - from.r;
       setCells(() => {

@@ -36,7 +36,7 @@ export default function Player({ project, onPick }: { project: Project; onPick: 
 
   return (
     <div className="player" style={{ ['--c' as string]: project.color }}>
-      <div className="pl-main" key={project.id}>
+      <div className="screen-wrap" key={project.id}>
         <div className="screen">
           {project.video ? (
             <video key={project.id} ref={vRef} controls playsInline preload="none" poster={project.poster} onLoadedMetadata={onMeta} onTimeUpdate={onTime}>
@@ -55,7 +55,9 @@ export default function Player({ project, onPick }: { project: Project; onPick: 
             </div>
           )}
         </div>
-        <div className="pl-info">
+      </div>
+      <aside className="pl-side">
+        <div className="pl-info" key={project.id}>
           <div className="pl-h">
             <h2>{project.name}</h2><span>{project.kind}</span>
             {project.video && (
@@ -77,8 +79,7 @@ export default function Player({ project, onPick }: { project: Project; onPick: 
             </ul>
           ) : null}
         </div>
-      </div>
-      <nav className="pl-list" aria-label={P.all}>
+        <nav className="pl-list" aria-label={P.all}>
         <p className="chap-h">{P.list}</p>
         <ul>
           {c.PROJECTS.map((p) => (
@@ -90,7 +91,8 @@ export default function Player({ project, onPick }: { project: Project; onPick: 
             </li>
           ))}
         </ul>
-      </nav>
+        </nav>
+      </aside>
     </div>
   );
 }

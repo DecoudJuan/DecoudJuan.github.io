@@ -57,11 +57,11 @@ const PROJECTS: (Omit<Project, 'name' | 'kind' | 'side' | 'text'> & { name: stri
   },
   {
     id: 'vexa', name: 'Vexa', color: '#7a2e22', motif: 'm2',
-    kind: { es: 'Facturación · Windows y Android', en: 'Invoicing · Windows and Android' },
+    kind: { es: 'Gestión y facturación · Windows y Android', en: 'Business & invoicing · Windows and Android' },
     side: { es: 'Lado A · 2026', en: 'Side A · 2026' },
     text: {
-      es: 'Reemplazó un sistema en Microsoft Access. Factura electrónica con ARCA (SOAP, firma CMS y QR de la RG 4291) y reintentos que nunca emiten dos veces la misma factura. Las reglas de negocio son escenarios Gherkin.',
-      en: 'Replaced a Microsoft Access system. Argentine e-invoicing through ARCA (SOAP, CMS signing and the RG 4291 QR) with retries that never issue the same invoice twice. The business rules are Gherkin scenarios.',
+      es: 'Un programa para manejar tu negocio de forma simple: facturá, imprimí etiquetas y llevá clientes y productos, desde Windows o desde el celular. Cuida los detalles: factura electrónica con ARCA, reintentos que nunca emiten dos veces la misma factura y una migración directa desde el sistema viejo en Access.',
+      en: 'A simple way to run a small business: invoice, print labels and manage clients and products, from Windows or from your phone. The details are taken care of: Argentine e-invoicing through ARCA, retries that never issue the same invoice twice and a direct migration from the old Access system.',
     },
     links: [['download', 'https://github.com/DecoudJuan/Vexa/releases/latest'], ['code', 'https://github.com/DecoudJuan/Vexa']],
     anim: 'vexa',
@@ -136,10 +136,10 @@ const PROJECTS: (Omit<Project, 'name' | 'kind' | 'side' | 'text'> & { name: stri
     kind: { es: 'Java · patrones GoF', en: 'Java · GoF patterns' },
     side: { es: 'Lado B · 2025', en: 'Side B · 2025' },
     text: {
-      es: 'Un motor de ajedrez y damas en Java construido sobre patrones GoF (Strategy, Adapter y Observer): validación completa de movimientos, detección de jaque y jaque mate, interfaz en Swing y tests con JUnit. El mismo motor juega los dos juegos cambiando sólo las reglas.',
-      en: 'A chess and checkers engine in Java built on GoF patterns (Strategy, Adapter and Observer): full move validation, check and checkmate detection, a Swing GUI and JUnit tests. The same engine plays both games by swapping only the rules.',
+      es: 'Un motor de ajedrez y damas en Java pensado con SOLID y patrones GoF. Los movimientos son reglas independientes de las piezas, la condición de victoria se cambia sin tocar el juego y el mismo motor juega ajedrez y damas. Valida movimientos, detecta jaque y jaque mate, y tiene interfaz en Swing y tests con JUnit.',
+      en: 'A chess and checkers engine in Java designed around SOLID and GoF patterns. Moves are rules independent of the pieces, the win condition swaps without touching the game, and the same engine plays chess and checkers. It validates moves, detects check and checkmate, and has a Swing UI and JUnit tests.',
     },
-    links: [['code', 'https://github.com/austral-ingsis-classroom/chess-DecoudJuan']],
+    links: [],
     anim: 'chess',
   },
 ];

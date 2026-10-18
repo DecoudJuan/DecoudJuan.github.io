@@ -4,7 +4,7 @@ import { PERSON, QUOTE } from '../../../data/content';
 export default function About() {
   return (
     <div className="about">
-      <div className="about-av"><Penguin label="Pingüino de Juan, con anteojos y auriculares. Tocalo." /></div>
+      <div className="about-av"><Penguin interactive={false} label="Pingüino de Juan, con anteojos y auriculares." /></div>
       <div className="about-tx">
         <p className="about-name">{PERSON.name}</p>
         <figure className="quote">

@@ -5,15 +5,17 @@ import { useEffect, useId, useRef } from 'react';
 const TORSO = 'M0.3 262 C-1.6 198 44 162 120 162 C196 162 241.6 198 239.7 262 Z';
 const BELLY = 'M64.9 262 C63 214 93.4 196 120 196 C146.6 196 177 214 175.1 262 Z';
 
-type Props = { interactive?: boolean; follow?: boolean; className?: string; label?: string };
+/** `still`: a static drawing (no blink, no cursor, no poke), for icons. */
+type Props = { interactive?: boolean; follow?: boolean; still?: boolean; className?: string; label?: string };
 
-export default function Penguin({ interactive = true, follow = true, className = '', label }: Props) {
+export default function Penguin({ interactive = true, follow = true, still = false, className = '', label }: Props) {
+  if (still) { interactive = false; follow = false; }
   const svgRef = useRef<SVGSVGElement>(null);
   const clip = 'pm-crop-' + useId().replace(/:/g, '');
 
   useEffect(() => {
     const svg = svgRef.current;
-    if (!svg) return;
+    if (!svg || still) return;
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const head = svg.querySelector<SVGGElement>('.pm-head')!;
     const body = svg.querySelector<SVGGElement>('.pm-body')!;
@@ -72,7 +74,7 @@ export default function Penguin({ interactive = true, follow = true, className =
       removeEventListener('pointermove', onMove);
       svg.removeEventListener('pointerdown', poke); svg.removeEventListener('keydown', onKey);
     };
-  }, [interactive, follow]);
+  }, [interactive, follow, still]);
 
   return (
     <svg

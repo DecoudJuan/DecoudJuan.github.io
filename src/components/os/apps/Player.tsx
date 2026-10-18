@@ -1,7 +1,8 @@
-// Player for long demos: nothing downloads until play (preload="none"), chapters to jump,
-// playback speed, and the position is remembered per project in this browser.
+// Player for long demos: the video with its description underneath, and the list of every
+// demo on the side. Nothing downloads until play (preload="none"); chapters, speed, and the
+// position is remembered per project in this browser.
 import { useEffect, useRef, useState } from 'react';
-import type { Project } from '../../../data/content';
+import { PROJECTS, type Project } from '../../../data/content';
 
 const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 const store = {
@@ -9,7 +10,7 @@ const store = {
   set: (k: string, v: number) => { try { localStorage.setItem(k, String(v)); } catch { /* not remembered */ } },
 };
 
-export default function Player({ project }: { project: Project }) {
+export default function Player({ project, onPick }: { project: Project; onPick: (id: string) => void }) {
   const vRef = useRef<HTMLVideoElement>(null);
   const [rate, setRate] = useState(1);
   const [resume, setResume] = useState('');
@@ -31,42 +32,56 @@ export default function Player({ project }: { project: Project }) {
 
   return (
     <div className="player" style={{ ['--c' as string]: project.color }}>
-      <div className="screen">
-        {project.video ? (
-          <video key={project.id} ref={vRef} controls playsInline preload="none" poster={project.poster} onLoadedMetadata={onMeta} onTimeUpdate={onTime}>
-            <source src={project.video} type="video/mp4" />
-          </video>
-        ) : (
-          <div className="ph-video">
-            <span className="play" aria-hidden="true" />
-            <b>Demo de {project.name}</b>
-            <small>Acá va el video. Carga recién cuando le das play, con portada, capítulos y velocidad.</small>
+      <div className="pl-main">
+        <div className="screen">
+          {project.video ? (
+            <video key={project.id} ref={vRef} controls playsInline preload="none" poster={project.poster} onLoadedMetadata={onMeta} onTimeUpdate={onTime}>
+              <source src={project.video} type="video/mp4" />
+            </video>
+          ) : (
+            <div className="ph-video">
+              <span className="play" aria-hidden="true" />
+              <b>Demo de {project.name}</b>
+              <small>Acá va el video. Carga recién cuando le das play.</small>
+            </div>
+          )}
+        </div>
+        <div className="pl-info">
+          <div className="pl-h">
+            <h2>{project.name}</h2><span>{project.kind}</span>
+            {project.video && (
+              <span className="pl-ctl" role="group" aria-label="Velocidad">
+                {[1, 1.5, 2].map((r) => (
+                  <button key={r} type="button" aria-pressed={rate === r} onClick={() => setRate(r)}>{String(r).replace('.', ',')}x</button>
+                ))}
+                {resume && <span>{resume}</span>}
+              </span>
+            )}
           </div>
-        )}
-      </div>
-      <div className="pl-side">
-        <div className="pl-h"><h2>{project.name}</h2><span>{project.kind}</span></div>
-        {project.video && (
-          <div className="pl-ctl" role="group" aria-label="Velocidad">
-            {[1, 1.5, 2].map((r) => (
-              <button key={r} type="button" aria-pressed={rate === r} onClick={() => setRate(r)}>{String(r).replace('.', ',')}x</button>
-            ))}
-            {resume && <span>{resume}</span>}
-          </div>
-        )}
-        <p className="pl-t">{project.text}</p>
-        {project.video && project.chapters?.length ? (
-          <div>
-            <p className="chap-h">Capítulos</p>
-            <ul className="chap">
+          <p className="pl-t">{project.text}</p>
+          {project.links.length > 0 && (
+            <div className="pl-links">{project.links.map(([l, u]) => <a key={u} href={u} target="_blank" rel="noopener">{l} <span aria-hidden="true">&#8599;</span></a>)}</div>
+          )}
+          {project.video && project.chapters?.length ? (
+            <ul className="chap" aria-label="Capítulos">
               {project.chapters.map(([t, l]) => <li key={t}><button type="button" onClick={() => seek(t)}><span>{fmt(t)}</span>{l}</button></li>)}
             </ul>
-          </div>
-        ) : null}
-        {project.links.length > 0 && (
-          <div className="pl-links">{project.links.map(([l, u]) => <a key={u} href={u} target="_blank" rel="noopener">{l} <span aria-hidden="true">&#8599;</span></a>)}</div>
-        )}
+          ) : null}
+        </div>
       </div>
+      <nav className="pl-list" aria-label="Todas las demos">
+        <p className="chap-h">Demos</p>
+        <ul>
+          {PROJECTS.map((p) => (
+            <li key={p.id}>
+              <button type="button" aria-current={p.id === project.id} onClick={() => onPick(p.id)} style={{ ['--c' as string]: p.color }}>
+                <span className="thumb" aria-hidden="true" />
+                <span className="pl-it"><b>{p.name}</b><small>{p.kind}</small></span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </nav>
     </div>
   );
 }

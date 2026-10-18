@@ -38,12 +38,13 @@ function layout(W: number, H: number): Record<AppId, Rect> {
   const hireH = clamp(avail * 0.42, 280, 520);
   const hire = { x: recX + 40, y: Math.min(records.y + records.h + 18, bottom - hireH - 10), w: clamp(records.w * 0.82, 340, 900), h: hireH };
   const pW = clamp(W * 0.8, 380, 1560);
-  const player = { x: Math.round((W - pW) / 2), y: top, w: pW, h: clamp(avail - 10, 320, pW * 0.6) };
+  // Height = 16:9 video + its description, so the window opens without empty space.
+  const player = { x: Math.round((W - pW) / 2), y: top, w: pW, h: clamp(((pW - 340) * 9) / 16 + 230, 320, avail - 10) };
   return { about, records, terminal, hire, player };
 }
 
 const ICONS: Record<AppId, ReactNode> = {
-  about: <Penguin interactive={false} follow={false} className="dk-pm" />,
+  about: <Penguin still className="dk-pm" />,
   records: <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="#17120e" /><circle cx="12" cy="12" r="7" fill="none" stroke="#3a2f27" strokeWidth=".8" /><circle cx="12" cy="12" r="5" fill="none" stroke="#3a2f27" strokeWidth=".8" /><circle cx="12" cy="12" r="3.2" fill="var(--acc)" /><circle cx="12" cy="12" r=".9" fill="#17120e" /></svg>,
   player: <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="3" fill="var(--ink)" /><path d="M10 9v6l5-3z" fill="var(--acc)" /></svg>,
   terminal: <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="4" width="19" height="16" rx="3" fill="#15110d" /><path d="M6.5 9.5l3 2.5-3 2.5M11.5 15h5" fill="none" stroke="#e0aa4f" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>,
@@ -159,7 +160,7 @@ export default function Desktop() {
   const content: Record<AppId, ReactNode> = {
     about: <About />,
     records: <Records onOpen={openProject} />,
-    player: <Player project={current} />,
+    player: <Player project={current} onPick={setProject} />,
     terminal: <Terminal focused={focus === 'terminal'} onOpen={openTarget} onTheme={() => toggleTheme()} />,
     hire: <Hire />,
   };
@@ -171,7 +172,7 @@ export default function Desktop() {
       <NetBackground />
 
       <div className="menu">
-        <span className="brand"><Penguin interactive={false} follow={false} className="menu-pm" />DecoudJuan</span>
+        <span className="brand"><Penguin still className="menu-pm" />DecoudJuan</span>
         <span className="apps">
           {(['about', 'records', 'terminal', 'hire'] as AppId[]).map((id) => <button key={id} type="button" onClick={() => open(id)}>{APPS[id].label}</button>)}
         </span>

@@ -148,7 +148,7 @@ main { height: 100%; }
    The video always fits whole; only the description (if long) and the strip of demos scroll. */
 .player { --strip: 112px; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) var(--strip);
   gap: 14px; padding: 16px; height: 100%; overflow: hidden; }
-.screen-wrap { display: grid; place-items: center; min-height: 0; animation: pl-in .5s cubic-bezier(.22,1,.36,1); }
+.screen-wrap { display: grid; place-items: start center; min-height: 0; animation: pl-in .5s cubic-bezier(.22,1,.36,1); }
 @keyframes pl-in { from { opacity: 0; transform: translateY(10px) scale(.985); filter: blur(4px); } }
 .screen { position: relative; width: 100%; max-width: calc(40cqh * 16 / 9); aspect-ratio: 16 / 9; border-radius: 10px; overflow: hidden; background: #0d0a08; color: #f3ead8; }
 .screen video { width: 100%; height: 100%; display: block; background: #000; object-fit: contain; }
@@ -175,7 +175,13 @@ main { height: 100%; }
 .pl-links a { font-weight: 700; color: var(--acc); text-decoration: none; }
 .pl-list { grid-column: 1 / -1; min-width: 0; display: flex; flex-direction: column; border-top: 1px solid var(--ln); padding-top: 8px; }
 .pl-list .chap-h { margin-bottom: 6px; }
-.pl-list ul { flex: 1; min-height: 0; overflow-x: auto; overflow-y: hidden; list-style: none; margin: 0; padding: 0 0 4px; display: flex; gap: 6px; scroll-snap-type: x proximity; }
+.strip { position: relative; flex: 1; min-height: 0; display: flex; }
+.pl-list ul { flex: 1; min-width: 0; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; list-style: none; margin: 0; padding: 0; display: flex; gap: 6px; scroll-snap-type: x proximity; }
+.pl-list ul::-webkit-scrollbar { display: none; }
+.pl-list .strip-btn { position: absolute; top: 50%; z-index: 2; width: 36px; height: 36px; margin-top: -18px; padding: 0 0 3px; border-radius: 50%; border: 1px solid var(--ln);
+  background: var(--win); color: var(--ink); font-size: 1.5rem; line-height: 1; display: grid; place-items: center; cursor: pointer; box-shadow: 0 8px 18px -8px var(--shadow); transition: transform .15s; }
+.pl-list .strip-btn:hover { transform: scale(1.08); background: var(--win); }
+.pl-list .strip-btn.l { left: 4px; } .pl-list .strip-btn.r { right: 4px; }
 .pl-list li { flex: none; scroll-snap-align: start; }
 .pl-list button { width: 230px; height: 100%; display: flex; gap: 10px; align-items: center; text-align: left; background: none; border: 1px solid transparent; border-radius: 10px; padding: 6px; cursor: pointer; }
 .pl-list button:hover { background: var(--bar); }

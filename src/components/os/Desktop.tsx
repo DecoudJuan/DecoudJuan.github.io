@@ -10,6 +10,7 @@ import Records from './apps/Records';
 import Player from './apps/Player';
 import Terminal from './apps/Terminal';
 import Hire from './apps/Hire';
+import Games from './apps/Games';
 import { toggleTheme } from './theme';
 import { NOW, PERSON, PROJECTS } from '../../data/content';
 import type { OpenTarget } from '../../data/fs';
@@ -23,9 +24,11 @@ const APPS: Record<AppId, { title: string; label: string; minW: number; minH: nu
   records: { title: '~/discos', label: 'Discos', minW: 320, minH: 260 },
   player: { title: 'reproductor', label: 'Reproductor', minW: 380, minH: 300 },
   terminal: { title: 'juan@decoudjuan: ~', label: 'Terminal', minW: 320, minH: 180, variant: 'dark' },
+  games: { title: 'juegos', label: 'Juegos', minW: 360, minH: 320 },
   hire: { title: 'Trabajemos juntos', label: 'Trabajemos juntos', minW: 320, minH: 230, variant: 'inv' },
 };
-const ORDER: AppId[] = ['about', 'records', 'player', 'terminal', 'hire'];
+const ORDER: AppId[] = ['about', 'records', 'player', 'terminal', 'games', 'hire'];
+const LAUNCH: AppId[] = ['about', 'records', 'terminal', 'games', 'hire'];
 
 /** Initial layout as a function of the desk size, so big screens get big windows instead of empty wood. */
 function layout(W: number, H: number): Record<AppId, Rect> {
@@ -35,12 +38,14 @@ function layout(W: number, H: number): Record<AppId, Rect> {
   const records = { x: recX, y: top + 18, w: clamp(usable - recX - usable * 0.02, 340, 1100), h: clamp(avail * 0.55, 320, 660) };
   const termY = about.y + about.h + 18;
   const terminal = { x: Math.round(usable * 0.05), y: termY, w: clamp(about.w * 0.9, 320, 820), h: clamp(bottom - termY - 12, 180, 480) };
-  const hireH = clamp(avail * 0.42, 280, 520);
-  const hire = { x: recX + 40, y: Math.min(records.y + records.h + 18, bottom - hireH - 10), w: clamp(records.w * 0.82, 340, 900), h: hireH };
+  const hireH = clamp(avail * 0.46, 400, 540);
+  const hire = { x: Math.max(0, Math.min(recX + 40, W - side - 670)), y: Math.min(records.y + records.h + 18, bottom - hireH - 10), w: clamp(records.w * 0.9, 660, 980), h: hireH };
   const pW = clamp(W * 0.8, 380, 1560);
   // Height = 16:9 video + its description, so the window opens without empty space.
   const player = { x: Math.round((W - pW) / 2), y: top, w: pW, h: clamp(((pW - 340) * 9) / 16 + 230, 320, avail - 10) };
-  return { about, records, terminal, hire, player };
+  const gW = clamp(W * 0.42, 380, 760);
+  const games = { x: Math.round((W - gW) / 2), y: top + 40, w: gW, h: clamp(avail * 0.62, 340, 580) };
+  return { about, records, terminal, hire, player, games };
 }
 
 const ICONS: Record<AppId, ReactNode> = {
@@ -48,6 +53,7 @@ const ICONS: Record<AppId, ReactNode> = {
   records: <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="#17120e" /><circle cx="12" cy="12" r="7" fill="none" stroke="#3a2f27" strokeWidth=".8" /><circle cx="12" cy="12" r="5" fill="none" stroke="#3a2f27" strokeWidth=".8" /><circle cx="12" cy="12" r="3.2" fill="var(--acc)" /><circle cx="12" cy="12" r=".9" fill="#17120e" /></svg>,
   player: <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="3" fill="var(--ink)" /><path d="M10 9v6l5-3z" fill="var(--acc)" /></svg>,
   terminal: <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="4" width="19" height="16" rx="3" fill="#15110d" /><path d="M6.5 9.5l3 2.5-3 2.5M11.5 15h5" fill="none" stroke="#e0aa4f" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>,
+  games: <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="7" width="19" height="10" rx="5" fill="var(--ink)" /><path d="M7 10v4M5 12h4" stroke="var(--win)" strokeWidth="1.8" strokeLinecap="round" /><circle cx="16" cy="11" r="1.2" fill="var(--acc)" /><circle cx="18" cy="13.2" r="1.2" fill="var(--acc)" /></svg>,
   hire: <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="12" rx="2.5" fill="var(--ink)" /><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7" fill="none" stroke="var(--ink)" strokeWidth="2" /><rect x="10.5" y="11" width="3" height="2.4" rx=".6" fill="var(--acc)" /></svg>,
 };
 const LINKS = [
@@ -162,6 +168,7 @@ export default function Desktop() {
     records: <Records onOpen={openProject} />,
     player: <Player project={current} onPick={setProject} />,
     terminal: <Terminal focused={focus === 'terminal'} onOpen={openTarget} onTheme={() => toggleTheme()} />,
+    games: <Games focused={focus === 'games'} />,
     hire: <Hire />,
   };
   const dockItems: DockItem[] = ORDER.map((id) => ({ id, label: APPS[id].label, icon: ICONS[id], running: wins[id].status !== 'closed' }));
@@ -174,7 +181,7 @@ export default function Desktop() {
       <div className="menu">
         <span className="brand"><Penguin still className="menu-pm" />DecoudJuan</span>
         <span className="apps">
-          {(['about', 'records', 'terminal', 'hire'] as AppId[]).map((id) => <button key={id} type="button" onClick={() => open(id)}>{APPS[id].label}</button>)}
+          {LAUNCH.map((id) => <button key={id} type="button" onClick={() => open(id)}>{APPS[id].label}</button>)}
         </span>
         <span className="r">
           <button type="button" aria-label="Cambiar tema" onClick={(e) => toggleTheme(e)}>&#9681;</button>
@@ -183,7 +190,7 @@ export default function Desktop() {
       </div>
 
       <div className="icons" aria-label="Escritorio">
-        {(['about', 'records', 'terminal', 'hire'] as AppId[]).map((id) => (
+        {LAUNCH.map((id) => (
           <button key={id} type="button" className="icon" onClick={() => open(id)}>
             <span className="ic">{ICONS[id]}</span><span className="lb">{APPS[id].label}</span>
           </button>

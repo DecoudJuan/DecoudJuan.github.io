@@ -32,7 +32,7 @@ export default function Player({ project, onPick }: { project: Project; onPick: 
 
   return (
     <div className="player" style={{ ['--c' as string]: project.color }}>
-      <div className="pl-main">
+      <div className="pl-main" key={project.id}>
         <div className="screen">
           {project.video ? (
             <video key={project.id} ref={vRef} controls playsInline preload="none" poster={project.poster} onLoadedMetadata={onMeta} onTimeUpdate={onTime}>

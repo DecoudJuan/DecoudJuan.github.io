@@ -1,4 +1,4 @@
-export type AppId = 'about' | 'records' | 'player' | 'terminal' | 'hire';
+export type AppId = 'about' | 'records' | 'player' | 'terminal' | 'games' | 'hire';
 export type Rect = { x: number; y: number; w: number; h: number };
 export type Anim = 'opening' | 'minimizing' | 'restoring' | 'closing';
 

@@ -11,11 +11,11 @@ const HELP = [
   'ls [ruta]        lista archivos',
   'cd <ruta>        cambia de carpeta (cd .. para subir)',
   'cat <archivo>    muestra un archivo',
-  'open <archivo>   lo abre en su ventana (también: open discos, open terminal)',
+  'open <archivo>   lo abre en su ventana (también: open discos, open juegos)',
   'tree             todo el sistema de archivos',
   'pwd · whoami · date · echo · history · theme · clear',
 ];
-const APPS: Record<string, string> = { discos: 'records', proyectos: 'records', 'sobre-mi': 'about', reproductor: 'player', terminal: 'terminal', 'trabajemos-juntos': 'hire' };
+const APPS: Record<string, string> = { discos: 'records', proyectos: 'records', 'sobre-mi': 'about', reproductor: 'player', terminal: 'terminal', juegos: 'games', 'trabajemos-juntos': 'hire' };
 
 function treeLines(d: FsDir, pre = ''): Line[] {
   const names = Object.keys(d.children);

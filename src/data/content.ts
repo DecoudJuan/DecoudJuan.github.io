@@ -46,18 +46,10 @@ export const NOW = [
 ];
 
 export const HIRE = {
-  title: '¿Tenés un proyecto en mente?',
-  text: 'Trabajo con pymes y emprendedores, de punta a punta: diseño, desarrollo y deploy, con una sola persona responsable de todo.',
-  services: [
-    ['Webs y landings', 'Sitios rápidos y con identidad propia, con íconos y tipografía elegidos para tu marca.'],
-    ['Sistemas a medida', 'Lo que hoy vive en planillas o en un sistema viejo, pasado a una app que se usa todos los días.'],
-    ['Automatizaciones con IA', 'Flujos en n8n y modelos de lenguaje conectados a tus herramientas y a tu CRM.'],
-  ] as [string, string][],
-  steps: [
-    ['Charlamos', 'Me contás qué necesitás y qué problema querés resolver.'],
-    ['Propuestas', 'Te muestro varias direcciones reales y elegís mirándolas.'],
-    ['Construyo y entrego', 'Lo desarrollo, lo publico y te lo dejo andando.'],
-  ] as [string, string][],
+  title: '¿Tenés un proyecto?',
+  text: 'Sistemas a medida, webs y automatizaciones con IA para pymes. Hablás directo con quien lo construye.',
+  services: ['Webs y landings', 'Sistemas a medida', 'Automatizaciones con IA'],
+  site: 'https://juandecoud.pages.dev/',
 };
 
 export const PROJECTS: Project[] = [

@@ -1,10 +1,11 @@
 // Player for long demos: the video with its description underneath, and the list of every
 // demo on the side. Nothing downloads until play (preload="none"); chapters, speed, and the
 // position is remembered per project in this browser.
-import { useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import type { Project } from '../../../data/content';
 import { useLang } from '../lang';
-import DemoAnim from './DemoAnim';
+// The canvas demos are a big chunk of code that the first demo (a video) doesn't need.
+const DemoAnim = lazy(() => import('./DemoAnim'));
 
 const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 const store = {
@@ -68,7 +69,7 @@ export default function Player({ project, onPick }: { project: Project; onPick: 
               <source src={project.video} type="video/mp4" />
             </video>
           ) : project.anim ? (
-            <DemoAnim key={project.anim} kind={project.anim} lang={lang} />
+            <Suspense fallback={null}><DemoAnim key={project.anim} kind={project.anim} lang={lang} /></Suspense>
           ) : (
             <div className="ph-video">
               {project.soon && <span className="soon-tag">{P.soonTitle}</span>}

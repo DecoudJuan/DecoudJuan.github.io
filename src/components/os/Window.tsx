@@ -113,6 +113,7 @@ export default function Window(p: Props) {
     <section
       ref={ref}
       className={cls}
+      data-app={win.id}
       aria-label={p.title}
       hidden={win.status !== 'open'}
       style={{ left: r.x, top: r.y, width: r.w, height: r.h, zIndex: win.z }}

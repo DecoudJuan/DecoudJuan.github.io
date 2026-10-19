@@ -52,12 +52,17 @@ export default function Player({ project, onPick }: { project: Project; onPick: 
     const v = vRef.current!;
     if (Math.abs(v.currentTime - last.current) > 4) { last.current = v.currentTime; store.set(key, Math.floor(v.currentTime)); }
   };
+  // Previous / next demo, wrapping around the list.
+  const idx = c.PROJECTS.findIndex((p) => p.id === project.id), n = c.PROJECTS.length;
+  const prev = c.PROJECTS[(idx - 1 + n) % n], next = c.PROJECTS[(idx + 1) % n];
   const seek = (t: number) => { const v = vRef.current; if (v) { v.currentTime = t; v.play().catch(() => {}); } };
 
   return (
     <div className="player" style={{ ['--c' as string]: project.color }}>
-      <div className="screen-wrap" key={project.id}>
-        <div className="screen">
+      <div className="screen-wrap">
+        <div className="screen-row">
+        <button type="button" className="nav-btn" aria-label={`${P.prev}: ${prev.name}`} title={prev.name} onClick={() => onPick(prev.id)}>&#8249;</button>
+        <div className="screen" key={project.id}>
           {project.video ? (
             <video key={project.id} ref={vRef} controls playsInline preload="none" poster={project.poster} onLoadedMetadata={onMeta} onTimeUpdate={onTime}>
               <source src={project.video} type="video/mp4" />
@@ -74,6 +79,8 @@ export default function Player({ project, onPick }: { project: Project; onPick: 
               })()}
             </div>
           )}
+        </div>
+        <button type="button" className="nav-btn" aria-label={`${P.next}: ${next.name}`} title={next.name} onClick={() => onPick(next.id)}>&#8250;</button>
         </div>
       </div>
       <aside className="pl-side">

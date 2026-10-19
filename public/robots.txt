@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://decoudjuan.github.io/sitemap.xml

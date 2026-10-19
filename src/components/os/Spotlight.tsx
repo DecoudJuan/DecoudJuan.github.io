@@ -14,7 +14,12 @@ export default function Spotlight({ items, placeholder, empty, onClose }: { item
     return (n ? items.filter((x) => norm(`${x.label} ${x.sub ?? ''} ${x.kind}`).includes(n)) : items).slice(0, 9);
   }, [q, items]);
 
-  useEffect(() => { input.current?.focus(); }, []);
+  // Focus the input on open and give focus back to whatever had it on close.
+  useEffect(() => {
+    const before = document.activeElement as HTMLElement | null;
+    input.current?.focus();
+    return () => { before?.focus?.(); };
+  }, []);
   useEffect(() => { setI(0); }, [q]);
 
   const go = (x?: SpotItem) => { if (!x) return; onClose(); x.run(); };
@@ -26,7 +31,7 @@ export default function Spotlight({ items, placeholder, empty, onClose }: { item
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" strokeWidth="2" /><path d="M15.5 15.5 21 21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
           <input
             ref={input} value={q} placeholder={placeholder} aria-label={placeholder} autoComplete="off" spellCheck={false}
-            role="combobox" aria-expanded="true" aria-controls="spot-list" aria-activedescendant={list[i] ? `spot-${list[i].id}` : undefined}
+            role="combobox" aria-autocomplete="list" aria-expanded={list.length > 0} aria-controls="spot-list" aria-activedescendant={list[i] ? `spot-${list[i].id}` : undefined}
             onChange={(e) => setQ(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === 'Escape') { e.preventDefault(); onClose(); }
@@ -37,6 +42,7 @@ export default function Spotlight({ items, placeholder, empty, onClose }: { item
           />
           <kbd>esc</kbd>
         </div>
+        <p className="sr-only" role="status">{list.length}</p>
         <ul id="spot-list" role="listbox">
           {list.length === 0 && <li className="spot-empty">{empty}</li>}
           {list.map((x, k) => (

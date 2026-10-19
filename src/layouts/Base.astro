@@ -13,6 +13,24 @@ const { title, description } = Astro.props;
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content={new URL(Astro.url.pathname, Astro.site)} />
+    <meta property="og:image" content={new URL('/og.png', Astro.site)} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="es_AR" />
+    <meta property="og:locale:alternate" content="en_US" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script type="application/ld+json" set:html={JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Person',
+      name: 'Juan Manuel Decoud',
+      url: 'https://decoudjuan.github.io/',
+      jobTitle: 'Support & Integrations Engineer',
+      worksFor: { '@type': 'Organization', name: 'Darwin AI' },
+      alumniOf: { '@type': 'CollegeOrUniversity', name: 'Universidad Austral' },
+      address: { '@type': 'PostalAddress', addressLocality: 'Buenos Aires', addressCountry: 'AR' },
+      sameAs: ['https://github.com/DecoudJuan', 'https://www.linkedin.com/in/decoudjuan/', 'https://juandecoud.pages.dev/'],
+    })} />
     <link rel="icon" href="/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

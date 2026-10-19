@@ -314,7 +314,8 @@ function Os() {
     records: <Records onOpen={openProject} />,
     player: <Player project={current} onPick={setProject} />,
     terminal: <Terminal focused={focus === 'terminal'} onOpen={openTarget} onTheme={() => toggleTheme()} onExit={() => patch('terminal', { anim: 'closing' })} />,
-    games: <Games focused={focus === 'games'} />,
+    // Mounted only while open, so the game loops don't run behind a closed window.
+    games: wins.games.status === 'open' ? <Games focused={focus === 'games'} /> : null,
     hire: <Hire />,
     music: <Music />,
     notes: <Notes current={note} onPick={setNote} />,
@@ -381,7 +382,7 @@ function Os() {
         </span>
       </div>
 
-      <div className="icons" aria-label="Escritorio">
+      <div className="icons" role="group" aria-label={t.desk}>
         {drag?.target && (
           <span className="cell-hint" aria-hidden="true" style={{ right: GRID_X + drag.target.c * CELL_W, top: GRID_Y + drag.target.r * CELL_H, width: CELL_W, height: CELL_H }} />
         )}

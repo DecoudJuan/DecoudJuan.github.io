@@ -109,7 +109,7 @@ export default function Player({ project, onPick }: { project: Project; onPick: 
         <nav className="pl-list" aria-label={P.all}>
         <p className="chap-h">{P.list}</p>
         <div className="strip">
-        {more.l && <button type="button" className="strip-btn l" aria-label="‹" onClick={() => page(-1)}>&#8249;</button>}
+        {more.l && <button type="button" className="strip-btn l" aria-label={P.left} onClick={() => page(-1)}>&#8249;</button>}
         <ul ref={strip}>
           {c.PROJECTS.map((p) => (
             <li key={p.id}>
@@ -120,7 +120,7 @@ export default function Player({ project, onPick }: { project: Project; onPick: 
             </li>
           ))}
         </ul>
-        {more.r && <button type="button" className="strip-btn r" aria-label="›" onClick={() => page(1)}>&#8250;</button>}
+        {more.r && <button type="button" className="strip-btn r" aria-label={P.right} onClick={() => page(1)}>&#8250;</button>}
         </div>
         </nav>
       </aside>

@@ -1,4 +1,5 @@
-// Language context: Spanish by default; an explicit choice is remembered in the browser.
+// Language context. Each language has its own URL (/ and /en/); an explicit choice is remembered
+// in the browser, and Base.astro sends a returning visitor of / to /en/ if that was their pick.
 import { createContext, useContext } from 'react';
 import { getContent, type Lang } from '../../data/content';
 import { UI } from '../../data/i18n';
@@ -10,10 +11,12 @@ export function useLang() {
   return { lang, setLang, t: UI[lang], c: getContent(lang) };
 }
 
-export function storedLang(): Lang | null {
-  try { const l = localStorage.getItem('lang'); return l === 'en' || l === 'es' ? l : null; } catch { return null; }
-}
+/** Switch language in place: remember it, and move the URL, title and description to that language. */
 export function storeLang(l: Lang) {
   try { localStorage.setItem('lang', l); } catch { /* not remembered */ }
+  const m = UI[l].meta;
   document.documentElement.lang = l;
+  document.title = m.title;
+  document.querySelector('meta[name="description"]')?.setAttribute('content', m.description);
+  history.replaceState(history.state, '', m.path + location.hash);
 }

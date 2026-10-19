@@ -17,7 +17,7 @@ import Cv from './apps/Cv';
 import Trash from './apps/Trash';
 import { toggleTheme } from './theme';
 import { ICONS, LINK_ICONS } from './icons';
-import { LangCtx, storeLang, storedLang, useLang } from './lang';
+import { LangCtx, storeLang, useLang } from './lang';
 import type { Lang } from '../../data/content';
 import { NOTES } from '../../data/notes';
 import type { OpenTarget } from '../../data/fs';
@@ -111,9 +111,9 @@ function Clock({ lang }: { lang: Lang }) {
   return <span>BUE {t}</span>;
 }
 
-export default function Desktop() {
-  const [lang, setLangState] = useState<Lang>('es');
-  useEffect(() => { const l = storedLang(); if (l) { setLangState(l); document.documentElement.lang = l; } }, []);
+/** `lang` is the language of the page that renders it: / is Spanish, /en/ is English. */
+export default function Desktop({ lang: initial }: { lang: Lang }) {
+  const [lang, setLangState] = useState<Lang>(initial);
   const setLang = useCallback((l: Lang) => { setLangState(l); storeLang(l); }, []);
   return (
     <LangCtx.Provider value={{ lang, setLang }}>

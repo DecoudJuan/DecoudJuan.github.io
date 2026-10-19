@@ -81,8 +81,10 @@ function layout(W: number, H: number): Record<AppId, Rect> {
   const hireH = clamp(avail * 0.5, 440, 560);
   const hire = { x: Math.max(0, Math.min(recX + 40, W - side - 670)), y: Math.min(records.y + records.h + 18, bottom - hireH - 10), w: clamp(records.w * 0.9, 660, 980), h: hireH };
   const pW = clamp(W * 0.8, 380, 1560);
-  // Height = 16:9 video + its description, so the window opens without empty space.
-  const player = { x: Math.round((W - pW) / 2), y: top, w: pW, h: clamp(((pW - 340) * 9) / 16 + 230, 320, avail - 10) };
+  // Height = 16:9 video (width minus the side panel and the two arrows) + the strip of demos,
+  // so the window opens hugging its content instead of leaving empty space.
+  const vidW = pW - 32 - clamp(pW * 0.3, 260, 400) - 14 - 2 * (40 + 16);
+  const player = { x: Math.round((W - pW) / 2), y: top, w: pW, h: clamp((vidW * 9) / 16 + 112 + 14 + 32 + 40 + 4, 320, avail - 10) };
   const centred = (w: number, h: number, dx = 0, dy = 0) => ({ x: Math.round((W - w) / 2 + dx), y: Math.round(top + (avail - h) / 2 + dy), w, h });
   return {
     about, records, terminal, hire, player,

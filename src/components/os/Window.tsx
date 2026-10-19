@@ -2,6 +2,7 @@
 // open / minimize (genie) / restore / close animations. Geometry lives in Desktop.
 import { useLayoutEffect, useRef, type ReactNode } from 'react';
 import type { Anim, Rect, WinState } from './types';
+import { useLang } from './lang';
 
 type Props = {
   win: WinState;
@@ -40,6 +41,7 @@ function genieFrames(el: HTMLElement, id: string): Keyframe[] | null {
 }
 
 export default function Window(p: Props) {
+  const { t } = useLang();
   const ref = useRef<HTMLElement>(null);
   /** The last hide animation. It keeps its end frame (fill: forwards) so the window doesn't
    *  flash back for a frame before React hides it; it is cancelled when the window comes back. */
@@ -115,12 +117,13 @@ export default function Window(p: Props) {
       hidden={win.status !== 'open'}
       style={{ left: r.x, top: r.y, width: r.w, height: r.h, zIndex: win.z }}
       onPointerDown={p.onFocus}
+      onFocusCapture={p.onFocus}
     >
       <header className="wt" onPointerDown={drag} onDoubleClick={(e) => { if (!(e.target as HTMLElement).closest('button')) p.onToggleMax(); }}>
         <span className="lights">
-          <button type="button" className="c" aria-label={`Cerrar ${p.title}`} onClick={() => p.onRequest('closing')}>&times;</button>
-          <button type="button" className="m" aria-label={`Minimizar ${p.title}`} onClick={() => p.onRequest('minimizing')}>&minus;</button>
-          <button type="button" className="x" aria-label={`${win.max ? 'Restaurar' : 'Maximizar'} ${p.title}`} onClick={p.onToggleMax}>+</button>
+          <button type="button" className="c" aria-label={`${t.win.close} ${p.title}`} onClick={() => p.onRequest('closing')}>&times;</button>
+          <button type="button" className="m" aria-label={`${t.win.min} ${p.title}`} onClick={() => p.onRequest('minimizing')}>&minus;</button>
+          <button type="button" className="x" aria-label={`${win.max ? t.win.restore : t.win.max} ${p.title}`} onClick={p.onToggleMax}>+</button>
         </span>
         <span className="ttl">{p.title}</span>
       </header>

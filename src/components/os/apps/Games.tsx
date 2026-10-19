@@ -75,6 +75,9 @@ function text(c: CanvasRenderingContext2D, s: string, x: number, y: number, col 
   c.fillStyle = col; c.fillText(s, x, y);
 }
 
+/** A game key only counts when the player isn't typing or pressing a control somewhere else. */
+const typing = (e: KeyboardEvent) => !!(e.target as HTMLElement | null)?.closest?.('input, textarea, select, button, a, [contenteditable]');
+
 const best = {
   get: (k: string) => { try { return Number(localStorage.getItem('best-' + k)) || 0; } catch { return 0; } },
   set: (k: string, v: number) => { try { localStorage.setItem('best-' + k, String(v)); } catch { /* not remembered */ } },
@@ -219,7 +222,7 @@ function Pingu({ active, onScore, onEnd, g }: { active: boolean; onScore: (n: nu
       draw();
       raf = requestAnimationFrame(step);
     };
-    const key = (e: KeyboardEvent) => { if (active && (e.code === 'Space' || e.code === 'ArrowUp')) { e.preventDefault(); jump(); } };
+    const key = (e: KeyboardEvent) => { if (active && !typing(e) && (e.code === 'Space' || e.code === 'ArrowUp')) { e.preventDefault(); jump(); } };
     document.fonts?.load('8px Silkscreen').then(draw).catch(() => {});
     raf = requestAnimationFrame(step);
     addEventListener('keydown', key);
@@ -308,7 +311,7 @@ function Snake({ active, onScore, onEnd, g }: { active: boolean; onScore: (n: nu
       raf = requestAnimationFrame(step);
     };
     const map: Record<string, number[]> = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0], KeyW: [0, -1], KeyS: [0, 1], KeyA: [-1, 0], KeyD: [1, 0] };
-    const key = (e: KeyboardEvent) => { const d = active && map[e.code]; if (d) { e.preventDefault(); turn(d); } };
+    const key = (e: KeyboardEvent) => { const d = active && !typing(e) && map[e.code]; if (d) { e.preventDefault(); turn(d); } };
     document.fonts?.load('8px Silkscreen').then(draw).catch(() => {});
     raf = requestAnimationFrame(step);
     addEventListener('keydown', key);
@@ -337,7 +340,7 @@ function Mines({ onScore, g }: { onScore: (n: number) => void; g: G }) {
   const N = 9, MINES = 10, T = 10, OX = 4, OY = 24, W = OX * 2 + N * T, H = OY + N * T + 4;
   const ref = usePixelCanvas(W, H);
   const fresh = (): Cell[] => Array.from({ length: N * N }, () => ({ mine: false, open: false, flag: false, n: 0 }));
-  const s = useRef({ cells: fresh(), state: 'ready' as 'ready' | 'play' | 'won' | 'lost', boom: -1, t0: 0, secs: 0 });
+  const s = useRef({ cells: fresh(), state: 'ready' as 'ready' | 'play' | 'won' | 'lost', boom: -1, t0: 0, secs: 0, cur: 40, kb: false });
   const [, tick] = useState(0);
   const nb = (i: number) => {
     const x = i % N, y = Math.floor(i / N), out: number[] = [];
@@ -375,6 +378,7 @@ function Mines({ onScore, g }: { onScore: (n: number) => void; g: G }) {
         c.fillStyle = P.S; c.fillRect(x + 1, y + T - 1, T - 1, 1); c.fillRect(x + T - 1, y + 1, 1, T - 1);
         if (cell.flag) sprite(c, FLAG, x + 2, y + 1);
       }
+      if (st.kb && i === st.cur) { c.strokeStyle = P.y; c.lineWidth = 1; c.strokeRect(x + 0.5, y + 0.5, T - 1, T - 1); }
     });
   }, [ref, W, H, OX, OY, T, N]);
 
@@ -388,7 +392,7 @@ function Mines({ onScore, g }: { onScore: (n: number) => void; g: G }) {
     return () => clearInterval(id);
   }, [draw]);
 
-  const reset = () => { s.current = { cells: fresh(), state: 'ready', boom: -1, t0: 0, secs: 0 }; onScore(0); draw(); tick((n) => n + 1); };
+  const reset = () => { s.current = { cells: fresh(), state: 'ready', boom: -1, t0: 0, secs: 0, cur: s.current.cur, kb: s.current.kb }; onScore(0); draw(); tick((n) => n + 1); };
   const at = (e: React.PointerEvent | React.MouseEvent) => {
     const r = ref.current!.getBoundingClientRect();
     const x = ((e.clientX - r.left) / r.width) * W, y = ((e.clientY - r.top) / r.height) * H;
@@ -439,7 +443,16 @@ function Mines({ onScore, g }: { onScore: (n: number) => void; g: G }) {
   return (
     <div className="mines-wrap">
       <canvas
-        ref={ref} className="pix" aria-label="Buscaminas"
+        ref={ref} className="pix" aria-label={`${g.help.mines}. ${g.minesKeys}`} tabIndex={0}
+        onFocus={() => { s.current.kb = true; draw(); }}
+        onBlur={() => { s.current.kb = false; draw(); }}
+        onKeyDown={(e) => {
+          const st2 = s.current, x = st2.cur % N, y = Math.floor(st2.cur / N);
+          const mv: Record<string, [number, number]> = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
+          if (mv[e.key]) { e.preventDefault(); const [dx, dy] = mv[e.key]; st2.cur = Math.min(N - 1, Math.max(0, y + dy)) * N + Math.min(N - 1, Math.max(0, x + dx)); draw(); }
+          else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(st2.cur); }
+          else if (e.key.toLowerCase() === 'f') { e.preventDefault(); flag(st2.cur); }
+        }}
         onContextMenu={(e) => { e.preventDefault(); const i = at(e); if (typeof i === 'number') flag(i); }}
         onPointerDown={(e) => {
           held.current = false;
@@ -474,9 +487,9 @@ export default function Games({ focused }: { focused: boolean }) {
   useEffect(() => { audio.on = sound; }, [sound]);
   return (
     <div className="games">
-      <div className="games-tabs" role="tablist" aria-label={g.tabs}>
+      <div className="games-tabs" role="group" aria-label={g.tabs}>
         {GAMES.map(([id, name]) => (
-          <button key={id} type="button" role="tab" aria-selected={game === id} onClick={() => setGame(id)}>{name[lang]}</button>
+          <button key={id} type="button" aria-pressed={game === id} onClick={() => setGame(id)}>{name[lang]}</button>
         ))}
         <span className="games-score">{game === 'mines' ? `${g.cells} ${score} · ${g.won} ${best.get(game)}` : `${g.points} ${score} · ${g.best} ${best.get(game)}`}</span>
         <button type="button" className="games-snd" aria-pressed={sound} aria-label={g.sound} title={g.sound} onClick={() => setSound((v) => !v)}>{sound ? '♪' : '♪̸'}</button>

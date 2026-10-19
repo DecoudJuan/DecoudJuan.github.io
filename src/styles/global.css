@@ -6,7 +6,7 @@
   --acc: #8a5a14; --on-acc: #fbf8f2;
   --dock: rgba(251, 248, 242, .8); --net: #5a4026;
   --inv: #16120e; --inv-fg: #f3ece1; --shadow: rgba(40, 24, 8, .5);
-  --term: #f7f1e6; --term-bar: #ece3d3; --term-ln: #ddd0bb; --term-fg: #2a2118; --term-acc: #8a5a14; --term-mut: #8a7a64; --term-dir: #2f5f8a;
+  --term: #f7f1e6; --term-bar: #ece3d3; --term-ln: #ddd0bb; --term-fg: #2a2118; --term-acc: #8a5a14; --term-mut: #6f604b; --term-dir: #2f5f8a;
   --red: #d9634a; --yel: #e0aa3e; --grn: #6aa25a;
   --note: #f3e3a6; --note-ink: #3a2e14;
   --sans: "Onest", ui-sans-serif, system-ui, sans-serif;
@@ -16,7 +16,7 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --desk: #2b1d14; --grain: .42;
-    --win: #1c1714; --bar: #241e19; --ink: #efe7da; --mut: #a59886; --ln: #3a3029;
+    --win: #262019; --bar: #2e2721; --ink: #efe7da; --mut: #a59886; --ln: #3d332b;
     --acc: #e0aa4f; --on-acc: #16120e;
     --dock: rgba(28, 23, 20, .8); --net: #e0aa4f;
     --inv: #f3ece1; --inv-fg: #16120e; --shadow: rgba(0, 0, 0, .7);
@@ -27,7 +27,7 @@
 }
 :root[data-theme="dark"] {
   --desk: #2b1d14; --grain: .42;
-  --win: #1c1714; --bar: #241e19; --ink: #efe7da; --mut: #a59886; --ln: #3a3029;
+  --win: #262019; --bar: #2e2721; --ink: #efe7da; --mut: #a59886; --ln: #3d332b;
   --acc: #e0aa4f; --on-acc: #16120e;
   --dock: rgba(28, 23, 20, .8); --net: #e0aa4f;
   --inv: #f3ece1; --inv-fg: #16120e; --shadow: rgba(0, 0, 0, .7);
@@ -85,7 +85,7 @@ main { height: 100%; }
 .wt { height: 40px; flex: none; display: flex; align-items: center; gap: 10px; padding: 0 12px; background: var(--bar); border-bottom: 1px solid var(--ln);
   cursor: grab; user-select: none; -webkit-user-select: none; touch-action: none; }
 .wt:active { cursor: grabbing; }
-.win:not(.focus) .wt { opacity: .8; }
+.win.focus .wt .ttl { color: var(--ink); }
 .lights { display: flex; align-items: center; gap: 9px; height: 100%; }
 .lights button { flex: none; width: 16px; height: 16px; border-radius: 50%; border: 0; padding: 0; margin: 0; cursor: pointer; display: grid; place-items: center; font: 700 12px/1 var(--sans); color: transparent; }
 .lights .c { background: var(--red); } .lights .m { background: var(--yel); } .lights .x { background: var(--grn); }
@@ -132,7 +132,7 @@ main { height: 100%; }
 .disc:hover .vin, .disc:focus-visible .vin { transform: translateX(22%); }
 .cover { position: absolute; z-index: 1; left: 0; top: 0; width: 100%; aspect-ratio: 1; border-radius: 4px; background: var(--c); color: #f3ead8; padding: 12px;
   display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; box-shadow: 0 14px 26px -16px rgba(0, 0, 0, .7); }
-.cover small { font: 500 .62rem var(--mono); letter-spacing: .08em; text-transform: uppercase; opacity: .75; position: relative; }
+.cover small { font: 500 .7rem var(--mono); letter-spacing: .08em; text-transform: uppercase; opacity: .92; position: relative; }
 .cover b { font-size: 1.25rem; line-height: 1; font-weight: 800; letter-spacing: -.03em; position: relative; }
 .cover i { position: absolute; inset: 0; opacity: .28; }
 .m1 i { background: repeating-radial-gradient(circle at 80% 20%, transparent 0 9px, #f3ead8 9px 10px); }
@@ -416,7 +416,11 @@ main { height: 100%; }
   .rz { display: none; } .wt { cursor: default; }
   .records { padding: 16px 30px 16px 16px; }
   .shelf { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 26px; }
-  .dock { overflow-x: auto; }
+  /* the dock scrolls sideways here: the bar itself carries the background, without a visible scrollbar */
+  .dock { overflow-x: auto; scrollbar-width: none; background: var(--dock); border: 1px solid var(--ln); border-radius: 20px; padding-bottom: 11px;
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+  .dock::-webkit-scrollbar { display: none; }
+  .dock-bg { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -440,3 +444,20 @@ main { height: 100%; }
 .desk:not(.ready) .win, .desk:not(.ready) .icons, .desk:not(.ready) .widgets, .desk:not(.ready) .home { visibility: hidden; }
 .desk.ready .icons, .desk.ready .widgets, .desk.ready .home { animation: appear .35s ease-out; }
 @keyframes appear { from { opacity: 0; } }
+
+/* touch screens: no hover tooltips on the dock */
+@media (hover: none) { .dk .tip { display: none; } }
+
+/* ---------- review fixes (docs/review-2026-10-18.md) ---------- */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.term form:focus-within { outline: 2px solid var(--term-acc); outline-offset: 4px; border-radius: 4px; }
+.pix:focus-visible { outline: 2px solid var(--acc); outline-offset: 3px; }
+.games-tabs button[aria-pressed="true"] { background: var(--bar); border-color: var(--ln); color: var(--ink); }
+.music-tabs button[aria-pressed="true"] { background: var(--bar); border-color: var(--ln); color: var(--ink); }
+.games-tabs button:hover, .music-tabs button:hover { background: var(--bar); }
+@media (hover: hover) { .btn-l:hover { filter: brightness(1.08); } .btn-o:hover { background: rgba(127, 127, 127, .14); } }
+.btn-l:active, .btn-o:active { transform: scale(.96); }
+/* touch screens can't hover: the vinyl always peeks out a little */
+@media (hover: none) { .disc .vin { transform: translateX(16%); } }
+/* small players: the strip below already navigates, the side arrows would eat the video */
+@container (max-width: 520px) { .screen-row .nav-btn { display: none; } }

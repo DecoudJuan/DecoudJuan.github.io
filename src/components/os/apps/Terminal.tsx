@@ -127,13 +127,14 @@ export default function Terminal({ focused, onOpen, onTheme, onExit }: Props) {
     setLines((l) => [...l, ...out]);
   }
 
-  function complete() {
+  /** Completes the last word; returns false when there is nothing to complete (Tab then moves focus as usual). */
+  function complete(): boolean {
     const parts = val.split(/\s+/);
     const word = parts[parts.length - 1];
     const slash = word.lastIndexOf('/');
     const dirPart = slash >= 0 ? word.slice(0, slash + 1) : '';
     const s = resolve(cwd, dirPart || '.'), n = s && nodeAt(root, s);
-    if (!n || n.type !== 'dir') return;
+    if (!n || n.type !== 'dir') return false;
     const opts = Object.entries(n.children).filter(([k]) => k.startsWith(word.slice(slash + 1)));
     if (opts.length === 1) {
       const [k, x] = opts[0];
@@ -142,18 +143,19 @@ export default function Terminal({ focused, onOpen, onTheme, onExit }: Props) {
     } else if (opts.length > 1) {
       setLines((l) => [...l, { t: `${prompt} ${val}`, k: 'cmd' }, { t: opts.map(([k]) => k).join('   '), k: 'dir' }]);
     }
+    return opts.length > 0;
   }
 
   return (
     <div className="term" ref={box} onClick={() => input.current?.focus({ preventScroll: true })}>
-      {lines.map((l, i) => <div key={i} className={l.k}>{l.t}</div>)}
+      <div role="log" aria-live="polite">{lines.map((l, i) => <div key={i} className={l.k}>{l.t}</div>)}</div>
       <form onSubmit={(e) => { e.preventDefault(); const v = val; setVal(''); if (v.trim()) { setHist((h) => [...h, v]); setHi(hist.length + 1); } run(v); }}>
         <label htmlFor="t-in">{prompt}</label>
         <input
-          id="t-in" ref={input} value={val} autoComplete="off" autoCapitalize="off" spellCheck={false} aria-label="Comando"
+          id="t-in" ref={input} value={val} autoComplete="off" autoCapitalize="off" spellCheck={false}
           onChange={(e) => setVal(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === 'Tab') { e.preventDefault(); complete(); }
+            if (e.key === 'Tab' && !e.shiftKey && val.trim() && complete()) e.preventDefault();
             else if (e.key === 'ArrowUp' && hi > 0) { e.preventDefault(); setHi(hi - 1); setVal(hist[hi - 1]); }
             else if (e.key === 'ArrowDown') { e.preventDefault(); const n = Math.min(hist.length, hi + 1); setHi(n); setVal(hist[n] ?? ''); }
           }}

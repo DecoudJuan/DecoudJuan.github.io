@@ -11,15 +11,15 @@ export default function Music() {
   return (
     <div className="music">
       <div className="music-head">
-        <span className="music-pm"><Penguin interactive={false} label={t.aboutPenguin} /></span>
+        <span className="music-pm"><Penguin interactive={false} follow={false} label={t.aboutPenguin} /></span>
         <div>
           <h2>{t.music.title}</h2>
           <div className="eq" aria-hidden="true">{Array.from({ length: 14 }, (_, k) => <i key={k} style={{ ['--d' as string]: `${(k * 137) % 900}ms` }} />)}</div>
         </div>
       </div>
-      <div className="music-tabs" role="tablist" aria-label={t.music.title}>
+      <div className="music-tabs" role="group" aria-label={t.music.title}>
         {PLAYLISTS.map(([label], k) => (
-          <button key={label} type="button" role="tab" aria-selected={k === i} onClick={() => setI(k)}>{label}</button>
+          <button key={label} type="button" aria-pressed={k === i} onClick={() => setI(k)}>{label}</button>
         ))}
       </div>
       <iframe

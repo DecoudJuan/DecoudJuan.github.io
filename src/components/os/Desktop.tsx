@@ -1,17 +1,16 @@
 // The whole desktop: owns window state (geometry, z-order, status, animations), language,
 // wallpaper and search, and wires the menu bar, icons, widgets, windows and dock together.
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import Window from './Window';
 import Dock, { type DockItem } from './Dock';
 import NetBackground from './NetBackground';
 import Penguin from './Penguin';
-import Spotlight, { type SpotItem } from './Spotlight';
+import type { SpotItem } from './Spotlight';
 import About from './apps/About';
 import Records from './apps/Records';
 import Player from './apps/Player';
 import Terminal from './apps/Terminal';
 import Hire from './apps/Hire';
-import Games from './apps/Games';
 import Music from './apps/Music';
 import Notes from './apps/Notes';
 import Cv from './apps/Cv';
@@ -23,6 +22,10 @@ import type { Lang } from '../../data/content';
 import { NOTES } from '../../data/notes';
 import type { OpenTarget } from '../../data/fs';
 import type { Anim, AppId, Rect, WinState } from './types';
+
+// Not needed on the first paint: loaded the first time they open.
+const Games = lazy(() => import('./apps/Games'));
+const Spotlight = lazy(() => import('./Spotlight'));
 
 const MENU = 34, DOCK = 92;
 const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
@@ -292,11 +295,11 @@ function Os() {
 
   const openProject = useCallback((pid: string) => { setProject(pid); open('player'); }, [open]);
   const openNote = useCallback((nid: string) => { setNote(nid); open('notes'); }, [open]);
-  const openTarget = (x: OpenTarget) => {
+  const openTarget = useCallback((x: OpenTarget) => {
     if ('project' in x) openProject(x.project);
     else if ('note' in x) openNote(x.note);
     else open(x.app as AppId);
-  };
+  }, [open, openProject, openNote]);
 
   const spotItems = useMemo<SpotItem[]>(() => [
     ...LAUNCH.map((id) => ({ id: 'a-' + id, kind: t.spot.app, label: t.app[id][0], run: () => open(id) })),
@@ -309,19 +312,21 @@ function Os() {
   ], [t, c, lang, open, openProject, openNote, setLang]);
 
   const current = c.PROJECTS.find((p) => p.id === project) ?? c.PROJECTS[0];
-  const content: Record<AppId, ReactNode> = {
+  // Memoized so that moving or resizing a window (or the desk) doesn't re-render every app.
+  const gamesOpen = wins.games.status === 'open';
+  const content = useMemo<Record<AppId, ReactNode>>(() => ({
     about: <About />,
     records: <Records onOpen={openProject} />,
     player: <Player project={current} onPick={setProject} />,
     terminal: <Terminal focused={focus === 'terminal'} onOpen={openTarget} onTheme={() => toggleTheme()} onExit={() => patch('terminal', { anim: 'closing' })} />,
     // Mounted only while open, so the game loops don't run behind a closed window.
-    games: wins.games.status === 'open' ? <Games focused={focus === 'games'} /> : null,
+    games: gamesOpen ? <Suspense fallback={null}><Games focused={focus === 'games'} /></Suspense> : null,
     hire: <Hire />,
     music: <Music />,
     notes: <Notes current={note} onPick={setNote} />,
     cv: <Cv />,
     trash: <Trash />,
-  };
+  }), [current, focus, gamesOpen, note, openProject, openTarget, patch]);
   const item = (id: AppId): DockItem => ({ id, label: t.app[id][0], icon: ICONS[id], running: wins[id].status !== 'closed' });
   const links = [
     { label: 'GitHub', href: c.PERSON.github, icon: LINK_ICONS.github },
@@ -448,7 +453,7 @@ function Os() {
 
       <Dock items={(['about', 'records', 'player', 'notes', 'music', 'terminal', 'games', 'cv', 'hire'] as AppId[]).map(item)} links={links} tail={[item('trash')]} onApp={dockClick} />
 
-      {spot && <Spotlight items={spotItems} placeholder={t.spot.placeholder} empty={t.spot.empty} onClose={() => setSpot(false)} />}
+      {spot && <Suspense fallback={null}><Spotlight items={spotItems} placeholder={t.spot.placeholder} empty={t.spot.empty} onClose={() => setSpot(false)} /></Suspense>}
 
       {boot !== 'off' && (
         <div className={'boot' + (boot === 'out' ? ' out' : '')} onClick={() => setBoot('off')} aria-hidden="true">

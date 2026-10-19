@@ -21,11 +21,18 @@ export default function NetBackground() {
       let s = 7;
       const rnd = () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; };
       nodes = Array.from({ length: Math.round((W * H) / 8000) }, () => ({ bx: rnd() * W, by: rnd() * H, p: rnd() * 6.28, x: 0, y: 0 }));
+      // Each node links to its 3 nearest neighbours: one pass per node keeping the best three,
+      // instead of sorting every distance.
       edges = [];
+      const seen = new Set<number>();
       nodes.forEach((a, i) => {
-        nodes.map((b, j) => [Math.hypot(a.bx - b.bx, a.by - b.by), j] as const)
-          .filter(([, j]) => j !== i).sort((p, q) => p[0] - q[0]).slice(0, 3)
-          .forEach(([, j]) => { if (!edges.some(([u, v]) => u === j && v === i)) edges.push([i, j]); });
+        const best: [number, number][] = [];
+        nodes.forEach((b, j) => {
+          if (j === i) return;
+          const d = (a.bx - b.bx) ** 2 + (a.by - b.by) ** 2;
+          if (best.length < 3 || d < best[2][0]) { best.push([d, j]); best.sort((p, q) => p[0] - q[0]); best.length = Math.min(best.length, 3); }
+        });
+        best.forEach(([, j]) => { if (!seen.has(j * nodes.length + i)) { seen.add(i * nodes.length + j); edges.push([i, j]); } });
       });
       col = getComputedStyle(cv).getPropertyValue('--net').trim();
     };
@@ -53,7 +60,10 @@ export default function NetBackground() {
       });
       c.globalAlpha = 1;
     };
-    const loop = () => { frame(); raf = requestAnimationFrame(loop); };
+    // A slow drift doesn't need 60 fps: draw every other frame (about 30 fps). The browser
+    // already stops requestAnimationFrame in hidden tabs.
+    let odd = false;
+    const loop = () => { odd = !odd; if (odd) frame(); raf = requestAnimationFrame(loop); };
     const run = () => { cancelAnimationFrame(raf); if (visible && !reduced) loop(); else frame(); };
 
     const desk = cv.parentElement!;

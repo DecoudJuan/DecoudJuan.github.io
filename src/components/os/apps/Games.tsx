@@ -3,6 +3,10 @@
 // sprites defined pixel by pixel on the Sweetie 16 palette and the Silkscreen pixel font.
 // Keyboard only reaches a game while its window is focused.
 import { useCallback, useEffect, useRef, useState } from 'react';
+import silkscreen from '@fontsource/silkscreen/files/silkscreen-latin-400-normal.woff2?url';
+
+// The pixel font is registered from this lazy chunk, so the rest of the site never loads it.
+if (typeof document !== 'undefined' && document.fonts) document.fonts.add(new FontFace('Silkscreen', `url(${silkscreen}) format('woff2')`));
 import { useLang } from '../lang';
 import type { UIStrings } from '../../../data/i18n';
 

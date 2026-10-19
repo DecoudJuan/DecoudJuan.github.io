@@ -4,11 +4,13 @@
 // Keyboard only reaches a game while its window is focused.
 import { useCallback, useEffect, useRef, useState } from 'react';
 import silkscreen from '@fontsource/silkscreen/files/silkscreen-latin-400-normal.woff2?url';
-
-// The pixel font is registered from this lazy chunk, so the rest of the site never loads it.
-if (typeof document !== 'undefined' && document.fonts) document.fonts.add(new FontFace('Silkscreen', `url(${silkscreen}) format('woff2')`));
+import { SpeakerHigh, SpeakerSlash } from '@phosphor-icons/react/dist/ssr';
 import { useLang } from '../lang';
 import type { UIStrings } from '../../../data/i18n';
+
+// The pixel font is registered from this lazy chunk (never run on the server), so the rest of
+// the site never loads it.
+document.fonts.add(new FontFace('Silkscreen', `url(${silkscreen}) format('woff2')`));
 
 type G = UIStrings['games'];
 type GameId = 'pingu' | 'snake' | 'mines';
@@ -496,7 +498,7 @@ export default function Games({ focused }: { focused: boolean }) {
           <button key={id} type="button" aria-pressed={game === id} onClick={() => setGame(id)}>{name[lang]}</button>
         ))}
         <span className="games-score">{game === 'mines' ? `${g.cells} ${score} · ${g.won} ${best.get(game)}` : `${g.points} ${score} · ${g.best} ${best.get(game)}`}</span>
-        <button type="button" className="games-snd" aria-pressed={sound} aria-label={g.sound} title={g.sound} onClick={() => setSound((v) => !v)}>{sound ? '♪' : '♪̸'}</button>
+        <button type="button" className="games-snd" aria-pressed={sound} aria-label={g.sound} title={g.sound} onClick={() => setSound((v) => !v)}>{sound ? <SpeakerHigh size={15} weight="bold" aria-hidden="true" /> : <SpeakerSlash size={15} weight="bold" aria-hidden="true" />}</button>
       </div>
       <div className="games-area">
         {game === 'pingu' && <Pingu active={focused} onScore={onScore} onEnd={onEnd} g={g} />}

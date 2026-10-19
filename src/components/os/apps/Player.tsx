@@ -1,11 +1,14 @@
 // Player for long demos: the video with its description underneath, and the list of every
 // demo on the side. Nothing downloads until play (preload="none"); chapters, speed, and the
 // position is remembered per project in this browser.
-import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import type { Project } from '../../../data/content';
+import { ArrowUpRight, CaretLeft, CaretRight } from '@phosphor-icons/react/dist/ssr';
 import { useLang } from '../lang';
+import { motionOff } from '../motion';
+import { lazyOrNothing } from '../lazy';
 // The canvas demos are a big chunk of code that the first demo (a video) doesn't need.
-const DemoAnim = lazy(() => import('./DemoAnim'));
+const DemoAnim = lazyOrNothing(() => import('./DemoAnim'));
 
 const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 const store = {
@@ -36,7 +39,7 @@ export default function Player({ project, onPick }: { project: Project; onPick: 
     ro.observe(ul);
     return () => { ul.removeEventListener('scroll', check); ul.removeEventListener('wheel', wheel); ro.disconnect(); };
   }, []);
-  const page = (dir: number) => strip.current?.scrollBy({ left: dir * strip.current.clientWidth * 0.8, behavior: 'smooth' });
+  const page = (dir: number) => strip.current?.scrollBy({ left: dir * strip.current.clientWidth * 0.8, behavior: motionOff() ? 'auto' : 'smooth' });
   const [rate, setRate] = useState(1);
   const [resume, setResume] = useState('');
   const key = 'pos-' + project.id;
@@ -62,7 +65,7 @@ export default function Player({ project, onPick }: { project: Project; onPick: 
     <div className="player" style={{ ['--c' as string]: project.color }}>
       <div className="screen-wrap">
         <div className="screen-row">
-        <button type="button" className="nav-btn" aria-label={`${P.prev}: ${prev.name}`} title={prev.name} onClick={() => onPick(prev.id)}>&#8249;</button>
+        <button type="button" className="nav-btn" aria-label={`${P.prev}: ${prev.name}`} title={prev.name} onClick={() => onPick(prev.id)}><CaretLeft size={18} weight="bold" aria-hidden="true" /></button>
         <div className="screen" key={project.id}>
           {project.video ? (
             <video key={project.id} ref={vRef} controls playsInline preload="none" poster={project.poster} onLoadedMetadata={onMeta} onTimeUpdate={onTime}>
@@ -76,12 +79,12 @@ export default function Player({ project, onPick }: { project: Project; onPick: 
               <b>{project.name}</b>
               {project.soon ? <small>{P.soon}</small> : (() => {
                 const live = project.links.find(([k]) => k === 'try');
-                return live ? <a className="btn-l" href={live[1]} target="_blank" rel="noopener">{P.live} <span aria-hidden="true">&#8599;</span></a> : null;
+                return live ? <a className="btn-l" href={live[1]} target="_blank" rel="noopener">{P.live} <ArrowUpRight size={14} weight="bold" aria-hidden="true" /></a> : null;
               })()}
             </div>
           )}
         </div>
-        <button type="button" className="nav-btn" aria-label={`${P.next}: ${next.name}`} title={next.name} onClick={() => onPick(next.id)}>&#8250;</button>
+        <button type="button" className="nav-btn" aria-label={`${P.next}: ${next.name}`} title={next.name} onClick={() => onPick(next.id)}><CaretRight size={18} weight="bold" aria-hidden="true" /></button>
         </div>
       </div>
       <aside className="pl-side">
@@ -99,7 +102,7 @@ export default function Player({ project, onPick }: { project: Project; onPick: 
           </div>
           <p className="pl-t">{project.text}</p>
           {project.links.length > 0 && (
-            <div className="pl-links">{project.links.map(([k, u]) => <a key={u} href={u} target="_blank" rel="noopener">{t.link[k]} <span aria-hidden="true">&#8599;</span></a>)}</div>
+            <div className="pl-links">{project.links.map(([k, u]) => <a key={u} href={u} target="_blank" rel="noopener">{t.link[k]} <ArrowUpRight size={14} weight="bold" aria-hidden="true" /></a>)}</div>
           )}
           {project.video && project.chapters?.length ? (
             <ul className="chap" aria-label={P.chapters}>
@@ -110,7 +113,7 @@ export default function Player({ project, onPick }: { project: Project; onPick: 
         <nav className="pl-list" aria-label={P.all}>
         <p className="chap-h">{P.list}</p>
         <div className="strip">
-        {more.l && <button type="button" className="strip-btn l" aria-label={P.left} onClick={() => page(-1)}>&#8249;</button>}
+        {more.l && <button type="button" className="strip-btn l" aria-label={P.left} onClick={() => page(-1)}><CaretLeft size={16} weight="bold" aria-hidden="true" /></button>}
         <ul ref={strip}>
           {c.PROJECTS.map((p) => (
             <li key={p.id}>
@@ -121,7 +124,7 @@ export default function Player({ project, onPick }: { project: Project; onPick: 
             </li>
           ))}
         </ul>
-        {more.r && <button type="button" className="strip-btn r" aria-label={P.right} onClick={() => page(1)}>&#8250;</button>}
+        {more.r && <button type="button" className="strip-btn r" aria-label={P.right} onClick={() => page(1)}><CaretRight size={16} weight="bold" aria-hidden="true" /></button>}
         </div>
         </nav>
       </aside>

@@ -1,12 +1,14 @@
 // Player for long demos: the video with its description underneath, and the list of every
 // demo on the side. Nothing downloads until play (preload="none"); chapters, speed, and the
 // position is remembered per project in this browser.
-import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import type { Project } from '../../../data/content';
 import { ArrowUpRight, CaretLeft, CaretRight } from '@phosphor-icons/react/dist/ssr';
 import { useLang } from '../lang';
+import { motionOff } from '../motion';
+import { lazyOrNothing } from '../lazy';
 // The canvas demos are a big chunk of code that the first demo (a video) doesn't need.
-const DemoAnim = lazy(() => import('./DemoAnim'));
+const DemoAnim = lazyOrNothing(() => import('./DemoAnim'));
 
 const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 const store = {
@@ -37,7 +39,7 @@ export default function Player({ project, onPick }: { project: Project; onPick: 
     ro.observe(ul);
     return () => { ul.removeEventListener('scroll', check); ul.removeEventListener('wheel', wheel); ro.disconnect(); };
   }, []);
-  const page = (dir: number) => strip.current?.scrollBy({ left: dir * strip.current.clientWidth * 0.8, behavior: 'smooth' });
+  const page = (dir: number) => strip.current?.scrollBy({ left: dir * strip.current.clientWidth * 0.8, behavior: motionOff() ? 'auto' : 'smooth' });
   const [rate, setRate] = useState(1);
   const [resume, setResume] = useState('');
   const key = 'pos-' + project.id;

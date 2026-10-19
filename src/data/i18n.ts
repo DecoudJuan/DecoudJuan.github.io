@@ -54,6 +54,7 @@ const es = {
   win: { close: 'Cerrar', min: 'Minimizar', max: 'Maximizar', restore: 'Restaurar', keys: 'Alt + flechas mueven la ventana; con Mayús, cambian su tamaño' },
   cmd: 'Comando',
   results: 'resultados',
+  iconKeys: 'Alt + flechas mueven el ícono',
 };
 
 const en: typeof es = {
@@ -108,6 +109,7 @@ const en: typeof es = {
   win: { close: 'Close', min: 'Minimize', max: 'Maximize', restore: 'Restore', keys: 'Alt + arrows move the window; with Shift, they resize it' },
   cmd: 'Command',
   results: 'results',
+  iconKeys: 'Alt + arrows move the icon',
 };
 
 export const UI: Record<Lang, typeof es> = { es, en };

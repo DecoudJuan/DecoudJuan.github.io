@@ -18,5 +18,8 @@ export function storeLang(l: Lang) {
   document.documentElement.lang = l;
   document.title = m.title;
   document.querySelector('meta[name="description"]')?.setAttribute('content', m.description);
-  history.replaceState(history.state, '', m.path + location.hash);
+  const url = new URL(m.path, location.origin).href;
+  document.querySelector('link[rel="canonical"]')?.setAttribute('href', url);
+  document.querySelector('meta[property="og:url"]')?.setAttribute('content', url);
+  history.replaceState(history.state, '', m.path + location.search + location.hash);
 }

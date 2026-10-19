@@ -6,7 +6,7 @@ import type { AppId } from './types';
 import { motionOff } from './motion';
 
 export type DockItem = { id: AppId; label: string; icon: ReactNode; running: boolean };
-type Props = { items: DockItem[]; links: { label: string; href: string; icon: ReactNode }[]; tail?: DockItem[]; onApp: (id: AppId) => void };
+type Props = { items: DockItem[]; links: { label: string; href: string; icon: ReactNode }[]; tail?: DockItem[]; onApp: (id: AppId, keyboard: boolean) => void };
 
 const BASE = 48, MAX = 1.55, GAP = 6, REACH = 140;
 
@@ -41,7 +41,7 @@ export default function Dock({ items, links, tail = [], onApp }: Props) {
   };
 
   const button = (it: DockItem) => (
-    <button key={it.id} type="button" className={'dk' + (it.running ? ' run' : '')} data-dock={it.id} onClick={() => onApp(it.id)} aria-label={it.label}>
+    <button key={it.id} type="button" className={'dk' + (it.running ? ' run' : '')} data-dock={it.id} onClick={(e) => onApp(it.id, e.detail === 0)} aria-label={it.label}>
       {it.icon}<span className="tip" aria-hidden="true">{it.label}</span>
     </button>
   );

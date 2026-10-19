@@ -20,7 +20,10 @@ const L = {
 type S = (typeof L)['es'];
 
 const ease = (x: number) => { x = Math.max(0, Math.min(1, x)); return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
-function txt(c: CanvasRenderingContext2D, s: string, x: number, y: number, size: number, col: string, weight = 500, align: CanvasTextAlign = 'left', font = 'Onest Variable') {
+/** Font families as Fontsource registers them (see Base.astro). */
+const SANS = 'Onest Variable', MONO = 'JetBrains Mono Variable';
+
+function txt(c: CanvasRenderingContext2D, s: string, x: number, y: number, size: number, col: string, weight = 500, align: CanvasTextAlign = 'left', font = SANS) {
   c.font = `${weight} ${size}px "${font}", sans-serif`; c.fillStyle = col; c.textAlign = align; c.textBaseline = 'alphabetic'; c.fillText(s, x, y);
 }
 
@@ -35,7 +38,7 @@ function wasp(c: CanvasRenderingContext2D, W: number, H: number, t: number, s: S
   }
   const cells = st.cells as { x: number; y: number; f: boolean; k: boolean; re: number }[];
   const cyc = t % 11, first = 4.2, sx = 24 + (cyc / first) * (cols * cs + 8), done = cyc > first;
-  txt(c, s.scan, 24, 26, 13, C.mut, 500, 'left', 'JetBrains Mono Variable');
+  txt(c, s.scan, 24, 26, 13, C.mut, 500, 'left', MONO);
   if (done && Math.random() < 0.05) cells[Math.floor(Math.random() * cells.length)].re = t;
   cells.forEach((q) => {
     const seen = done || q.x < sx, flash = done && t - q.re < 0.45;
@@ -47,7 +50,7 @@ function wasp(c: CanvasRenderingContext2D, W: number, H: number, t: number, s: S
   c.globalAlpha = 1;
   if (!done) { c.fillStyle = C.acc; c.fillRect(sx, 34, 2, rows * cs + 10); }
   txt(c, done ? '6 s' : '142 s', 24, H - 34, 30, C.acc, 800);
-  txt(c, done ? s.cached : s.first, 24, H - 14, 13, C.mut, 500, 'left', 'JetBrains Mono Variable');
+  txt(c, done ? s.cached : s.first, 24, H - 14, 13, C.mut, 500, 'left', MONO);
   txt(c, s.model, W - 24, H - 14, 13, C.ink, 500, 'right');
 }
 
@@ -95,7 +98,7 @@ function vexa(c: CanvasRenderingContext2D, W: number, H: number, t: number, lang
 
   // step caption + progress
   const [title, line] = v.steps[step];
-  txt(c, `${step + 1} / ${v.steps.length}`, 24, 26, 12, C.mut, 600, 'left', 'JetBrains Mono Variable');
+  txt(c, `${step + 1} / ${v.steps.length}`, 24, 26, 12, C.mut, 600, 'left', MONO);
   c.globalAlpha = fade;
   txt(c, title, 70, 27, 18, C.ink, 800);
   txt(c, line, 70 + c.measureText(title).width + 14, 27, 13, C.mut, 500);
@@ -108,7 +111,7 @@ function vexa(c: CanvasRenderingContext2D, W: number, H: number, t: number, lang
   const frame = (x: number, y: number, w: number, h: number, r: number, label: string) => {
     c.fillStyle = C.paper; c.beginPath(); c.roundRect(x, y, w, h, r); c.fill();
     c.fillStyle = '#ece5d8'; c.beginPath(); c.roundRect(x, y, w, 24, [r, r, 0, 0]); c.fill();
-    txt(c, label, x + 12, y + 16, 11, '#6b6052', 600, 'left', 'JetBrains Mono Variable');
+    txt(c, label, x + 12, y + 16, 11, '#6b6052', 600, 'left', MONO);
   };
   frame(dx, top, dw, fh, 8, v.win);
   frame(px, top, pw, fh, 18, v.phone);
@@ -132,7 +135,7 @@ function vexa(c: CanvasRenderingContext2D, W: number, H: number, t: number, lang
   } else if (step === 2) {
     // invoice on the PC, the phone gets it at once
     txt(c, v.invoice, ix, iy + 18, 15, ink, 800);
-    txt(c, v.clients[0], ix, iy + 38, 12, soft, 500, 'left', 'JetBrains Mono Variable');
+    txt(c, v.clients[0], ix, iy + 38, 12, soft, 500, 'left', MONO);
     v.products.forEach((p, i) => { const a = ease((k - 0.3 - i * 0.2) / 0.3); c.globalAlpha = a; txt(c, p[0], ix, iy + 70 + i * 22, 13, ink, 500); txt(c, p[1], ix + iw, iy + 70 + i * 22, 13, ink, 600, 'right'); c.globalAlpha = 1; });
     const q = Math.max(2, Math.min(4, (fh - 200) / 26)), qx = ix, qy = top + fh - 20 - 21 * q, shown = Math.floor(ease((k - 1) / 1.2) * 441);
     c.fillStyle = ink; for (let i = 0; i < shown; i++) if (qr[i]) c.fillRect(qx + (i % 21) * q, qy + Math.floor(i / 21) * q, q, q);
@@ -141,7 +144,7 @@ function vexa(c: CanvasRenderingContext2D, W: number, H: number, t: number, lang
       c.save(); c.translate(ix + iw * 0.72, qy + 21 * q * 0.5); c.rotate(-0.14); c.scale(1.4 - 0.4 * s, 1.4 - 0.4 * s); c.globalAlpha = s;
       c.strokeStyle = C.grn; c.lineWidth = 3; c.strokeRect(-76, -18, 152, 36); txt(c, v.cae, 0, 6, 15, C.grn, 800, 'center'); c.restore(); c.globalAlpha = 1;
       txt(c, v.invoice.split(' ').slice(0, 2).join(' '), mx, my + 20, Math.min(13, mw / 10), ink, 700);
-      txt(c, '✓ ' + v.synced, mx, my + 42, 11, C.grn, 600, 'left', 'JetBrains Mono Variable');
+      txt(c, '✓ ' + v.synced, mx, my + 42, 11, C.grn, 600, 'left', MONO);
     }
   } else {
     // labels slide out of the printer
@@ -154,7 +157,7 @@ function vexa(c: CanvasRenderingContext2D, W: number, H: number, t: number, lang
       for (let b = 0; b < 30; b++) { c.fillStyle = ink; c.fillRect(x + 10 + b * ((lw - 20) / 30), y + 32, (b * 7) % 3 ? 1.5 : 3, 30); }
       c.globalAlpha = 1;
     }
-    txt(c, '⎙ ' + v.label + ' ×3', mx, my + 20, Math.min(12, mw / 11), ink, 600, 'left', 'JetBrains Mono Variable');
+    txt(c, '⎙ ' + v.label + ' ×3', mx, my + 20, Math.min(12, mw / 11), ink, 600, 'left', MONO);
   }
 }
 
@@ -207,7 +210,7 @@ const CHESS_WORDS = {
 };
 
 function wrap(c: CanvasRenderingContext2D, s: string, x: number, y: number, maxW: number, lh: number, size: number, col: string) {
-  c.font = `500 ${size}px "Onest Variable", sans-serif`; c.fillStyle = col; c.textAlign = 'left';
+  c.font = `500 ${size}px "${SANS}", sans-serif`; c.fillStyle = col; c.textAlign = 'left';
   let line = '', yy = y;
   s.split(' ').forEach((w) => {
     const test = line ? line + ' ' + w : w;
@@ -233,10 +236,10 @@ function chess(c: CanvasRenderingContext2D, W: number, H: number, t: number, lan
     if (label) txt(c, label, cx, cy + sq * 0.12, sq * 0.36, white ? '#1e1914' : '#f3ead8', 800, 'center');
   };
   const chip = (x: number, y: number, s: string, on: boolean) => {
-    c.font = '600 12px "JetBrains Mono Variable", monospace'; const tw = c.measureText(s).width + 18;
+    c.font = `600 12px "${MONO}", monospace`; const tw = c.measureText(s).width + 18;
     c.fillStyle = on ? 'rgba(224,170,79,.18)' : '#17120e'; c.fillRect(x, y, tw, 24);
     c.strokeStyle = on ? C.acc : C.dim; c.lineWidth = on ? 1.6 : 1; c.strokeRect(x + 0.5, y + 0.5, tw - 1, 23);
-    txt(c, s, x + 9, y + 16, 12, on ? C.acc : C.mut, 600, 'left', 'JetBrains Mono Variable');
+    txt(c, s, x + 9, y + 16, 12, on ? C.acc : C.mut, 600, 'left', MONO);
     return x + tw + 8;
   };
 
@@ -255,7 +258,7 @@ function chess(c: CanvasRenderingContext2D, W: number, H: number, t: number, lan
     }
     piece(q[0], q[1], true, 'Q');
     let x = px; x = chip(x, vy, w.straight, straight); x = chip(x, vy, w.diag, diag); chip(x, vy, w.l, false);
-    if (phase === 2) txt(c, w.queen, px, vy + 46, 14, C.ink, 700, 'left', 'JetBrains Mono Variable');
+    if (phase === 2) txt(c, w.queen, px, vy + 46, 14, C.ink, 700, 'left', MONO);
   } else if (ch === 1) {
     // same game loop, two win conditions
     const checkers = k >= 3;
@@ -277,7 +280,7 @@ function chess(c: CanvasRenderingContext2D, W: number, H: number, t: number, lan
     const ex = px, ey = vy - 6, ew = Math.min(pw, 300);
     c.fillStyle = '#17120e'; c.fillRect(ex, ey, ew, 70); c.strokeStyle = C.acc; c.lineWidth = 1.6; c.strokeRect(ex + 0.5, ey + 0.5, ew - 1, 69);
     txt(c, w.engine, ex + 12, ey + 22, 14, C.acc, 800);
-    [w.moves, w.rules, w.win].forEach((s, i) => txt(c, '‹' + s + '›', ex + 12 + i * (ew - 24) / 3, ey + 52, 11, C.ink, 600, 'left', 'JetBrains Mono Variable'));
+    [w.moves, w.rules, w.win].forEach((s, i) => txt(c, '‹' + s + '›', ex + 12 + i * (ew - 24) / 3, ey + 52, 11, C.ink, 600, 'left', MONO));
     txt(c, checkers ? w.checkers : w.chess, ex + ew + 14, ey + 42, 14, C.ink, 700);
   } else {
     // a move, and the listeners react
@@ -291,15 +294,15 @@ function chess(c: CanvasRenderingContext2D, W: number, H: number, t: number, lan
       c.fillStyle = on ? 'rgba(224,170,79,.16)' : '#17120e'; c.fillRect(lx, vy, lw, 52);
       c.strokeStyle = on ? C.acc : C.dim; c.lineWidth = on ? 1.6 : 1; c.strokeRect(lx + 0.5, vy + 0.5, lw - 1, 51);
       txt(c, s, lx + 10, vy + 20, 12, C.ink, 700);
-      txt(c, k > 1.6 ? 'e2 → e4' : '·', lx + 10, vy + 40, 12, C.acc, 600, 'left', 'JetBrains Mono Variable');
+      txt(c, k > 1.6 ? 'e2 → e4' : '·', lx + 10, vy + 40, 12, C.acc, 600, 'left', MONO);
     });
-    if (k > 1.2 && k < 2.2) txt(c, 'notify()', px, vy - 10, 12, C.acc, 600, 'left', 'JetBrains Mono Variable');
+    if (k > 1.2 && k < 2.2) txt(c, 'notify()', px, vy - 10, 12, C.acc, 600, 'left', MONO);
   }
 
   // chapter text
   c.globalAlpha = fade;
   const cp = CHAPTERS[ch];
-  txt(c, `${ch + 1} / ${CHAPTERS.length}`, px, by + 16, 12, C.mut, 600, 'left', 'JetBrains Mono Variable');
+  txt(c, `${ch + 1} / ${CHAPTERS.length}`, px, by + 16, 12, C.mut, 600, 'left', MONO);
   const ty = wrap(c, cp.title[lang], px, by + 46, pw, 26, 21, C.ink);
   wrap(c, cp.text[lang], px, ty + 30, pw, 21, 14.5, C.soft);
   c.globalAlpha = 1;

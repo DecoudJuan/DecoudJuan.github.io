@@ -45,6 +45,7 @@ public/
 - Every user-facing string comes from `content.ts` or `i18n.ts`, in Spanish and English. Components read them with `useLang()`, so a change goes in those files and never in a component.
 - Each language has its own URL. The language button switches in place and moves the URL, the title and the description with `history.replaceState` (`storeLang` in `lang.tsx`).
 - The choice and the theme are stored in `localStorage`. A visitor who picked English and comes back to `/` is sent to `/en/`; the browser language is not used to guess (search engines would then index the wrong language).
+- `public/sitemap.xml` repeats the two URLs and their hreflang by hand: a new language goes there too.
 - The page title, description and share image of each language live in `meta` in `i18n.ts`. The share images are `public/og.png` and `public/og-en.png`.
 
 ## Adding things

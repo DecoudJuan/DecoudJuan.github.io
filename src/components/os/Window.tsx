@@ -24,6 +24,7 @@ type Props = {
 const DIRS = ['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'] as const;
 const narrow = () => matchMedia('(max-width: 760px)').matches;
 const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
+const STEP: Record<string, [number, number]> = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
 
 /** macOS-style genie: the bottom edge narrows onto the dock icon, then the window pours into it. */
 function genieFrames(el: HTMLElement, id: string): Keyframe[] | null {
@@ -74,6 +75,7 @@ export default function Window(p: Props) {
     const a = win.anim;
     if (!el || !a) return;
     const done = () => p.onAnimEnd(a);
+    // Read here, while the window still shows: the effect above acts on it once the status changes.
     if (a === 'closing' || a === 'minimizing') giveBack.current = el.contains(document.activeElement);
     if (a === 'restoring' || a === 'opening') { held.current?.cancel(); held.current = null; }
     if (motionOff() || narrow() || !el.animate) { done(); return; }
@@ -129,11 +131,13 @@ export default function Window(p: Props) {
   };
 
   /** Keyboard alternative to dragging: Alt + arrows move the window, Alt + Shift + arrows resize it. */
-  const STEP: Record<string, [number, number]> = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
   const keys = (e: React.KeyboardEvent) => {
     const d = STEP[e.key];
-    if (!e.altKey || !d || narrow() || win.max) return;
+    // Not with Ctrl or Cmd (screen readers, workspaces, AltGr), and not inside a text field,
+    // where Option + arrows move the caret by word on a Mac.
+    if (!e.altKey || e.ctrlKey || e.metaKey || !d || (e.target as HTMLElement).matches('input, textarea, [contenteditable]')) return;
     e.preventDefault();
+    if (narrow() || win.max) return;
     const b = p.bounds(), o = win.rect, dx = d[0] * 24, dy = d[1] * 24;
     p.onRect(e.shiftKey
       ? { ...o, w: clamp(o.w + dx, p.minW, b.w - o.x), h: clamp(o.h + dy, p.minH, b.bottom - o.y) }
@@ -149,6 +153,7 @@ export default function Window(p: Props) {
       data-app={win.id}
       tabIndex={-1}
       aria-label={p.title}
+      aria-describedby="win-keys"
       aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown Alt+ArrowLeft Alt+ArrowRight Alt+Shift+ArrowUp Alt+Shift+ArrowDown Alt+Shift+ArrowLeft Alt+Shift+ArrowRight"
       hidden={win.status !== 'open'}
       style={{ left: r.x, top: r.y, width: r.w, height: r.h, zIndex: win.z }}
@@ -156,7 +161,7 @@ export default function Window(p: Props) {
       onFocusCapture={p.onFocus}
       onKeyDown={keys}
     >
-      <header className="wt" title={t.win.keys} onPointerDown={drag} onDoubleClick={(e) => { if (!(e.target as HTMLElement).closest('button')) p.onToggleMax(); }}>
+      <header className="wt" onPointerDown={drag} onDoubleClick={(e) => { if (!(e.target as HTMLElement).closest('button')) p.onToggleMax(); }}>
         <span className="lights">
           <button type="button" className="c" aria-label={`${t.win.close} ${p.title}`} onClick={() => p.onRequest('closing')}>&times;</button>
           <button type="button" className="m" aria-label={`${t.win.min} ${p.title}`} onClick={() => p.onRequest('minimizing')}>&minus;</button>

@@ -1,6 +1,6 @@
 // The whole desktop: owns window state (geometry, z-order, status, animations), language,
 // wallpaper and search, and wires the menu bar, icons, widgets, windows and dock together.
-import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import Window from './Window';
 import Dock, { type DockItem } from './Dock';
 import NetBackground from './NetBackground';
@@ -18,6 +18,7 @@ import Trash from './apps/Trash';
 import { CircleHalf, Image as ImageIcon, MagnifyingGlass, Pause, Play } from '@phosphor-icons/react/dist/ssr';
 import { toggleTheme } from './theme';
 import { motionOff, setStill } from './motion';
+import { lazyOrNothing } from './lazy';
 import { ICONS, LINK_ICONS } from './icons';
 import { LangCtx, storeLang, useLang } from './lang';
 import type { Lang } from '../../data/content';
@@ -26,8 +27,8 @@ import type { OpenTarget } from '../../data/fs';
 import type { Anim, AppId, Rect, WinState } from './types';
 
 // Not needed on the first paint: loaded the first time they open.
-const Games = lazy(() => import('./apps/Games'));
-const Spotlight = lazy(() => import('./Spotlight'));
+const Games = lazyOrNothing(() => import('./apps/Games'));
+const Spotlight = lazyOrNothing(() => import('./Spotlight'));
 
 const MENU = 34, DOCK = 92;
 const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
@@ -74,6 +75,9 @@ function placeIcons(saved: Partial<Record<AppId, Cell>>, g: { cols: number; rows
   return out;
 }
 type Wall = (typeof WALLS)[number];
+/** Alt + arrow steps for a desktop icon. Columns count from the right edge, so left is +1. */
+const ICON_STEP: Record<string, Cell> = { ArrowLeft: { c: 1, r: 0 }, ArrowRight: { c: -1, r: 0 }, ArrowUp: { c: 0, r: -1 }, ArrowDown: { c: 0, r: 1 } };
+const saveCells = (cells: Partial<Record<AppId, Cell>>) => { try { localStorage.setItem('icon-cells', JSON.stringify(cells)); } catch { /* not remembered */ } };
 
 /** Initial layout as a function of the desk size, so big screens get big windows instead of empty wood. */
 function layout(W: number, H: number): Record<AppId, Rect> {
@@ -143,6 +147,7 @@ function Os() {
   const [spot, setSpot] = useState(false);
   const [wall, setWall] = useState<Wall>('auto');
   const [wallMenu, setWallMenu] = useState(false);
+  const wallBtn = useRef<HTMLButtonElement>(null);
   const [still, setStillState] = useState(false);
   useEffect(() => { setStillState(document.documentElement.hasAttribute('data-still')); }, []);
   const toggleStill = () => { setStill(!still); setStillState(!still); };
@@ -208,7 +213,7 @@ function Os() {
           taken.add(key(spot));
           next[k] = spot;
         });
-        try { localStorage.setItem('icon-cells', JSON.stringify(next)); } catch { /* ignore */ }
+        saveCells(next);
         return next;
       });
     };
@@ -216,15 +221,14 @@ function Os() {
   };
   /** Keyboard alternative to dragging: Alt + arrows move the focused icon one cell, swapping places
    *  with the icon already there. */
-  const ICON_STEP: Record<string, Cell> = { ArrowLeft: { c: 1, r: 0 }, ArrowRight: { c: -1, r: 0 }, ArrowUp: { c: 0, r: -1 }, ArrowDown: { c: 0, r: 1 } };
   const keyIcon = (id: AppId) => (e: React.KeyboardEvent) => {
     const d = ICON_STEP[e.key];
-    if (!e.altKey || !d) return;
+    if (!e.altKey || e.ctrlKey || e.metaKey || !d) return;
     e.preventDefault();
     const want = { c: clamp(placed[id].c + d.c, 0, grid.cols - 1), r: clamp(placed[id].r + d.r, 0, grid.rows - 1) };
     const other = LAUNCH.find((k) => k !== id && key(placed[k]) === key(want));
     const next: Partial<Record<AppId, Cell>> = { ...placed, [id]: want, ...(other ? { [other]: placed[id] } : {}) };
-    try { localStorage.setItem('icon-cells', JSON.stringify(next)); } catch { /* ignore */ }
+    saveCells(next);
     setCells(next);
   };
 
@@ -272,6 +276,7 @@ function Os() {
     return () => { clearTimeout(a); clearTimeout(b); removeEventListener('keydown', key); };
   }, []);
 
+  const closeSpot = useCallback(() => setSpot(false), []);
   const pickWall = (w: Wall) => { setWall(w); setWallMenu(false); try { localStorage.setItem('wall', w); } catch { /* ignore */ } };
 
   const patch = useCallback((id: AppId, p: Partial<WinState>) => setWins((ws) => ({ ...ws, [id]: { ...ws[id], ...p } })), []);
@@ -285,6 +290,12 @@ function Os() {
       return { ...ws, [id]: { ...s, status: 'open', anim, z: ++z.current } };
     });
     setFocus(id);
+    // Also when it was already open (a new window takes focus itself): after this frame, so it
+    // wins over the search giving focus back to where it was.
+    requestAnimationFrame(() => {
+      const el = document.querySelector<HTMLElement>(`[data-app="${id}"]`);
+      if (el && !el.hidden && !el.contains(document.activeElement)) el.focus({ preventScroll: true });
+    });
   }, []);
 
   const toggleMax = useCallback((id: AppId) => {
@@ -305,16 +316,19 @@ function Os() {
     else patch(id, { anim: null });
   }, [patch]);
 
-  const dockClick = (id: AppId) => {
+  const dockClick = (id: AppId, keyboard: boolean) => {
     const s = wins[id];
-    if (s.status === 'open' && focus === id) patch(id, { anim: 'minimizing' });
+    // A click on the icon of the window in front minimizes it, like macOS. From the keyboard it
+    // always goes to the window: there the dock is how you get back to it.
+    if (s.status === 'open' && focus === id && !keyboard) patch(id, { anim: 'minimizing' });
     else open(id);
   };
 
   /** Skip link: straight to the window on top, or to the home screen when none is open. */
   const skip = () => {
     const top = ORDER.filter((id) => wins[id].status === 'open').sort((a, b) => wins[b].z - wins[a].z)[0];
-    (document.querySelector<HTMLElement>(top ? `[data-app="${top}"]` : '.home button, .dock .dk'))?.focus();
+    const to = top ? [document.querySelector<HTMLElement>(`[data-app="${top}"]`)] : [...document.querySelectorAll<HTMLElement>('.home button, .dock .dk')];
+    to.find((el) => el?.offsetParent)?.focus();
   };
 
   const openProject = useCallback((pid: string) => { setProject(pid); open('player'); }, [open]);
@@ -337,12 +351,12 @@ function Os() {
 
   const current = c.PROJECTS.find((p) => p.id === project) ?? c.PROJECTS[0];
   // Memoized so that moving or resizing a window (or the desk) doesn't re-render every app.
-  const gamesOpen = wins.games.status === 'open';
+  const gamesOpen = wins.games.status === 'open', termOpen = wins.terminal.status === 'open';
   const content = useMemo<Record<AppId, ReactNode>>(() => ({
     about: <About />,
     records: <Records onOpen={openProject} />,
     player: <Player project={current} onPick={setProject} />,
-    terminal: <Terminal focused={focus === 'terminal'} onOpen={openTarget} onTheme={() => toggleTheme()} onExit={() => patch('terminal', { anim: 'closing' })} />,
+    terminal: <Terminal focused={termOpen && focus === 'terminal'} onOpen={openTarget} onTheme={() => toggleTheme()} onExit={() => patch('terminal', { anim: 'closing' })} />,
     // Mounted only while open, so the game loops don't run behind a closed window.
     games: gamesOpen ? <Suspense fallback={null}><Games focused={focus === 'games'} /></Suspense> : null,
     hire: <Hire />,
@@ -350,7 +364,7 @@ function Os() {
     notes: <Notes current={note} onPick={setNote} />,
     cv: <Cv />,
     trash: <Trash />,
-  }), [current, focus, gamesOpen, note, openProject, openTarget, patch]);
+  }), [current, focus, gamesOpen, termOpen, note, openProject, openTarget, patch]);
   const item = (id: AppId): DockItem => ({ id, label: t.app[id][0], icon: ICONS[id], running: wins[id].status !== 'closed' });
   const links = [
     { label: 'GitHub', href: c.PERSON.github, icon: LINK_ICONS.github },
@@ -387,6 +401,9 @@ function Os() {
       <NetBackground />
 
       <button type="button" className="skip" onClick={skip}>{t.menu.skip}</button>
+      {/* What the keyboard shortcuts do, read out with each window and desktop icon. */}
+      <p id="win-keys" className="sr-only">{t.win.keys}</p>
+      <p id="icon-keys" className="sr-only">{t.iconKeys}</p>
       <div className="menu">
         <span className="brand"><Penguin still className="menu-pm" />DecoudJuan</span>
         <span className="apps">
@@ -396,13 +413,14 @@ function Os() {
           <button type="button" aria-label={t.menu.search} title="Ctrl + K" onClick={() => setSpot(true)}>
             <MagnifyingGlass size={15} weight="bold" aria-hidden="true" />
           </button>
-          <span className="wall-wrap">
-            <button type="button" aria-label={t.menu.wall} aria-expanded={wallMenu} onClick={() => setWallMenu((v) => !v)}>
+          <span className="wall-wrap" onKeyDown={(e) => { if (e.key === 'Escape' && wallMenu) { e.stopPropagation(); setWallMenu(false); wallBtn.current?.focus(); } }}
+            onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setWallMenu(false); }}>
+            <button type="button" ref={wallBtn} aria-label={t.menu.wall} aria-expanded={wallMenu} aria-controls="wall-menu" onClick={() => setWallMenu((v) => !v)}>
               <ImageIcon size={15} weight="bold" aria-hidden="true" />
             </button>
             {wallMenu && (
-              <span className="wall-menu" role="menu">
-                {WALLS.map((w) => <button key={w} type="button" role="menuitemradio" aria-checked={wall === w} onClick={() => pickWall(w)}><i data-w={w} />{t.wall[w]}</button>)}
+              <span className="wall-menu" id="wall-menu" role="group" aria-label={t.menu.wall}>
+                {WALLS.map((w) => <button key={w} type="button" aria-pressed={wall === w} onClick={() => pickWall(w)}><i data-w={w} />{t.wall[w]}</button>)}
               </span>
             )}
           </span>
@@ -443,7 +461,7 @@ function Os() {
           return (
             <button
               key={id} type="button" ref={(el) => { iconRefs.current[id] = el; }}
-              className={'icon' + (sel.includes(id) ? ' sel' : '') + (moving ? ' moving' : '')} aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown Alt+ArrowLeft Alt+ArrowRight"
+              className={'icon' + (sel.includes(id) ? ' sel' : '') + (moving ? ' moving' : '')} aria-describedby="icon-keys" aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown Alt+ArrowLeft Alt+ArrowRight"
               style={{ right: GRID_X + at.c * CELL_W, top: GRID_Y + at.r * CELL_H, transform: moving ? `translate(${drag!.dx}px, ${drag!.dy}px)` : undefined }}
               onPointerDown={dragIcon(id)}
               onKeyDown={keyIcon(id)}
@@ -482,7 +500,7 @@ function Os() {
 
       <Dock items={(['about', 'records', 'player', 'notes', 'music', 'terminal', 'games', 'cv', 'hire'] as AppId[]).map(item)} links={links} tail={[item('trash')]} onApp={dockClick} />
 
-      {spot && <Suspense fallback={null}><Spotlight items={spotItems} placeholder={t.spot.placeholder} empty={t.spot.empty} onClose={() => setSpot(false)} /></Suspense>}
+      {spot && <Suspense fallback={null}><Spotlight items={spotItems} placeholder={t.spot.placeholder} empty={t.spot.empty} results={t.results} onClose={closeSpot} /></Suspense>}
 
       {boot !== 'off' && (
         <div className={'boot' + (boot === 'out' ? ' out' : '')} onClick={() => setBoot('off')} aria-hidden="true">

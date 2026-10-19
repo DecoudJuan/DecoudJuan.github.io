@@ -35,7 +35,7 @@ See [docs/architecture.md](docs/architecture.md). In short:
 - **Projects:**
   - Links point to public repositories or sites.
   - Do not present someone else's project as Juan's. `manos` is not his.
-- **Demo videos** go on an external host (R2 or unlisted YouTube), never in the repo. The player loads them only on play.
+- **Demo videos** live in `public/demos/` (MP4 plus a `.webp` poster), compressed and short. The player loads them only on play.
 - **Motion:** respects `prefers-reduced-motion`. Pointer-only effects check `pointerType === 'mouse'`.
 - **Binary files** are marked in `.gitattributes`.
 

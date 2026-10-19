@@ -2,6 +2,12 @@
 import type { Lang } from './content';
 
 const es = {
+  /** <title>, description and share image of the page in this language (Base.astro). */
+  meta: {
+    title: 'Juan Decoud · webs, sistemas y automatizaciones con IA',
+    description: 'Juan Manuel Decoud: webs, sistemas y automatizaciones con IA para pymes. Support & Integrations Engineer en Darwin AI y estudiante de Ingeniería Informática en la Universidad Austral.',
+    locale: 'es_AR', path: '/', og: '/og.png',
+  },
   app: {
     about: ['Sobre mí', '~/sobre-mi.txt'], records: ['Discos', '~/discos'], player: ['Reproductor', 'reproductor'],
     terminal: ['Terminal', 'juan@decoudjuan: ~'], games: ['Juegos', 'juegos'], hire: ['Trabajemos juntos', 'Trabajemos juntos'],
@@ -51,6 +57,11 @@ const es = {
 };
 
 const en: typeof es = {
+  meta: {
+    title: 'Juan Decoud · websites, systems and AI automations',
+    description: 'Juan Manuel Decoud: websites, systems and AI automations for small businesses. Support & Integrations Engineer at Darwin AI and Computer Engineering student at Universidad Austral.',
+    locale: 'en_US', path: '/en/', og: '/og-en.png',
+  },
   app: {
     about: ['About me', '~/about-me.txt'], records: ['Records', '~/records'], player: ['Player', 'player'],
     terminal: ['Terminal', 'juan@decoudjuan: ~'], games: ['Games', 'games'], hire: ['Work with me', 'Work with me'],

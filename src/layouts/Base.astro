@@ -3,25 +3,34 @@ import '@fontsource-variable/onest';
 import '@fontsource-variable/jetbrains-mono';
 import onestLatin from '@fontsource-variable/onest/files/onest-latin-wght-normal.woff2?url';
 import '../styles/global.css';
-const { title, description } = Astro.props;
+import { UI } from '../data/i18n';
+import type { Lang } from '../data/content';
+
+const { lang } = Astro.props as { lang: Lang };
+const { title, description, locale, og } = UI[lang].meta;
+const other: Lang = lang === 'es' ? 'en' : 'es';
+const url = (path: string) => new URL(path, Astro.site).href;
 ---
 <!doctype html>
-<html lang="es">
+<html lang={lang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    <link rel="canonical" href={url(UI[lang].meta.path)} />
+    <link rel="alternate" hreflang="es" href={url(UI.es.meta.path)} />
+    <link rel="alternate" hreflang="en" href={url(UI.en.meta.path)} />
+    <link rel="alternate" hreflang="x-default" href={url(UI.es.meta.path)} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content={new URL(Astro.url.pathname, Astro.site)} />
-    <meta property="og:image" content={new URL('/og.png', Astro.site)} />
+    <meta property="og:url" content={url(UI[lang].meta.path)} />
+    <meta property="og:image" content={url(og)} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:locale" content="es_AR" />
-    <meta property="og:locale:alternate" content="en_US" />
+    <meta property="og:locale" content={locale} />
+    <meta property="og:locale:alternate" content={UI[other].meta.locale} />
     <meta name="twitter:card" content="summary_large_image" />
     <script type="application/ld+json" set:html={JSON.stringify({
       '@context': 'https://schema.org',
@@ -39,6 +48,9 @@ const { title, description } = Astro.props;
     <script is:inline>
       // Apply a stored theme before first paint; without one, CSS follows the system.
       try { const t = localStorage.getItem('theme'); if (t) document.documentElement.setAttribute('data-theme', t); } catch (e) {}
+      // Whoever picked English before goes to /en/ when they come back to /. A link straight
+      // to either URL is respected, and nothing is guessed from the browser language.
+      try { if (location.pathname === '/' && localStorage.getItem('lang') === 'en') location.replace('/en/' + location.hash); } catch (e) {}
       // Mark the visits that will play the boot screen (same rule as Desktop.tsx), so the CSS
       // doesn't show "Sobre mí" early only to cover it a moment later.
       try { if (sessionStorage.getItem('boot') !== '1' && !matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.setAttribute('data-boot', ''); } catch (e) {}

@@ -1,12 +1,13 @@
 // Connected nodes drifting over the wood. Edges near the pointer light up and carry pulses.
 import { useEffect, useRef } from 'react';
+import { useMotionOff } from './motion';
 
 export default function NetBackground() {
   const ref = useRef<HTMLCanvasElement>(null);
+  const reduced = useMotionOff();
 
   useEffect(() => {
     const cv = ref.current!, c = cv.getContext('2d')!;
-    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
     let W = 0, H = 0, raf = 0, mx = -1e4, my = -1e4, col = '#000', visible = true;
     let nodes: { bx: number; by: number; p: number; x: number; y: number }[] = [];
     let edges: [number, number][] = [];
@@ -84,7 +85,7 @@ export default function NetBackground() {
       desk.removeEventListener('pointermove', onMove); desk.removeEventListener('pointerleave', onLeave);
       removeEventListener('themechange', onTheme); mq.removeEventListener('change', onTheme);
     };
-  }, []);
+  }, [reduced]);
 
   return <canvas className="net" ref={ref} aria-hidden="true" />;
 }

@@ -3,6 +3,7 @@
 // covering the outermost icons, as in macOS.
 import { useRef, type ReactNode } from 'react';
 import type { AppId } from './types';
+import { motionOff } from './motion';
 
 export type DockItem = { id: AppId; label: string; icon: ReactNode; running: boolean };
 type Props = { items: DockItem[]; links: { label: string; href: string; icon: ReactNode }[]; tail?: DockItem[]; onApp: (id: AppId) => void };
@@ -13,7 +14,7 @@ export default function Dock({ items, links, tail = [], onApp }: Props) {
   const ref = useRef<HTMLElement>(null);
 
   const move = (e: React.PointerEvent) => {
-    if (e.pointerType !== 'mouse' || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (e.pointerType !== 'mouse' || motionOff()) return;
     const dock = ref.current!, els = [...dock.querySelectorAll<HTMLElement>('.dk')];
     const px = e.clientX - dock.getBoundingClientRect().left;
     // Layout centres (offsetLeft ignores transforms, so these stay stable while we animate).

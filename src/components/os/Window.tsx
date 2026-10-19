@@ -3,6 +3,7 @@
 import { useLayoutEffect, useRef, type ReactNode } from 'react';
 import type { Anim, Rect, WinState } from './types';
 import { useLang } from './lang';
+import { motionOff } from './motion';
 
 type Props = {
   win: WinState;
@@ -21,7 +22,6 @@ type Props = {
 };
 
 const DIRS = ['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'] as const;
-const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const narrow = () => matchMedia('(max-width: 760px)').matches;
 const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
 
@@ -47,6 +47,26 @@ export default function Window(p: Props) {
    *  flash back for a frame before React hides it; it is cancelled when the window comes back. */
   const held = useRef<Animation | null>(null);
   const { win } = p;
+  /** Focus: whatever opened the window gets it back when the window closes or minimizes, if focus
+   *  was inside the window at that moment (otherwise the user is already somewhere else). */
+  const opener = useRef<HTMLElement | null>(null);
+  const giveBack = useRef(false);
+  const wasOpen = useRef(win.status === 'open');
+  // Layout effect, so it runs before the apps' own effects (the terminal focuses its prompt).
+  useLayoutEffect(() => {
+    const el = ref.current!, open = win.status === 'open';
+    if (open && !wasOpen.current) {
+      const a = document.activeElement as HTMLElement | null;
+      opener.current = a && a !== document.body ? a : null;
+      el.focus({ preventScroll: true });
+    } else if (!open && wasOpen.current && giveBack.current) {
+      const o = opener.current;
+      (o?.isConnected && o.offsetParent ? o : document.querySelector<HTMLElement>(`[data-dock="${win.id}"]`))?.focus({ preventScroll: true });
+    }
+    if (!open) giveBack.current = false;
+    wasOpen.current = open;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [win.status]);
 
   // Run the requested animation, then report back so Desktop can commit the state.
   useLayoutEffect(() => {
@@ -54,8 +74,9 @@ export default function Window(p: Props) {
     const a = win.anim;
     if (!el || !a) return;
     const done = () => p.onAnimEnd(a);
+    if (a === 'closing' || a === 'minimizing') giveBack.current = el.contains(document.activeElement);
     if (a === 'restoring' || a === 'opening') { held.current?.cancel(); held.current = null; }
-    if (reduced() || narrow() || !el.animate) { done(); return; }
+    if (motionOff() || narrow() || !el.animate) { done(); return; }
     let anim: Animation | null = null;
     const genie = genieFrames(el, win.id);
     const hide = { fill: 'forwards' as const };
@@ -107,6 +128,18 @@ export default function Window(p: Props) {
     t.addEventListener('pointermove', move); t.addEventListener('pointerup', up); t.addEventListener('pointercancel', up);
   };
 
+  /** Keyboard alternative to dragging: Alt + arrows move the window, Alt + Shift + arrows resize it. */
+  const STEP: Record<string, [number, number]> = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
+  const keys = (e: React.KeyboardEvent) => {
+    const d = STEP[e.key];
+    if (!e.altKey || !d || narrow() || win.max) return;
+    e.preventDefault();
+    const b = p.bounds(), o = win.rect, dx = d[0] * 24, dy = d[1] * 24;
+    p.onRect(e.shiftKey
+      ? { ...o, w: clamp(o.w + dx, p.minW, b.w - o.x), h: clamp(o.h + dy, p.minH, b.bottom - o.y) }
+      : { ...o, x: clamp(o.x + dx, -o.w + 120, b.w - 120), y: clamp(o.y + dy, b.top, b.bottom - 36) });
+  };
+
   const r = win.rect;
   const cls = ['win', p.focused && 'focus', win.max && 'max', p.variant, win.maxAnim && 'anim', r.w >= 760 && 'wide'].filter(Boolean).join(' ');
   return (
@@ -114,13 +147,16 @@ export default function Window(p: Props) {
       ref={ref}
       className={cls}
       data-app={win.id}
+      tabIndex={-1}
       aria-label={p.title}
+      aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown Alt+ArrowLeft Alt+ArrowRight Alt+Shift+ArrowUp Alt+Shift+ArrowDown Alt+Shift+ArrowLeft Alt+Shift+ArrowRight"
       hidden={win.status !== 'open'}
       style={{ left: r.x, top: r.y, width: r.w, height: r.h, zIndex: win.z }}
       onPointerDown={p.onFocus}
       onFocusCapture={p.onFocus}
+      onKeyDown={keys}
     >
-      <header className="wt" onPointerDown={drag} onDoubleClick={(e) => { if (!(e.target as HTMLElement).closest('button')) p.onToggleMax(); }}>
+      <header className="wt" title={t.win.keys} onPointerDown={drag} onDoubleClick={(e) => { if (!(e.target as HTMLElement).closest('button')) p.onToggleMax(); }}>
         <span className="lights">
           <button type="button" className="c" aria-label={`${t.win.close} ${p.title}`} onClick={() => p.onRequest('closing')}>&times;</button>
           <button type="button" className="m" aria-label={`${t.win.min} ${p.title}`} onClick={() => p.onRequest('minimizing')}>&minus;</button>

@@ -1,5 +1,5 @@
 // Spotlight-style search (Ctrl/Cmd + K): apps, projects, notes and actions in one list.
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 export type SpotItem = { id: string; kind: string; label: string; sub?: string; run: () => void };
 
@@ -9,23 +9,32 @@ export default function Spotlight({ items, placeholder, empty, onClose }: { item
   const [q, setQ] = useState('');
   const [i, setI] = useState(0);
   const input = useRef<HTMLInputElement>(null);
+  const wrap = useRef<HTMLDivElement>(null);
   const list = useMemo(() => {
     const n = norm(q.trim());
     return (n ? items.filter((x) => norm(`${x.label} ${x.sub ?? ''} ${x.kind}`).includes(n)) : items).slice(0, 9);
   }, [q, items]);
 
-  // Focus the input on open and give focus back to whatever had it on close.
-  useEffect(() => {
+  // A real modal: everything behind it is inert (no Tab, no clicks, hidden from screen readers)
+  // while it is open. Focus goes to the input and back to whatever had it on close; a window
+  // opened from a result then takes it. A layout effect, so its cleanup lifts the inert before
+  // that window tries to take focus.
+  useLayoutEffect(() => {
     const before = document.activeElement as HTMLElement | null;
+    const behind = [...(wrap.current!.parentElement?.children ?? [])].filter((el) => el !== wrap.current && !el.hasAttribute('inert'));
+    behind.forEach((el) => el.setAttribute('inert', ''));
     input.current?.focus();
-    return () => { before?.focus?.(); };
+    return () => {
+      behind.forEach((el) => el.removeAttribute('inert'));
+      before?.focus?.();
+    };
   }, []);
   useEffect(() => { setI(0); }, [q]);
 
   const go = (x?: SpotItem) => { if (!x) return; onClose(); x.run(); };
 
   return (
-    <div className="spot-wrap" onPointerDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+    <div className="spot-wrap" ref={wrap} onPointerDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="spot" role="dialog" aria-modal="true" aria-label={placeholder}>
         <div className="spot-in">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" strokeWidth="2" /><path d="M15.5 15.5 21 21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>

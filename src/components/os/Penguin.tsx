@@ -1,6 +1,7 @@
 // The penguin bust from Claude-pet (avatars/penguin/draw.js, MIT, same author), ported to React.
 // It follows the cursor, blinks and squashes when poked. The torso geometry is PetBody's.
 import { useEffect, useId, useRef } from 'react';
+import { useMotionOff } from './motion';
 
 const TORSO = 'M0.3 262 C-1.6 198 44 162 120 162 C196 162 241.6 198 239.7 262 Z';
 const BELLY = 'M64.9 262 C63 214 93.4 196 120 196 C146.6 196 177 214 175.1 262 Z';
@@ -12,11 +13,11 @@ export default function Penguin({ interactive = true, follow = true, still = fal
   if (still) { interactive = false; follow = false; }
   const svgRef = useRef<SVGSVGElement>(null);
   const clip = 'pm-crop-' + useId().replace(/:/g, '');
+  const reduced = useMotionOff();
 
   useEffect(() => {
     const svg = svgRef.current;
     if (!svg || still) return;
-    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const head = svg.querySelector<SVGGElement>('.pm-head')!;
     const body = svg.querySelector<SVGGElement>('.pm-body')!;
     const pupils = svg.querySelectorAll<SVGGElement>('.pm-pupil');
@@ -74,7 +75,7 @@ export default function Penguin({ interactive = true, follow = true, still = fal
       removeEventListener('pointermove', onMove);
       svg.removeEventListener('pointerdown', poke); svg.removeEventListener('keydown', onKey);
     };
-  }, [interactive, follow, still]);
+  }, [interactive, follow, still, reduced]);
 
   return (
     <svg

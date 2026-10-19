@@ -15,7 +15,7 @@ import Music from './apps/Music';
 import Notes from './apps/Notes';
 import Cv from './apps/Cv';
 import Trash from './apps/Trash';
-import { Pause, Play } from '@phosphor-icons/react/dist/ssr';
+import { CircleHalf, Image as ImageIcon, MagnifyingGlass, Pause, Play } from '@phosphor-icons/react/dist/ssr';
 import { toggleTheme } from './theme';
 import { motionOff, setStill } from './motion';
 import { ICONS, LINK_ICONS } from './icons';
@@ -394,11 +394,11 @@ function Os() {
         </span>
         <span className="r">
           <button type="button" aria-label={t.menu.search} title="Ctrl + K" onClick={() => setSpot(true)}>
-            <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" strokeWidth="2.4" /><path d="M15.5 15.5 21 21" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" /></svg>
+            <MagnifyingGlass size={15} weight="bold" aria-hidden="true" />
           </button>
           <span className="wall-wrap">
             <button type="button" aria-label={t.menu.wall} aria-expanded={wallMenu} onClick={() => setWallMenu((v) => !v)}>
-              <svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3" fill="none" stroke="currentColor" strokeWidth="2" /><path d="m4 17 5-5 4 4 3-3 4 4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" /></svg>
+              <ImageIcon size={15} weight="bold" aria-hidden="true" />
             </button>
             {wallMenu && (
               <span className="wall-menu" role="menu">
@@ -408,7 +408,7 @@ function Os() {
           </span>
           <button type="button" className="lang-btn" aria-label={t.menu.lang} onClick={() => setLang(lang === 'es' ? 'en' : 'es')}>{lang === 'es' ? 'ES' : 'EN'}</button>
           <button type="button" aria-label={t.menu.motion} aria-pressed={still} title={t.menu.motion} onClick={toggleStill}>{still ? <Play size={15} weight="bold" aria-hidden="true" /> : <Pause size={15} weight="bold" aria-hidden="true" />}</button>
-          <button type="button" aria-label={t.menu.theme} onClick={(e) => toggleTheme(e)}>&#9681;</button>
+          <button type="button" aria-label={t.menu.theme} onClick={(e) => toggleTheme(e)}><CircleHalf size={15} weight="bold" aria-hidden="true" /></button>
           <Clock lang={lang} />
         </span>
       </div>

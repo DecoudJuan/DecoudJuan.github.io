@@ -1,5 +1,6 @@
 // Short pitch plus a live-looking preview of the freelance site; everything leads there.
 import { useRef, useState } from 'react';
+import { ArrowUpRight } from '@phosphor-icons/react/dist/ssr';
 import { useLang } from '../lang';
 import { motionOff } from '../motion';
 
@@ -28,7 +29,7 @@ export default function Hire() {
         <ul className="hire-tags">{HIRE.services.map((s) => <li key={s}>{s}</li>)}</ul>
         <div className="row">
           <a ref={btn} className="btn-l" href={HIRE.site} target="_blank" rel="noopener" onPointerMove={mag} onPointerLeave={() => { btn.current!.style.transform = ''; }}>
-            {t.hire.cta} <span aria-hidden="true">&#8599;</span>
+            {t.hire.cta} <ArrowUpRight size={15} weight="bold" aria-hidden="true" />
           </a>
           <button type="button" className="btn-o" onClick={copy}>{copied ? t.hire.copied : t.hire.copy}</button>
         </div>

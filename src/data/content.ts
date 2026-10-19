@@ -17,7 +17,7 @@ export type Project = {
   motif: 'm1' | 'm2' | 'm3' | 'm4' | 'm5' | 'm6' | 'm7';
   text: string;
   links: [LinkKind, string][];
-  /** Full demo. Hosted outside the repo (R2 or similar); loaded only on play. */
+  /** Full demo, an MP4 under public/demos; loaded only on play. */
   video?: string;
   poster?: string;
   /** [seconds, label]; only shown when there is a video. */

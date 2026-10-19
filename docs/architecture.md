@@ -25,6 +25,7 @@ src/
     icons.tsx                app icons (Phosphor glyphs on coloured tiles)
     lang.tsx                 language context and useLang()
     theme.ts                 theme toggle with the View Transitions circle
+    motion.ts                whether motion is off (system setting or the pause button) and useMotionOff()
     types.ts                 AppId, WinState, Rect
     apps/                    one file per app: About, Records, Player, Notes, Music, Terminal, Games, Cv, Hire, Trash
 public/
@@ -55,6 +56,13 @@ public/
   1. Add its id to `AppId` (`types.ts`).
   2. Add its labels to `i18n.ts` and its icon to `icons.tsx`.
   3. Add its size to `META` and `layout()` in `Desktop.tsx`, and its component to `content` there.
+
+## Keyboard and motion
+
+- Opening a window moves focus to it; closing or minimizing it gives focus back to what opened it (or its dock icon).
+- Alt + arrows move the focused window, Alt + Shift + arrows resize it, and Alt + arrows move a focused desktop icon one cell.
+- The search is a modal: everything behind it is `inert` while it is open.
+- Animations stop with `prefers-reduced-motion` or with the pause button in the menu bar. Code that animates checks `motionOff()`, or `useMotionOff()` when it runs its own loop.
 
 ## Theme
 

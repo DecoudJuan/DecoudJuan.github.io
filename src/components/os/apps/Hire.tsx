@@ -1,6 +1,7 @@
 // Short pitch plus a live-looking preview of the freelance site; everything leads there.
 import { useRef, useState } from 'react';
 import { useLang } from '../lang';
+import { motionOff } from '../motion';
 
 export default function Hire() {
   const { t, c } = useLang();
@@ -13,7 +14,7 @@ export default function Hire() {
   };
   // The main button leans toward the pointer (mouse only).
   const mag = (e: React.PointerEvent) => {
-    if (e.pointerType !== 'mouse' || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (e.pointerType !== 'mouse' || motionOff()) return;
     const el = btn.current!, r = el.getBoundingClientRect();
     el.style.transform = `translate(${(e.clientX - r.left - r.width / 2) * 0.25}px, ${(e.clientY - r.top - r.height / 2) * 0.35}px)`;
   };

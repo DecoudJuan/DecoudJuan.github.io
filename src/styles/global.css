@@ -430,6 +430,8 @@ main { height: 100%; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+/* the same when the visitor pauses the animations from the menu bar (motion.ts) */
+:root[data-still] *, :root[data-still] *::before, :root[data-still] *::after { animation: none !important; transition: none !important; }
 
 /* ---------- app icons: one tile shape, colour per app (see icons.tsx) ---------- */
 .appicon { position: relative; display: block; width: 100%; height: 100%; border-radius: 23%; background: var(--tile); overflow: hidden;
@@ -475,3 +477,11 @@ main { height: 100%; }
 /* No visible scrollbars anywhere: areas still scroll with the wheel, the trackpad or a finger. */
 * { scrollbar-width: none; }
 *::-webkit-scrollbar { display: none; }
+
+/* ---------- keyboard: skip link and focusable windows ---------- */
+.skip { position: absolute; left: 8px; top: 6px; z-index: 1001; background: var(--acc); color: var(--on-acc); border: 0; border-radius: 8px; padding: .35rem .8rem; font-weight: 700; font-size: .85rem; cursor: pointer;
+  transform: translateY(-150%); }
+.skip:focus-visible { transform: none; outline-color: var(--ink); }
+.win:focus { outline: none; }
+.win:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
+.menu button[aria-pressed="true"] { opacity: 1; color: var(--acc); }

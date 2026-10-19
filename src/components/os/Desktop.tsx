@@ -15,7 +15,9 @@ import Music from './apps/Music';
 import Notes from './apps/Notes';
 import Cv from './apps/Cv';
 import Trash from './apps/Trash';
+import { Pause, Play } from '@phosphor-icons/react/dist/ssr';
 import { toggleTheme } from './theme';
+import { motionOff, setStill } from './motion';
 import { ICONS, LINK_ICONS } from './icons';
 import { LangCtx, storeLang, useLang } from './lang';
 import type { Lang } from '../../data/content';
@@ -141,6 +143,9 @@ function Os() {
   const [spot, setSpot] = useState(false);
   const [wall, setWall] = useState<Wall>('auto');
   const [wallMenu, setWallMenu] = useState(false);
+  const [still, setStillState] = useState(false);
+  useEffect(() => { setStillState(document.documentElement.hasAttribute('data-still')); }, []);
+  const toggleStill = () => { setStill(!still); setStillState(!still); };
   const z = useRef(20);
   // Desktop selection: click selects an icon, drag on empty wood draws a selection box.
   const [sel, setSel] = useState<AppId[]>([]);
@@ -209,6 +214,19 @@ function Os() {
     };
     el.addEventListener('pointermove', move); el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up);
   };
+  /** Keyboard alternative to dragging: Alt + arrows move the focused icon one cell, swapping places
+   *  with the icon already there. */
+  const ICON_STEP: Record<string, Cell> = { ArrowLeft: { c: 1, r: 0 }, ArrowRight: { c: -1, r: 0 }, ArrowUp: { c: 0, r: -1 }, ArrowDown: { c: 0, r: 1 } };
+  const keyIcon = (id: AppId) => (e: React.KeyboardEvent) => {
+    const d = ICON_STEP[e.key];
+    if (!e.altKey || !d) return;
+    e.preventDefault();
+    const want = { c: clamp(placed[id].c + d.c, 0, grid.cols - 1), r: clamp(placed[id].r + d.r, 0, grid.rows - 1) };
+    const other = LAUNCH.find((k) => k !== id && key(placed[k]) === key(want));
+    const next: Partial<Record<AppId, Cell>> = { ...placed, [id]: want, ...(other ? { [other]: placed[id] } : {}) };
+    try { localStorage.setItem('icon-cells', JSON.stringify(next)); } catch { /* ignore */ }
+    setCells(next);
+  };
 
   // Track the desk size; windows the user hasn't touched follow the responsive layout.
   useLayoutEffect(() => {
@@ -247,7 +265,7 @@ function Os() {
     addEventListener('keydown', key);
     let seen = false;
     try { seen = sessionStorage.getItem('boot') === '1'; } catch { /* ignore */ }
-    if (seen || matchMedia('(prefers-reduced-motion: reduce)').matches) return () => removeEventListener('keydown', key);
+    if (seen || motionOff()) return () => removeEventListener('keydown', key);
     setBoot('on');
     const a = setTimeout(() => setBoot('out'), 1400), b = setTimeout(() => setBoot('off'), 1900);
     try { sessionStorage.setItem('boot', '1'); } catch { /* ignore */ }
@@ -291,6 +309,12 @@ function Os() {
     const s = wins[id];
     if (s.status === 'open' && focus === id) patch(id, { anim: 'minimizing' });
     else open(id);
+  };
+
+  /** Skip link: straight to the window on top, or to the home screen when none is open. */
+  const skip = () => {
+    const top = ORDER.filter((id) => wins[id].status === 'open').sort((a, b) => wins[b].z - wins[a].z)[0];
+    (document.querySelector<HTMLElement>(top ? `[data-app="${top}"]` : '.home button, .dock .dk'))?.focus();
   };
 
   const openProject = useCallback((pid: string) => { setProject(pid); open('player'); }, [open]);
@@ -362,6 +386,7 @@ function Os() {
       <div className="grain" aria-hidden="true" />
       <NetBackground />
 
+      <button type="button" className="skip" onClick={skip}>{t.menu.skip}</button>
       <div className="menu">
         <span className="brand"><Penguin still className="menu-pm" />DecoudJuan</span>
         <span className="apps">
@@ -382,10 +407,32 @@ function Os() {
             )}
           </span>
           <button type="button" className="lang-btn" aria-label={t.menu.lang} onClick={() => setLang(lang === 'es' ? 'en' : 'es')}>{lang === 'es' ? 'ES' : 'EN'}</button>
+          <button type="button" aria-label={t.menu.motion} aria-pressed={still} title={t.menu.motion} onClick={toggleStill}>{still ? <Play size={15} weight="bold" aria-hidden="true" /> : <Pause size={15} weight="bold" aria-hidden="true" />}</button>
           <button type="button" aria-label={t.menu.theme} onClick={(e) => toggleTheme(e)}>&#9681;</button>
           <Clock lang={lang} />
         </span>
       </div>
+
+      {/* Windows come first in the focus order: they hold the content; icons and dock follow. */}
+      {ORDER.map((id) => (
+        <Window
+          key={id}
+          win={wins[id]}
+          title={id === 'player' ? `${t.app.player[1]} · ${current.name}` : t.app[id][1]}
+          focused={focus === id}
+          variant={META[id].variant}
+          minW={META[id].minW}
+          minH={META[id].minH}
+          bounds={bounds}
+          onFocus={() => { if (focus !== id || wins[id].z < z.current) raise(id); }}
+          onRect={(r) => patch(id, { rect: r, touched: true })}
+          onRequest={(a) => patch(id, { anim: a })}
+          onToggleMax={() => toggleMax(id)}
+          onAnimEnd={(a) => animEnd(id, a)}
+        >
+          {content[id]}
+        </Window>
+      ))}
 
       <div className="icons" role="group" aria-label={t.desk}>
         {drag?.target && (
@@ -396,9 +443,10 @@ function Os() {
           return (
             <button
               key={id} type="button" ref={(el) => { iconRefs.current[id] = el; }}
-              className={'icon' + (sel.includes(id) ? ' sel' : '') + (moving ? ' moving' : '')} aria-pressed={sel.includes(id)}
+              className={'icon' + (sel.includes(id) ? ' sel' : '') + (moving ? ' moving' : '')} aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown Alt+ArrowLeft Alt+ArrowRight"
               style={{ right: GRID_X + at.c * CELL_W, top: GRID_Y + at.r * CELL_H, transform: moving ? `translate(${drag!.dx}px, ${drag!.dy}px)` : undefined }}
               onPointerDown={dragIcon(id)}
+              onKeyDown={keyIcon(id)}
               // Mouse: click selects, double-click opens (like a desktop). Touch and keyboard: open right away.
               onClick={(e) => {
                 if (dragged.current) { dragged.current = false; return; }
@@ -427,25 +475,6 @@ function Os() {
         ))}
       </nav>
 
-      {ORDER.map((id) => (
-        <Window
-          key={id}
-          win={wins[id]}
-          title={id === 'player' ? `${t.app.player[1]} · ${current.name}` : t.app[id][1]}
-          focused={focus === id}
-          variant={META[id].variant}
-          minW={META[id].minW}
-          minH={META[id].minH}
-          bounds={bounds}
-          onFocus={() => { if (focus !== id || wins[id].z < z.current) raise(id); }}
-          onRect={(r) => patch(id, { rect: r, touched: true })}
-          onRequest={(a) => patch(id, { anim: a })}
-          onToggleMax={() => toggleMax(id)}
-          onAnimEnd={(a) => animEnd(id, a)}
-        >
-          {content[id]}
-        </Window>
-      ))}
 
       {box && (
         <div className="marquee" aria-hidden="true" style={{ left: Math.min(box.x0, box.x1), top: Math.min(box.y0, box.y1), width: Math.abs(box.x1 - box.x0), height: Math.abs(box.y1 - box.y0) }} />

@@ -3,6 +3,7 @@
 // (the design is the point, so it walks through it chapter by chapter).
 // Drawn on a canvas that fills the player screen; paused while off screen.
 import { useEffect, useRef } from 'react';
+import { useMotionOff } from '../motion';
 import type { Lang } from '../../../data/content';
 
 export type AnimKind = 'wasp' | 'vexa' | 'chess';
@@ -325,9 +326,9 @@ function chess(c: CanvasRenderingContext2D, W: number, H: number, t: number, lan
 
 export default function DemoAnim({ kind, lang }: { kind: AnimKind; lang: Lang }) {
   const ref = useRef<HTMLCanvasElement>(null);
+  const reduced = useMotionOff();
   useEffect(() => {
     const cv = ref.current!, c = cv.getContext('2d')!;
-    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
     let W = 0, H = 0, raf = 0, vis = true;
     const st: Record<string, unknown> = {}, t0 = performance.now();
     const size = () => {
@@ -355,6 +356,6 @@ export default function DemoAnim({ kind, lang }: { kind: AnimKind; lang: Lang })
     io.observe(cv);
     document.fonts?.ready.then(frame).catch(() => {});
     return () => { cancelAnimationFrame(raf); ro.disconnect(); io.disconnect(); };
-  }, [kind, lang]);
+  }, [kind, lang, reduced]);
   return <canvas ref={ref} className="demo-anim" aria-hidden="true" />;
 }

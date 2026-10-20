@@ -56,6 +56,17 @@ const PROJECTS: (Omit<Project, 'name' | 'kind' | 'side' | 'text'> & { name: stri
     video: '/demos/scout.mp4', poster: '/demos/scout.webp',
   },
   {
+    id: 'meta-harness', name: 'meta-harness', color: '#4a3b5c', motif: 'm4',
+    kind: { es: 'Agente que mejora su propio harness · Node', en: 'An agent that improves its own harness · Node' },
+    side: { es: 'Lado A · en desarrollo', en: 'Side A · in development' },
+    text: {
+      es: 'Un sistema para que un agente de IA mejore su propio harness de forma segura: prueba cada cambio en un sandbox contra un banco de tareas y lo entrega como una propuesta con evidencia que aprueba un humano. Reimplementa a mi manera el ciclo Propose → Probe → Compose del paper Harness², con un holdout ciego contra el reward hacking y los controles afuera del prompt. En desarrollo: estructura, sandbox e infraestructura listos; primer ciclo real en preparación. Repo privado, demo a pedido.',
+      en: 'A system that lets an AI agent improve its own harness safely: it tests each change in a sandbox against a task bank and delivers it as a proposal with evidence, for a human to approve. My own reimplementation of the Propose → Probe → Compose loop from the Harness² paper, with a blind holdout against reward hacking and the controls outside the prompt. In development: structure, sandbox and infrastructure are ready; the first real cycle is being prepared. Private repo, demo on request.',
+    },
+    links: [],
+    soon: true,
+  },
+  {
     id: 'vexa', name: 'Vexa', color: '#7a2e22', motif: 'm2',
     kind: { es: 'Gestión y facturación · Windows y Android', en: 'Business & invoicing · Windows and Android' },
     side: { es: 'Lado A · 2026', en: 'Side A · 2026' },

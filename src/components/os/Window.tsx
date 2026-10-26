@@ -2,6 +2,7 @@
 // open / minimize (genie) / restore / close animations. Geometry lives in Desktop.
 import { useLayoutEffect, useRef, type ReactNode } from 'react';
 import type { Anim, Rect, WinState } from './types';
+import { Minus, Plus, X } from '@phosphor-icons/react/dist/ssr';
 import { useLang } from './lang';
 import { motionOff } from './motion';
 
@@ -163,9 +164,9 @@ export default function Window(p: Props) {
     >
       <header className="wt" onPointerDown={drag} onDoubleClick={(e) => { if (!(e.target as HTMLElement).closest('button')) p.onToggleMax(); }}>
         <span className="lights">
-          <button type="button" className="c" aria-label={`${t.win.close} ${p.title}`} onClick={() => p.onRequest('closing')}>&times;</button>
-          <button type="button" className="m" aria-label={`${t.win.min} ${p.title}`} onClick={() => p.onRequest('minimizing')}>&minus;</button>
-          <button type="button" className="x" aria-label={`${win.max ? t.win.restore : t.win.max} ${p.title}`} onClick={p.onToggleMax}>+</button>
+          <button type="button" className="c" aria-label={`${t.win.close} ${p.title}`} onClick={() => p.onRequest('closing')}><X weight="bold" aria-hidden="true" /></button>
+          <button type="button" className="m" aria-label={`${t.win.min} ${p.title}`} onClick={() => p.onRequest('minimizing')}><Minus weight="bold" aria-hidden="true" /></button>
+          <button type="button" className="x" aria-label={`${win.max ? t.win.restore : t.win.max} ${p.title}`} onClick={p.onToggleMax}><Plus weight="bold" aria-hidden="true" /></button>
         </span>
         <span className="ttl">{p.title}</span>
       </header>

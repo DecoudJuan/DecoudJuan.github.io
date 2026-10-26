@@ -20,7 +20,6 @@ src/
     Window.tsx               one window: title bar, the three buttons, drag, 8 resize handles, animations
     Dock.tsx                 the dock and its magnification
     Spotlight.tsx            Ctrl/Cmd + K search
-    NetBackground.tsx        the animated network of nodes on the canvas behind everything
     Penguin.tsx              the penguin (ported from Claude-pet): follows the cursor, blinks, reacts
     icons.tsx                app icons (Phosphor glyphs on coloured tiles)
     lang.tsx                 language context and useLang()

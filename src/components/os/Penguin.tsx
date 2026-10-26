@@ -124,8 +124,9 @@ export default function Penguin({ interactive = true, follow = true, still = fal
           </g>
         </g>
         <g aria-hidden="true">
-          <text className="pm-note" x="16" y="70">&#9834;</text>
-          <text className="pm-note pm-note-b" x="206" y="78" style={{ ['--pm-nx' as string]: '12px' }}>&#9835;</text>
+          {/* Drawn, not the ♪ ♫ characters: those change shape with every system font. */}
+          <path className="pm-note" d="M18 66 a6 4.5 0 1 0 12 0 a6 4.5 0 1 0 -12 0 Z M27 44 h3 v22 h-3 Z M30 44 c1 6 9 7 7 16 c-1 -5 -4 -7 -7 -8 Z" />
+          <path className="pm-note pm-note-b" style={{ ['--pm-nx' as string]: '12px' }} d="M203.5 72 a5.5 4.2 0 1 0 11 0 a5.5 4.2 0 1 0 -11 0 Z M218.5 68 a5.5 4.2 0 1 0 11 0 a5.5 4.2 0 1 0 -11 0 Z M212 52 h2.5 v20 h-2.5 Z M227 48 h2.5 v20 h-2.5 Z M212 52 L229.5 48 V52 L212 56 Z" />
         </g>
       </g>
     </svg>

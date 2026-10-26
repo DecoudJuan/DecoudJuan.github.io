@@ -4,7 +4,7 @@ Personal portfolio of Juan Manuel Decoud: Computer Engineering student at Univer
 
 Live site: https://decoudjuan.github.io/
 
-The site is **DecoudJuan OS**: a desktop operating system made of wood, with a network of connected nodes in the background and Juan's penguin (from [Claude-pet](https://github.com/DecoudJuan/Claude-pet)) as its character.
+The site is **DecoudJuan OS**: a desktop operating system on a wooden desk, with Juan's penguin (from [Claude-pet](https://github.com/DecoudJuan/Claude-pet)) as its character.
 
 ## What the site has
 

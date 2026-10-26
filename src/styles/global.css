@@ -9,8 +9,9 @@
   --term: #f7f1e6; --term-bar: #ece3d3; --term-ln: #ddd0bb; --term-fg: #2a2118; --term-acc: #8a5a14; --term-mut: #6f604b; --term-dir: #2f5f8a;
   --red: #d9634a; --yel: #e0aa3e; --grn: #6aa25a;
   --note: #f3e3a6; --note-ink: #3a2e14;
-  /* app tiles: one treatment for the whole set (icons.tsx); "Sobre mí" is the accent tile */
-  --tile-bg: linear-gradient(160deg, #3b2d22, #1c1510); --tile-fg: #e7b866; --tile-acc: #e7b866;
+  /* app tiles: one light tile for the whole set, the glyph in one of four tones (icons.tsx); "Sobre mí" is the accent tile */
+  --tile-bg: linear-gradient(160deg, #fffcf6, #efe6d6); --tile-acc: linear-gradient(160deg, #f6e4bd, #e8c98f);
+  --tone-1: #2f5d46; --tone-2: #8a3324; --tone-3: #a06a12; --tone-4: #3a2c24;
   /* record sleeves: four warm tones, same in both themes */
   --cover-1: #2f5d46; --cover-2: #7a2e22; --cover-3: #9c6f1e; --cover-4: #3a2c24;
   /* shape, depth and motion: one scale for everything */
@@ -27,7 +28,8 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --desk: #2b1d14; --grain: .36; --vignette: rgba(0, 0, 0, .5);
-    --tile-bg: linear-gradient(160deg, #4a392b, #261d16);
+    --tile-bg: linear-gradient(160deg, #3d332b, #2c241e); --tile-acc: linear-gradient(160deg, #5a4830, #43361f);
+    --tone-1: #8cc4a2; --tone-2: #e58f78; --tone-3: #e9b65a; --tone-4: #e6d8c2;
     --win: #262019; --bar: #2e2721; --ink: #efe7da; --mut: #a59886; --ln: #3d332b;
     --acc: #e0aa4f; --on-acc: #16120e;
     --dock: rgba(28, 23, 20, .8);
@@ -39,7 +41,8 @@
 }
 :root[data-theme="dark"] {
   --desk: #2b1d14; --grain: .36; --vignette: rgba(0, 0, 0, .5);
-  --tile-bg: linear-gradient(160deg, #4a392b, #261d16);
+  --tile-bg: linear-gradient(160deg, #3d332b, #2c241e); --tile-acc: linear-gradient(160deg, #5a4830, #43361f);
+  --tone-1: #8cc4a2; --tone-2: #e58f78; --tone-3: #e9b65a; --tone-4: #e6d8c2;
   --win: #262019; --bar: #2e2721; --ink: #efe7da; --mut: #a59886; --ln: #3d332b;
   --acc: #e0aa4f; --on-acc: #16120e;
   --dock: rgba(28, 23, 20, .8);
@@ -247,7 +250,7 @@ main { height: 100%; }
 .browser-bar span { flex: 1; margin: 0 8px; padding: .1rem .6rem; border-radius: var(--r-xs); background: #fff; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .browser img { display: block; width: 100%; height: auto; }
 @container (min-width: 640px) { .hire { grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); align-items: center; gap: clamp(20px, 4cqi, 48px); } }
-@container (max-height: 330px) and (max-width: 639px) { .browser { display: none; } }
+@container (max-height: 440px) and (max-width: 639px) { .browser { display: none; } }
 /* short windows (the top row of the first layout): tighter, so the buttons stay in view */
 @container (max-height: 440px) { .hire { padding-block: 18px; gap: 10px; } .hire-tx { gap: 8px; } .hire-tx h2 { font-size: clamp(1.4rem, 3.4cqi, 2rem); } }
 
@@ -467,8 +470,8 @@ main { height: 100%; }
 :root[data-still] *, :root[data-still] *::before, :root[data-still] *::after { animation: none !important; transition: none !important; }
 
 /* ---------- app icons: one tile shape and colour for the whole set (see icons.tsx) ---------- */
-.appicon { position: relative; display: block; width: 100%; height: 100%; border-radius: 23%; background: var(--tile-bg); color: var(--tile-fg); overflow: hidden;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12), inset 0 0 0 1px rgba(0, 0, 0, .25), 0 6px 14px -8px var(--shadow); }
+.appicon { position: relative; display: block; width: 100%; height: 100%; border-radius: 23%; background: var(--tile-bg); color: var(--tile-fg, var(--tone-4)); overflow: hidden;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), inset 0 0 0 1px color-mix(in srgb, var(--ink) 12%, transparent), 0 6px 14px -8px var(--shadow); }
 .appicon::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; background: linear-gradient(rgba(255, 255, 255, .14), transparent 45%); }
 .appicon .glyph { position: absolute; left: 50%; top: 50%; width: 64%; height: 64%; transform: translate(-50%, -50%); display: block; }
 .appicon.pengu { background: var(--tile-acc); }

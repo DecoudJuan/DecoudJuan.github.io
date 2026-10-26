@@ -8,10 +8,10 @@ import type { Icon } from '@phosphor-icons/react';
 import Penguin from './Penguin';
 import type { AppId } from './types';
 
-// One treatment for every tile: the colours come from --tile-bg / --tile-fg in global.css, so the
-// dock reads as one set. "Sobre mí" is the only accent tile.
-const tile = (Glyph: Icon) => (
-  <span className="appicon" aria-hidden="true">
+// One treatment for every tile: a light tile (--tile-bg) and the glyph in one of the four tones of
+// the palette (--tone-1 … --tone-4 in global.css). "Sobre mí" is the accent tile.
+const tile = (Glyph: Icon, tone: 1 | 2 | 3 | 4) => (
+  <span className="appicon" style={{ ['--tile-fg' as string]: `var(--tone-${tone})` }} aria-hidden="true">
     <Glyph weight="duotone" className="glyph" />
   </span>
 );
@@ -22,18 +22,18 @@ export const ICONS: Record<AppId, ReactNode> = {
       <Penguin still />
     </span>
   ),
-  records: tile(VinylRecord),
-  player: tile(MonitorPlay),
-  notes: tile(Notepad),
-  music: tile(MusicNotes),
-  terminal: tile(TerminalWindow),
-  games: tile(GameController),
-  cv: tile(FileText),
-  hire: tile(Briefcase),
-  trash: tile(Trash),
+  records: tile(VinylRecord, 2),
+  player: tile(MonitorPlay, 1),
+  notes: tile(Notepad, 3),
+  music: tile(MusicNotes, 2),
+  terminal: tile(TerminalWindow, 4),
+  games: tile(GameController, 1),
+  cv: tile(FileText, 4),
+  hire: tile(Briefcase, 3),
+  trash: tile(Trash, 4),
 };
 
 export const LINK_ICONS = {
-  github: tile(GithubLogo),
-  linkedin: tile(LinkedinLogo),
+  github: tile(GithubLogo, 4),
+  linkedin: tile(LinkedinLogo, 4),
 };

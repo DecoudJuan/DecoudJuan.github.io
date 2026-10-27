@@ -1,4 +1,4 @@
-// App icons: Phosphor glyphs (duotone) on rounded tiles, one colour per app. The same artwork
+// App icons: Phosphor glyphs (duotone) on rounded tiles. The same artwork
 // is used in the dock, the desktop and the phone home screen. Only "Sobre mí" keeps the penguin.
 import type { ReactNode } from 'react';
 import {
@@ -8,31 +8,32 @@ import type { Icon } from '@phosphor-icons/react';
 import Penguin from './Penguin';
 import type { AppId } from './types';
 
-const CREAM = '#f6eedf';
-const tile = (bg: string, Glyph: Icon, color = CREAM, cls = '') => (
-  <span className={'appicon ' + cls} style={{ ['--tile' as string]: bg }} aria-hidden="true">
-    <Glyph weight="duotone" color={color} className="glyph" />
+// One treatment for every tile: a light tile (--tile-bg) and the glyph in one of the four tones of
+// the palette (--tone-1 … --tone-4 in global.css). "Sobre mí" is the accent tile.
+const tile = (Glyph: Icon, tone: 1 | 2 | 3 | 4) => (
+  <span className="appicon" style={{ ['--tile-fg' as string]: `var(--tone-${tone})` }} aria-hidden="true">
+    <Glyph weight="duotone" className="glyph" />
   </span>
 );
 
 export const ICONS: Record<AppId, ReactNode> = {
   about: (
-    <span className="appicon pengu" style={{ ['--tile' as string]: '#efe6d6' }} aria-hidden="true">
+    <span className="appicon pengu" aria-hidden="true">
       <Penguin still />
     </span>
   ),
-  records: tile('#241b14', VinylRecord, '#e7b866'),
-  player: tile('#8a3324', MonitorPlay),
-  notes: tile('#f0dc97', Notepad, '#3a2e14', 'light'),
-  music: tile('#c98a2c', MusicNotes),
-  terminal: tile('#17120e', TerminalWindow, '#e7b866'),
-  games: tile('#2f6a4f', GameController),
-  cv: tile('#fbf8f2', FileText, '#8a5a14', 'light'),
-  hire: tile('#21395a', Briefcase),
-  trash: tile('#8b8478', Trash),
+  records: tile(VinylRecord, 2),
+  player: tile(MonitorPlay, 1),
+  notes: tile(Notepad, 3),
+  music: tile(MusicNotes, 2),
+  terminal: tile(TerminalWindow, 4),
+  games: tile(GameController, 1),
+  cv: tile(FileText, 4),
+  hire: tile(Briefcase, 3),
+  trash: tile(Trash, 4),
 };
 
 export const LINK_ICONS = {
-  github: tile('#1e1914', GithubLogo),
-  linkedin: tile('#2a5d8f', LinkedinLogo),
+  github: tile(GithubLogo, 4),
+  linkedin: tile(LinkedinLogo, 4),
 };

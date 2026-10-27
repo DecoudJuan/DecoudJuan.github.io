@@ -3,7 +3,6 @@
 import { Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import Window from './Window';
 import Dock, { type DockItem } from './Dock';
-import NetBackground from './NetBackground';
 import Penguin from './Penguin';
 import type { SpotItem } from './Spotlight';
 import About from './apps/About';
@@ -79,16 +78,20 @@ type Wall = (typeof WALLS)[number];
 const ICON_STEP: Record<string, Cell> = { ArrowLeft: { c: 1, r: 0 }, ArrowRight: { c: -1, r: 0 }, ArrowUp: { c: 0, r: -1 }, ArrowDown: { c: 0, r: 1 } };
 const saveCells = (cells: Partial<Record<AppId, Cell>>) => { try { localStorage.setItem('icon-cells', JSON.stringify(cells)); } catch { /* not remembered */ } };
 
-/** Initial layout as a function of the desk size, so big screens get big windows instead of empty wood. */
+/** Initial layout as a function of the desk size, so big screens get big windows instead of empty wood.
+ *  The three windows open on load are tiled, not stacked: "Sobre mí" and "Trabajemos juntos" side by
+ *  side on top, the records along the bottom. Nothing covers anything until the visitor moves it. */
 function layout(W: number, H: number): Record<AppId, Rect> {
-  const top = MENU + 14, bottom = H - DOCK, side = W > 1500 ? 280 : 120, usable = W - side, avail = bottom - top;
-  const about = { x: Math.round(usable * 0.03), y: top, w: clamp(usable * 0.4, 380, 900), h: clamp(avail * 0.46, 300, 540) };
-  const recX = Math.round(about.x + about.w + usable * 0.03);
-  const records = { x: recX, y: top + 18, w: clamp(usable - recX - usable * 0.02, 340, 1100), h: clamp(avail * 0.55, 320, 660) };
-  const termY = about.y + about.h + 18;
-  const terminal = { x: Math.round(usable * 0.05), y: termY, w: clamp(about.w * 0.9, 320, 820), h: clamp(bottom - termY - 12, 180, 480) };
-  const hireH = clamp(avail * 0.5, 440, 560);
-  const hire = { x: Math.max(0, Math.min(recX + 40, W - side - 670)), y: Math.min(records.y + records.h + 18, bottom - hireH - 10), w: clamp(records.w * 0.9, 660, 980), h: hireH };
+  // Keep clear of the desktop icons (one column, two on short screens) and, on wide ones, of the "Ahora" note.
+  const iconCols = Math.ceil(LAUNCH.length / gridFor(W, H).rows);
+  const top = MENU + 14, bottom = H - DOCK, side = Math.max(W > 1500 ? 380 : 120, GRID_X + iconCols * CELL_W + 16), usable = W - side, avail = bottom - top;
+  const gap = Math.round(clamp(usable * 0.02, 14, 28)), left = Math.round(usable * 0.03), right = usable - gap;
+  const about = { x: left, y: top, w: clamp(usable * 0.42, 470, 900), h: clamp(avail * 0.5, 320, 560) };
+  const hireX = about.x + about.w + gap;
+  const hire = { x: hireX, y: top, w: clamp(right - hireX, 320, 980), h: about.h };
+  const recY = about.y + about.h + gap;
+  const records = { x: left, y: recY, w: clamp(hire.x + hire.w - left, 340, 1880), h: clamp(bottom - recY - 12, 260, 660) };
+  const terminal = { x: Math.round(usable * 0.05), y: recY, w: clamp(about.w * 0.9, 320, 820), h: clamp(bottom - recY - 12, 180, 480) };
   const pW = clamp(W * 0.8, 380, 1560);
   // Height = 16:9 video (width minus the side panel and the two arrows) + the strip of demos,
   // so the window opens hugging its content instead of leaving empty space.
@@ -134,8 +137,9 @@ function Os() {
   const [size, setSize] = useState({ w: 1280, h: 800 });
   const [wins, setWins] = useState<Record<AppId, WinState>>(() => {
     const L = layout(1280, 800);
-    const open: AppId[] = ['about', 'records', 'terminal', 'hire'];
-    return Object.fromEntries(ORDER.map((id, i) => [id, { id, rect: L[id], status: open.includes(id) ? 'open' : 'closed', max: false, z: 10 + i, anim: null }])) as Record<AppId, WinState>;
+    const open: AppId[] = ['about', 'records', 'hire'];
+    // "Sobre mí" starts in front: it is the one the visitor reads first.
+    return Object.fromEntries(ORDER.map((id, i) => [id, { id, rect: L[id], status: open.includes(id) ? 'open' : 'closed', max: false, z: id === 'about' ? 19 : 10 + i, anim: null }])) as Record<AppId, WinState>;
   });
   const [focus, setFocus] = useState<AppId>('about');
   const [project, setProject] = useState(c.PROJECTS[0].id);
@@ -144,6 +148,9 @@ function Os() {
   // The server render can't know the screen size: windows and icons stay hidden (still in the
   // HTML for search engines) until the first measurement, so nothing jumps on load.
   const [ready, setReady] = useState(false);
+  // First load only: the windows behind "Sobre mí" (already painted by the server) slide in one
+  // after the other. CSS keeps it off under reduced motion and the pause button.
+  const [intro, setIntro] = useState(true);
   const [spot, setSpot] = useState(false);
   const [wall, setWall] = useState<Wall>('auto');
   const [wallMenu, setWallMenu] = useState(false);
@@ -276,6 +283,12 @@ function Os() {
     return () => { clearTimeout(a); clearTimeout(b); removeEventListener('keydown', key); };
   }, []);
 
+  useEffect(() => {
+    if (!ready || boot === 'on' || !intro) return;
+    const id = setTimeout(() => setIntro(false), 1100);
+    return () => clearTimeout(id);
+  }, [ready, boot, intro]);
+
   const closeSpot = useCallback(() => setSpot(false), []);
   const pickWall = (w: Wall) => { setWall(w); setWallMenu(false); try { localStorage.setItem('wall', w); } catch { /* ignore */ } };
 
@@ -373,11 +386,11 @@ function Os() {
 
   return (
     <div
-      className={'desk' + (ready ? ' ready' : '')} ref={desk} data-wall={wall}
+      className={'desk' + (ready ? ' ready' : '') + (ready && intro && boot !== 'on' ? ' intro' : '')} ref={desk} data-wall={wall}
       onPointerDown={(e) => {
         const tgt = e.target as HTMLElement;
         // Only the bare desk starts a selection: not windows, icons, menu, dock or widgets.
-        if (e.button !== 0 || e.pointerType !== 'mouse' || !(tgt === desk.current || tgt.classList.contains('grain') || tgt.classList.contains('net'))) return;
+        if (e.button !== 0 || e.pointerType !== 'mouse' || !(tgt === desk.current || tgt.classList.contains('grain'))) return;
         setWallMenu(false);
         const r = desk.current!.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
         setSel([]);
@@ -398,7 +411,6 @@ function Os() {
       onPointerCancel={() => setBox(null)}
     >
       <div className="grain" aria-hidden="true" />
-      <NetBackground />
 
       <button type="button" className="skip" onClick={skip}>{t.menu.skip}</button>
       {/* What the keyboard shortcuts do, read out with each window and desktop icon. */}
@@ -485,13 +497,26 @@ function Os() {
         </aside>
       </div>
 
-      <nav className="home" aria-label={t.home}>
-        {LAUNCH.map((id) => (
-          <button key={id} type="button" onClick={() => open(id)}>
-            <span className="ic">{ICONS[id]}</span><span className="lb">{t.app[id][0]}</span>
-          </button>
-        ))}
-      </nav>
+      {/* Phones: who Juan is and the two ways in, above the app grid. */}
+      <div className="home">
+        <section className="home-card" aria-label={t.app.about[0]}>
+          <span className="home-av"><Penguin still /></span>
+          <p className="about-name">{c.PERSON.name}</p>
+          <p className="home-q">{c.QUOTE.text}</p>
+          <p className="home-bio">{c.PERSON.bio}</p>
+          <span className="home-row">
+            <button type="button" className="btn-l" onClick={() => open('hire')}>{t.app.hire[0]}</button>
+            <button type="button" className="btn-o" onClick={() => open('records')}>{t.app.records[0]}</button>
+          </span>
+        </section>
+        <nav className="home-grid" aria-label={t.home}>
+          {LAUNCH.map((id) => (
+            <button key={id} type="button" onClick={() => open(id)}>
+              <span className="ic">{ICONS[id]}</span><span className="lb">{t.app[id][0]}</span>
+            </button>
+          ))}
+        </nav>
+      </div>
 
 
       {box && (

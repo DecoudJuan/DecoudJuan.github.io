@@ -11,7 +11,7 @@ export type Project = {
   kind: string;
   /** Small label printed on the record sleeve. */
   side: string;
-  /** Sleeve colour (album art, same in both themes). */
+  /** Sleeve colour: one of the four --cover-* tokens in global.css (same in both themes). */
   color: string;
   /** Sleeve pattern, see `.cover.m1` … `.m6` in global.css. */
   motif: 'm1' | 'm2' | 'm3' | 'm4' | 'm5' | 'm6' | 'm7';
@@ -45,7 +45,7 @@ export const CV_PDF = '/cv/Juan_Decoud_Resume_EN.pdf';
 
 const PROJECTS: (Omit<Project, 'name' | 'kind' | 'side' | 'text'> & { name: string | T; kind: T; side: T; text: T })[] = [
   {
-    id: 'scout', name: 'Scout', color: '#2f5d46', motif: 'm1',
+    id: 'scout', name: 'Scout', color: 'var(--cover-1)', motif: 'm1',
     kind: { es: '1.er puesto · hackatón 2026', en: '1st place · 2026 hackathon' },
     side: { es: 'Lado A · 2026', en: 'Side A · 2026' },
     text: {
@@ -56,7 +56,7 @@ const PROJECTS: (Omit<Project, 'name' | 'kind' | 'side' | 'text'> & { name: stri
     video: '/demos/scout.mp4', poster: '/demos/scout.webp',
   },
   {
-    id: 'meta-harness', name: 'meta-harness', color: '#4a3b5c', motif: 'm4',
+    id: 'meta-harness', name: 'meta-harness', color: 'var(--cover-2)', motif: 'm4',
     kind: { es: 'Agente que mejora su propio harness · Node', en: 'An agent that improves its own harness · Node' },
     side: { es: 'Lado A · en desarrollo', en: 'Side A · in development' },
     text: {
@@ -67,7 +67,7 @@ const PROJECTS: (Omit<Project, 'name' | 'kind' | 'side' | 'text'> & { name: stri
     soon: true,
   },
   {
-    id: 'vexa', name: 'Vexa', color: '#7a2e22', motif: 'm2',
+    id: 'vexa', name: 'Vexa', color: 'var(--cover-3)', motif: 'm2',
     kind: { es: 'Gestión y facturación · Windows y Android', en: 'Business & invoicing · Windows and Android' },
     side: { es: 'Lado A · 2026', en: 'Side A · 2026' },
     text: {
@@ -78,7 +78,7 @@ const PROJECTS: (Omit<Project, 'name' | 'kind' | 'side' | 'text'> & { name: stri
     anim: 'vexa',
   },
   {
-    id: 'wasp', name: 'Wasp', color: '#9c6f1e', motif: 'm3',
+    id: 'wasp', name: 'Wasp', color: 'var(--cover-4)', motif: 'm3',
     kind: { es: 'Auditor OWASP · Rust', en: 'OWASP auditor · Rust' },
     side: { es: 'Lado A · en progreso', en: 'Side A · in progress' },
     text: {
@@ -89,7 +89,7 @@ const PROJECTS: (Omit<Project, 'name' | 'kind' | 'side' | 'text'> & { name: stri
     anim: 'wasp',
   },
   {
-    id: 'guitar', name: 'Guitar Learning', color: '#1f3550', motif: 'm4',
+    id: 'guitar', name: 'Guitar Learning', color: 'var(--cover-1)', motif: 'm4',
     kind: { es: 'Cámara · navegador', en: 'Camera · browser' },
     side: { es: 'Lado B · 2026', en: 'Side B · 2026' },
     text: {
@@ -99,7 +99,7 @@ const PROJECTS: (Omit<Project, 'name' | 'kind' | 'side' | 'text'> & { name: stri
     links: [['try', 'https://guitar-learning-ten.vercel.app'], ['code', 'https://github.com/DecoudJuan/Guitar-Learning']],
   },
   {
-    id: 'bench', name: 'Benchmarks IA', color: '#55552a', motif: 'm5',
+    id: 'bench', name: 'Benchmarks IA', color: 'var(--cover-2)', motif: 'm5',
     kind: { es: 'Proyecto final · cliente real', en: 'Capstone · real client' },
     side: { es: 'Lado B · capstone', en: 'Side B · capstone' },
     text: {
@@ -110,7 +110,7 @@ const PROJECTS: (Omit<Project, 'name' | 'kind' | 'side' | 'text'> & { name: stri
     soon: true,
   },
   {
-    id: 'snippet', name: 'Snippet Searcher', color: '#3a2c24', motif: 'm6',
+    id: 'snippet', name: 'Snippet Searcher', color: 'var(--cover-3)', motif: 'm6',
     kind: { es: 'Lenguaje propio · 8 servicios', en: 'Own language · 8 services' },
     side: { es: 'Lado B · en equipo', en: 'Side B · team project' },
     text: {
@@ -121,7 +121,7 @@ const PROJECTS: (Omit<Project, 'name' | 'kind' | 'side' | 'text'> & { name: stri
     video: '/demos/snippet-searcher.mp4', poster: '/demos/snippet-searcher.webp',
   },
   {
-    id: 'agent', name: 'Agent Orchestra', color: '#2e4057', motif: 'm2',
+    id: 'agent', name: 'Agent Orchestra', color: 'var(--cover-4)', motif: 'm2',
     kind: { es: 'Agente de código · Python', en: 'Coding agent · Python' },
     side: { es: 'Lado C · 2026', en: 'Side C · 2026' },
     text: {
@@ -132,7 +132,7 @@ const PROJECTS: (Omit<Project, 'name' | 'kind' | 'side' | 'text'> & { name: stri
     video: '/demos/agent-orchestra.mp4', poster: '/demos/agent-orchestra.webp',
   },
   {
-    id: 'sonora', name: 'Sonora', color: '#6b3f5e', motif: 'm1',
+    id: 'sonora', name: 'Sonora', color: 'var(--cover-1)', motif: 'm1',
     kind: { es: 'Full-stack en Azure · en equipo', en: 'Full-stack on Azure · team project' },
     side: { es: 'Lado C · 2025', en: 'Side C · 2025' },
     text: {
@@ -143,7 +143,7 @@ const PROJECTS: (Omit<Project, 'name' | 'kind' | 'side' | 'text'> & { name: stri
     video: '/demos/sonora.mp4', poster: '/demos/sonora.webp',
   },
   {
-    id: 'chess', name: { es: 'Ajedrez y damas', en: 'Chess & Checkers' }, color: '#5a3e2b', motif: 'm7',
+    id: 'chess', name: { es: 'Ajedrez y damas', en: 'Chess & Checkers' }, color: 'var(--cover-2)', motif: 'm7',
     kind: { es: 'Java · patrones GoF', en: 'Java · GoF patterns' },
     side: { es: 'Lado B · 2025', en: 'Side B · 2025' },
     text: {
